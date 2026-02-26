@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Restaurant Menu</title>
+  <style>
+    body { font-family: Arial; padding: 15px; background:#f7f7f7;}
+    .item { background:white; padding:12px; margin:8px 0; border-radius:8px; }
+    button { width:100%; padding:12px; background:green; color:white; border:none; border-radius:8px; font-size:16px;}
+    input[type="text"] { width:100%; padding:10px; margin:5px 0;}
+  </style>
+</head>
+<body>
+
+<h2>🍽 Restaurant Menu</h2>
+
+<input type="text" id="name" placeholder="Your Name" required>
+<input type="text" id="phone" placeholder="WhatsApp Number (+971...)" required>
+<input type="text" id="table" placeholder="Table Number" required>
+
+<div class="item">
+  <input type="checkbox" value="Burger" data-price="20"> Burger - 20 AED
+</div>
+
+<div class="item">
+  <input type="checkbox" value="Pizza" data-price="30"> Pizza - 30 AED
+</div>
+
+<div class="item">
+  <input type="checkbox" value="Momos" data-price="15"> Momos - 15 AED
+</div>
+
+<h3>Total: <span id="total">0</span> AED</h3>
+
+<button onclick="placeOrder()">Place Order</button>
+
+<script>
+let checkboxes = document.querySelectorAll('input[type="checkbox"]');
+checkboxes.forEach(cb => {
+  cb.addEventListener('change', calculateTotal);
+});
+
+function calculateTotal() {
+  let total = 0;
+  checkboxes.forEach(cb => {
+    if (cb.checked) total += parseInt(cb.dataset.price);
+  });
+  document.getElementById('total').innerText = total;
+}
+
+async function placeOrder() {
+  let items = [];
+  let total = 0;
+
+  checkboxes.forEach(cb => {
+    if (cb.checked) {
+      items.push(cb.value + " - " + cb.dataset.price + " AED");
+      total += parseInt(cb.dataset.price);
+    }
+  });
+
+  const data = {
+    name: document.getElementById('name').value,
+    phone: document.getElementById('phone').value,
+    table: document.getElementById('table').value,
+    items: items.join(", "),
+    total: total
+  };
+
+  await fetch("https://avijitemail01.app.n8n.cloud/webhook-test/restaurant-qrcode-order", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data)
+  });
+
+  alert("Order placed successfully!");
+}
+</script>
+
+</body>
+</html>
