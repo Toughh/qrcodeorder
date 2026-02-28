@@ -57,13 +57,14 @@ h2 {
 
 textarea {
   width:100%;
+  box-sizing:border-box;
   padding:6px;
   font-size:12px;
   border-radius:6px;
   border:1px solid #ddd;
   resize:none;
   height:50px;
-  margin:6px 0;
+  margin:8px 0;
 }
 
 .category {
@@ -177,6 +178,7 @@ button {
 
 <div class="button-row">
   <button class="place-btn" id="placeBtn" onclick="submitOrder(this)">👆 Place Order</button>
+  <button onclick="resetOrder()">Reset</button>
   <button class="cancel-btn" id="cancelBtn" onclick="cancelOrder(this)">Cancel Order</button>
 </div>
 
@@ -359,6 +361,23 @@ async function cancelOrder(btn){
 
   btn.disabled=true;
   document.getElementById("cancelInfo").innerText="Order cancelled successfully.";
+}
+
+function resetOrder(){
+
+  // Uncheck all items
+  document.querySelectorAll('input[type="checkbox"]').forEach(cb=>{
+    cb.checked=false;
+  });
+
+  // Clear notes
+  document.getElementById("notes").value="";
+
+  // Reset totals
+  document.getElementById("subtotal").innerText="0.00";
+  document.getElementById("vat").innerText="0.00";
+  document.getElementById("grandTotal").innerText="0.00";
+
 }
 </script>
 
