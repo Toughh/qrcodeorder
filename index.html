@@ -5,237 +5,55 @@
 <title>Food Spot Cafe and Restaurant Digital Menu</title>
 
 <style>
-body{
-  font-family: Arial;
-  padding:12px;
-  background:#f4f6f9;
-}
+body{font-family:Arial;padding:12px;background:#f4f6f9;}
+.top-bar{display:flex;justify-content:space-between;}
+#datetime{font-size:12px;color:gray;}
+h2{text-align:center;font-size:18px;margin:20px 0;}
+.input-row{display:flex;gap:6px;margin-bottom:8px;}
+.field{display:flex;align-items:center;background:white;padding:6px 8px;border-radius:6px;flex:1;}
+.field span{margin-right:5px;font-size:13px;}
+.field input{border:none;outline:none;width:100%;font-size:12px;}
 
-/* TOP BAR */
-.top-bar{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-}
+.search-row{display:flex;justify-content:center;margin-bottom:12px;}
+.search-box{display:flex;align-items:center;background:white;padding:6px 8px;border-radius:6px;width:60%;}
+.search-box span{margin-right:5px;}
+.search-box input{border:none;outline:none;width:100%;font-size:12px;}
 
-#datetime{
-  font-size:12px;
-  color:gray;
-}
+#categoryButtons{display:flex;gap:6px;overflow-x:auto;margin-bottom:10px;}
+.category-btn{padding:6px 10px;border:none;border-radius:20px;background:#e0e0e0;font-size:11px;cursor:pointer;white-space:nowrap;}
+.category-btn.active{background:#d79c3f;color:white;}
 
-h2{
-  text-align:center;
-  font-size:18px;
-  margin:20px 0;
-}
+.menu-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;}
+.menu-card{background:white;border-radius:8px;overflow:hidden;font-size:11px;box-shadow:0 2px 4px rgba(0,0,0,0.05);}
+.menu-card img{width:100%;height:95px;object-fit:cover;}
+.card-body{padding:6px;}
+.card-body h4{margin:0 0 2px;font-size:12px;}
+.card-body p{margin:0 0 3px;font-size:10px;color:gray;}
 
-/* INPUT ROW */
-.input-row{
-  display:flex;
-  gap:6px;
-  margin-bottom:8px;
-}
+.price-row{display:flex;align-items:center;gap:6px;}
+.price{font-weight:bold;font-size:12px;}
 
-.field{
-  display:flex;
-  align-items:center;
-  background:white;
-  padding:6px 8px;
-  border-radius:6px;
-  flex:1;
-}
+.qty-control{display:flex;align-items:center;gap:3px;}
+.qty-control button{width:16px;height:16px;font-size:10px;border:none;cursor:pointer;}
+.minus{background:red;color:white;}
+.plus{background:green;color:white;}
+.qty-number{font-size:11px;min-width:12px;text-align:center;}
 
-.field span{
-  margin-right:5px;
-  font-size:13px;
-}
+textarea{width:100%;box-sizing:border-box;padding:6px;font-size:12px;border-radius:6px;border:1px solid #ddd;resize:none;height:50px;margin-top:10px;}
 
-.field input{
-  border:none;
-  outline:none;
-  width:100%;
-  font-size:12px;
-}
+.bill-box{background:white;padding:8px;border-radius:6px;font-size:12px;margin-top:8px;}
 
-/* SEARCH */
-.search-row{
-  display:flex;
-  justify-content:center;
-  margin-bottom:12px;
-}
+.info{font-size:11px;color:gray;margin-top:6px;}
 
-.search-box{
-  display:flex;
-  align-items:center;
-  background:white;
-  padding:6px 8px;
-  border-radius:6px;
-  width:60%;
-}
-
-.search-box span{
-  margin-right:5px;
-}
-
-.search-box input{
-  border:none;
-  outline:none;
-  width:100%;
-  font-size:12px;
-}
-
-/* CATEGORY */
-#categoryButtons{
-  display:flex;
-  gap:6px;
-  overflow-x:auto;
-  margin-bottom:10px;
-}
-
-.category-btn{
-  padding:6px 10px;
-  border:none;
-  border-radius:20px;
-  background:#e0e0e0;
-  font-size:11px;
-  cursor:pointer;
-  white-space:nowrap;
-}
-
-.category-btn.active{
-  background:#d79c3f;
-  color:white;
-}
-
-/* GRID */
-.menu-grid{
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:8px;
-}
-
-.menu-card{
-  background:white;
-  border-radius:8px;
-  overflow:hidden;
-  font-size:11px;
-  box-shadow:0 2px 4px rgba(0,0,0,0.05);
-}
-
-.menu-card img{
-  width:100%;
-  height:95px;
-  object-fit:cover;
-}
-
-.card-body{
-  padding:6px;
-}
-
-.card-body h4{
-  margin:0 0 2px;
-  font-size:12px;
-}
-
-.card-body p{
-  margin:0 0 3px;
-  font-size:10px;
-  color:gray;
-}
-
-.price-row{
-  display:flex;
-  align-items:center;
-  gap:6px;
-}
-
-.price{
-  font-weight:bold;
-  font-size:12px;
-}
-
-/* VERY SMALL QTY BUTTONS */
-.qty-control{
-  display:flex;
-  align-items:center;
-  gap:3px;
-}
-
-.qty-control button{
-  width:16px;
-  height:16px;
-  padding:0;
-  font-size:10px;
-  border:none;
-  cursor:pointer;
-}
-
-.minus{
-  background:red;
-  color:white;
-}
-
-.plus{
-  background:green;
-  color:white;
-}
-
-.qty-number{
-  font-size:11px;
-  min-width:12px;
-  text-align:center;
-}
-
-/* NOTES */
-textarea{
-  width:100%;
-  box-sizing:border-box;
-  padding:6px;
-  font-size:12px;
-  border-radius:6px;
-  border:1px solid #ddd;
-  resize:none;
-  height:50px;
-  margin-top:10px;
-}
-
-/* BILL */
-.bill-box{
-  background:white;
-  padding:8px;
-  border-radius:6px;
-  font-size:12px;
-  margin-top:8px;
-}
-
-/* INFO */
-.info{
-  font-size:11px;
-  color:gray;
-  margin-top:5px;
-}
-
-/* SMALL BUTTONS */
-.button-row{
-  margin-top:8px;
-}
-
-.button-row button{
-  padding:5px 10px;
-  border:none;
-  border-radius:5px;
-  font-size:12px;
-  cursor:pointer;
-  margin-right:6px;
-}
-
-.place-btn{ background:green; color:white; }
-.reset-btn{ background:orange; color:white; }
-.cancel-btn{ background:red; color:white; }
+.button-row{margin-top:8px;}
+.button-row button{padding:5px 10px;border:none;border-radius:5px;font-size:12px;cursor:pointer;margin-right:6px;}
+.place-btn{background:green;color:white;}
+.reset-btn{background:orange;color:white;}
+.cancel-btn{background:red;color:white;}
+button:disabled{opacity:0.5;cursor:not-allowed;}
 
 </style>
 </head>
-
 <body>
 
 <div class="top-bar">
@@ -246,20 +64,9 @@ textarea{
 <h2>🍽 Food Spot Cafe and Restaurant Digital Menu</h2>
 
 <div class="input-row">
-  <div class="field">
-    <span>👤</span>
-    <input type="text" id="name" placeholder="Your Name (Optional)">
-  </div>
-
-  <div class="field">
-    <span>📱</span>
-    <input type="text" id="phone" placeholder="WhatsApp Number (+971...)" required>
-  </div>
-
-  <div class="field">
-    <span>🏠</span>
-    <input type="text" placeholder="Address (Optional - Room/Flat No, Building Name, Nearest Landmark)">
-  </div>
+  <div class="field"><span>👤</span><input type="text" id="name" placeholder="Your Name (Optional)"></div>
+  <div class="field"><span>📱</span><input type="text" id="phone" placeholder="WhatsApp Number (+971...)" required></div>
+  <div class="field"><span>🏠</span><input type="text" id="address" placeholder="Address (Optional - Room/Flat No, Building Name, Nearest Landmark)"></div>
 </div>
 
 <div class="search-row">
@@ -272,178 +79,178 @@ textarea{
 <div id="categoryButtons"></div>
 <div id="menuSection"></div>
 
-<textarea placeholder="Extra Notes (Less spicy, No onion, etc.)"></textarea>
+<textarea id="notes" placeholder="Extra Notes (Less spicy, No onion, etc.)"></textarea>
 
 <div class="bill-box">
-  Subtotal: <b><span id="subtotal">0.00</span> AED</b><br>
-  VAT (5%): <b><span id="vat">0.00</span> AED</b>
-  <hr>
-  <div style="font-size:14px;">
-    Total Amount: <b><span id="grandTotal">0.00</span> AED</b>
-  </div>
-</div>
-
-<div class="info">
-  ⏱ You can place order in 2 mins.  
-  ❌ You can cancel your order within 2 mins.
+Subtotal: <b><span id="subtotal">0.00</span> AED</b><br>
+VAT (5%): <b><span id="vat">0.00</span> AED</b>
+<hr>
+Total Amount: <b><span id="grandTotal">0.00</span> AED</b>
 </div>
 
 <div class="button-row">
-  <button class="place-btn" onclick="placeOrder()">🤚 Place Order</button>
-  <button class="reset-btn" onclick="resetOrder()">Reset</button>
-  <button class="cancel-btn" onclick="cancelOrder()">❌ Cancel Order</button>
+  <button id="placeBtn" class="place-btn" onclick="placeOrder()">🤚 Place Order</button>
+  <button id="resetBtn" class="reset-btn" onclick="resetOrder()" disabled>Reset</button>
+  <button id="cancelBtn" class="cancel-btn" onclick="cancelOrder()" disabled>❌ Cancel Order</button>
+</div>
+
+<div class="info" id="infoMsg">
+⏱ You can cancel your order within 2 mins after placing order.
 </div>
 
 <script>
 
 /* DATE TIME */
 function updateDateTime(){
-  document.getElementById("datetime").innerText=new Date().toLocaleString();
+document.getElementById("datetime").innerText=new Date().toLocaleString();
 }
 setInterval(updateDateTime,1000);
 updateDateTime();
 
-/* 9 CATEGORIES */
+/* MENU DATA */
 const menuData={
- "Arabian Grill":generateItems("Grilled",85),
- "Cold Mezza":generateItems("Mezza",40),
- "Hot Mezza":generateItems("Hot Dish",45),
- "Burgers":generateItems("Burger",30),
- "Pizzas":generateItems("Pizza",35),
- "Chinese":generateItems("Chinese Dish",28),
- "Indian":generateItems("Indian Dish",25),
- "Desserts":generateItems("Dessert",18),
- "Beverages":generateItems("Drink",12)
+"Arabian Grill":generateItems("Grilled",85),
+"Burgers":generateItems("Burger",30),
+"Pizzas":generateItems("Pizza",35),
+"Chinese":generateItems("Chinese Dish",28),
+"Indian":generateItems("Indian Dish",25),
+"Desserts":generateItems("Dessert",18),
+"Beverages":generateItems("Drink",12),
+"Cold Mezza":generateItems("Mezza",40),
+"Hot Mezza":generateItems("Hot Dish",45)
 };
 
 function generateItems(name,price){
- let arr=[];
- for(let i=1;i<=6;i++){
-   arr.push({
-     id:name+i,
-     name:name+" "+i,
-     desc:"Fresh prepared delicious item.",
-     price:price+i,
-     img:"https://picsum.photos/300?random="+Math.random(),
-     qty:0
-   });
- }
- return arr;
+let arr=[];
+for(let i=1;i<=4;i++){
+arr.push({id:name+i,name:name+" "+i,desc:"Fresh prepared delicious item.",price:price+i,img:"https://picsum.photos/300?random="+Math.random(),qty:0});
+}
+return arr;
 }
 
 let currentCategory="Arabian Grill";
+let orderPlaced=false;
+let orderTimer=null;
 
 const catButtons=document.getElementById("categoryButtons");
 const menuSection=document.getElementById("menuSection");
 
 Object.keys(menuData).forEach(cat=>{
- let btn=document.createElement("button");
- btn.innerText=cat;
- btn.className="category-btn";
- if(cat===currentCategory) btn.classList.add("active");
-
- btn.onclick=()=>{
-   currentCategory=cat;
-   document.querySelectorAll(".category-btn").forEach(b=>b.classList.remove("active"));
-   btn.classList.add("active");
-   renderMenu();
- };
- catButtons.appendChild(btn);
+let btn=document.createElement("button");
+btn.innerText=cat;
+btn.className="category-btn";
+if(cat===currentCategory) btn.classList.add("active");
+btn.onclick=()=>{currentCategory=cat;document.querySelectorAll(".category-btn").forEach(b=>b.classList.remove("active"));btn.classList.add("active");renderMenu();};
+catButtons.appendChild(btn);
 });
 
 function renderMenu(list=null){
- let items=list || menuData[currentCategory];
- menuSection.innerHTML='<div class="menu-grid"></div>';
- let grid=document.querySelector(".menu-grid");
+let items=list || menuData[currentCategory];
+menuSection.innerHTML='<div class="menu-grid"></div>';
+let grid=document.querySelector(".menu-grid");
 
- items.forEach(item=>{
-   grid.innerHTML+=`
-   <div class="menu-card">
-     <img src="${item.img}">
-     <div class="card-body">
-       <h4>${item.name}</h4>
-       <p>${item.desc}</p>
-       <div class="price-row">
-         <div class="price">AED ${item.price}</div>
-         <div class="qty-control">
-           <button class="minus" onclick="updateQty('${item.id}',-1)">-</button>
-           <span class="qty-number" id="qty-${item.id}">${item.qty}</span>
-           <button class="plus" onclick="updateQty('${item.id}',1)">+</button>
-         </div>
-       </div>
-     </div>
-   </div>`;
- });
+items.forEach(item=>{
+grid.innerHTML+=`
+<div class="menu-card">
+<img src="${item.img}">
+<div class="card-body">
+<h4>${item.name}</h4>
+<p>${item.desc}</p>
+<div class="price-row">
+<div class="price">AED ${item.price}</div>
+<div class="qty-control">
+<button class="minus" onclick="updateQty('${item.id}',-1)">-</button>
+<span class="qty-number" id="qty-${item.id}">${item.qty}</span>
+<button class="plus" onclick="updateQty('${item.id}',1)">+</button>
+</div>
+</div>
+</div>
+</div>`;
+});
 }
 
 function updateQty(id,change){
- Object.values(menuData).forEach(cat=>{
-   cat.forEach(item=>{
-     if(item.id===id){
-       item.qty=Math.max(0,item.qty+change);
-       document.getElementById("qty-"+id).innerText=item.qty;
-     }
-   });
- });
- calculateTotal();
+Object.values(menuData).forEach(cat=>{
+cat.forEach(item=>{
+if(item.id===id){
+item.qty=Math.max(0,item.qty+change);
+document.getElementById("qty-"+id).innerText=item.qty;
+}
+});
+});
+calculateTotal();
+checkResetEnable();
 }
 
 function calculateTotal(){
- let subtotal=0;
- Object.values(menuData).forEach(cat=>{
-   cat.forEach(item=>{
-     subtotal+=item.qty*item.price;
-   });
- });
- let vat=subtotal*0.05;
- document.getElementById("subtotal").innerText=subtotal.toFixed(2);
- document.getElementById("vat").innerText=vat.toFixed(2);
- document.getElementById("grandTotal").innerText=(subtotal+vat).toFixed(2);
+let subtotal=0;
+Object.values(menuData).forEach(cat=>{
+cat.forEach(item=>subtotal+=item.qty*item.price);
+});
+let vat=subtotal*0.05;
+document.getElementById("subtotal").innerText=subtotal.toFixed(2);
+document.getElementById("vat").innerText=vat.toFixed(2);
+document.getElementById("grandTotal").innerText=(subtotal+vat).toFixed(2);
 }
 
-function searchItems(){
- let value=document.getElementById("searchInput").value.toLowerCase();
- if(value===""){ renderMenu(); return; }
- let results=[];
- Object.values(menuData).forEach(cat=>{
-   cat.forEach(item=>{
-     if(item.name.toLowerCase().includes(value)){
-       results.push(item);
-     }
-   });
- });
- renderMenu(results);
+function checkResetEnable(){
+let anySelected=false;
+Object.values(menuData).forEach(cat=>{
+cat.forEach(item=>{if(item.qty>0) anySelected=true;});
+});
+document.getElementById("resetBtn").disabled=!anySelected;
 }
 
 function resetOrder(){
- Object.values(menuData).forEach(cat=>{
-   cat.forEach(item=>item.qty=0);
- });
- renderMenu();
- calculateTotal();
- alert("Order has been reset.");
+Object.values(menuData).forEach(cat=>cat.forEach(item=>item.qty=0));
+renderMenu();
+calculateTotal();
+document.getElementById("resetBtn").disabled=true;
 }
 
 function cancelOrder(){
- resetOrder();
- alert("Your order has been cancelled successfully.");
+if(!orderPlaced) return;
+resetOrder();
+document.getElementById("cancelBtn").disabled=true;
+document.getElementById("infoMsg").innerText="❌ Order cancelled successfully.";
 }
 
-function placeOrder(){
- let phone=document.getElementById("phone").value.trim();
- if(phone===""){
-   alert("⚠ Please enter WhatsApp number.");
-   return;
- }
+async function placeOrder(){
+let phone=document.getElementById("phone").value.trim();
+if(phone===""){alert("Please enter WhatsApp number.");return;}
 
- let total=parseFloat(document.getElementById("grandTotal").innerText);
- if(total===0){
-   alert("⚠ Please select at least one item.");
-   return;
- }
+let total=parseFloat(document.getElementById("grandTotal").innerText);
+if(total===0){alert("Please select at least one item.");return;}
 
- alert("✅ Order placed successfully!");
- resetOrder();
+orderPlaced=true;
+document.getElementById("placeBtn").disabled=true;
+document.getElementById("cancelBtn").disabled=false;
+document.getElementById("resetBtn").disabled=true;
+
+document.getElementById("infoMsg").innerText="✅ Order placed successfully! You can cancel your order within 2 mins. You can place your new order again after 2 mins.";
+
+await fetch("https://YOUR_N8N_URL/webhook/restaurant-order",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({name:document.getElementById("name").value,phone:phone,total:total})
+});
+
+orderTimer=setTimeout(()=>{
+orderPlaced=false;
+document.getElementById("placeBtn").disabled=false;
+document.getElementById("cancelBtn").disabled=true;
+document.getElementById("infoMsg").innerText="⏱ You can place your new order now.";
+},120000);
+}
+
+function searchItems(){
+let value=document.getElementById("searchInput").value.toLowerCase();
+if(value===""){renderMenu();return;}
+let results=[];
+Object.values(menuData).forEach(cat=>{
+cat.forEach(item=>{if(item.name.toLowerCase().includes(value)) results.push(item);});
+});
+renderMenu(results);
 }
 
 renderMenu();
