@@ -7,7 +7,7 @@
 <style>
 body {
   font-family: Arial;
-  padding: 15px;
+  padding: 12px;
   background:#f4f6f9;
 }
 
@@ -18,38 +18,64 @@ body {
 }
 
 #datetime {
-  font-size:13px;
+  font-size:12px;
   color:gray;
 }
 
-h2 { text-align:center; margin-top:5px; }
+h2 {
+  text-align:center;
+  margin:5px 0 10px;
+  font-size:18px;
+}
 
 .input-row {
   display:flex;
-  gap:10px;
+  gap:6px;
+  margin-bottom:6px;
 }
 
-input, textarea {
-  padding:8px;
+.field {
+  display:flex;
+  align-items:center;
+  background:white;
+  padding:5px 8px;
+  border-radius:6px;
+  flex:1;
+}
+
+.field span {
+  margin-right:5px;
+  font-size:14px;
+}
+
+.field input {
+  border:none;
+  outline:none;
   width:100%;
-  margin:5px 0;
+  font-size:12px;
 }
 
 textarea {
+  width:100%;
+  padding:6px;
+  font-size:12px;
+  border-radius:6px;
+  border:1px solid #ddd;
   resize:none;
   height:50px;
+  margin:6px 0;
 }
 
 .category {
-  margin-bottom:15px;
+  margin-bottom:10px;
   background:white;
-  border-radius:10px;
-  padding:10px;
+  border-radius:8px;
+  padding:8px;
 }
 
 .category-header {
   font-weight:bold;
-  font-size:18px;
+  font-size:14px;
   cursor:pointer;
   display:flex;
   justify-content:space-between;
@@ -80,35 +106,34 @@ textarea {
 
 .button-row {
   display:flex;
-  gap:10px;
-  margin-top:10px;
+  gap:8px;
+  margin-top:6px;
 }
 
 button {
-  padding:8px 14px;
+  padding:6px 10px;
   border:none;
-  border-radius:6px;
+  border-radius:5px;
   cursor:pointer;
-  font-size:14px;
+  font-size:12px;
 }
 
 .place-btn { background:green; color:white; }
 .cancel-btn { background:red; color:white; }
 
 .info {
-  font-size:12px;
+  font-size:11px;
   color:gray;
-  margin-top:5px;
-}
-
-.click-animate {
-  animation: clickEffect 0.3s ease;
+  margin-top:4px;
 }
 
 @keyframes clickEffect {
   0% { transform: scale(1); }
   50% { transform: scale(0.9); }
   100% { transform: scale(1); }
+}
+.click-animate {
+  animation: clickEffect 0.3s ease;
 }
 </style>
 </head>
@@ -122,9 +147,20 @@ button {
 
 <h2>🍽 Food Spot Cafe and Restaurant Digital Menu</h2>
 
+<!-- Name + Phone + Address -->
 <div class="input-row">
-  <input type="text" id="name" placeholder="Your Name (Optional)">
-  <input type="text" id="phone" placeholder="WhatsApp Number (+971...)" required>
+  <div class="field">
+    <span>👤</span>
+    <input type="text" id="name" placeholder="Your Name (Optional)">
+  </div>
+  <div class="field">
+    <span>📱</span>
+    <input type="text" id="phone" placeholder="WhatsApp Number (+971...)" required>
+  </div>
+  <div class="field">
+    <span>🏠</span>
+    <input type="text" id="address" placeholder="Address (Room/Flat, Building, Landmark)">
+  </div>
 </div>
 
 <textarea id="notes" placeholder="Extra Notes (Less spicy, No onion, etc.)"></textarea>
@@ -145,26 +181,14 @@ You can cancel your order within 2 minutes after placing it.
 
 <script>
 
-// LIVE DATE TIME
+// Live Date Time
 function updateDateTime(){
   document.getElementById("datetime").innerText = new Date().toLocaleString();
 }
 setInterval(updateDateTime,1000);
 updateDateTime();
 
-// AUTO CUSTOMER NAME
-let customerCounter = localStorage.getItem("customerCounter") || 1;
-
-function getCustomerName() {
-  let name = document.getElementById("name").value;
-  if (!name) {
-    name = "Customer" + customerCounter;
-    localStorage.setItem("customerCounter", ++customerCounter);
-  }
-  return name;
-}
-
-// MENU GENERATOR
+// Menu Generator
 const menuData = {
   "Burgers": generateItems("Burger",20),
   "Pizzas": generateItems("Pizza",30),
@@ -173,13 +197,13 @@ const menuData = {
   "Desserts": generateItems("Dessert",15)
 };
 
-function generateItems(name, price) {
+function generateItems(name, price){
   let items=[];
   for(let i=1;i<=10;i++){
     items.push({
-      name: name+" "+i,
-      price: price+i,
-      img: "https://picsum.photos/200?random="+Math.random()
+      name:name+" "+i,
+      price:price+i,
+      img:"https://picsum.photos/200?random="+Math.random()
     });
   }
   return items;
@@ -188,31 +212,30 @@ function generateItems(name, price) {
 const menuDiv=document.getElementById("menu");
 
 for(let category in menuData){
-  let catDiv=document.createElement("div");
-  catDiv.className="category";
-  catDiv.innerHTML=`
+  let cat=document.createElement("div");
+  cat.className="category";
+  cat.innerHTML=`
     <div class="category-header" onclick="toggleCategory(this)">
       ${category} ▼
     </div>
     <div class="items"></div>
   `;
-
-  let itemsDiv=catDiv.querySelector(".items");
+  let itemsDiv=cat.querySelector(".items");
 
   menuData[category].forEach(item=>{
-    let itemDiv=document.createElement("div");
-    itemDiv.className="item";
-    itemDiv.innerHTML=`
+    let div=document.createElement("div");
+    div.className="item";
+    div.innerHTML=`
       <img src="${item.img}">
       <div>
         <input type="checkbox" value="${item.name}" data-price="${item.price}">
         ${item.name}<br>${item.price} AED
       </div>
     `;
-    itemsDiv.appendChild(itemDiv);
+    itemsDiv.appendChild(div);
   });
 
-  menuDiv.appendChild(catDiv);
+  menuDiv.appendChild(cat);
 }
 
 function toggleCategory(header){
@@ -220,7 +243,7 @@ function toggleCategory(header){
   items.style.display=items.style.display==="grid"?"none":"grid";
 }
 
-// TOTAL
+// Total
 document.addEventListener("change",function(e){
   if(e.target.type==="checkbox") calculateTotal();
 });
@@ -233,7 +256,7 @@ function calculateTotal(){
   document.getElementById("total").innerText=total;
 }
 
-// SUBMIT
+// Submit Order
 async function submitOrder(btn){
 
   btn.classList.add("click-animate");
@@ -255,23 +278,29 @@ async function submitOrder(btn){
     }
   });
 
-  let orderId=localStorage.getItem("orderId");
-
   const data={
-    orderId:orderId||null,
-    name:getCustomerName(),
+    orderId:localStorage.getItem("orderId")||null,
+    name:document.getElementById("name").value||"Customer",
     phone:phone,
+    address:document.getElementById("address").value,
     notes:document.getElementById("notes").value,
     items:items.join(", "),
     total:total,
     status:"Active"
   };
 
-  await fetch("https://avijitemail01.app.n8n.cloud/webhook/restaurant-qrcode-order",{
+  const res=await fetch("https://avijitemail01.app.n8n.cloud/webhook/restaurant-qrcode-order",{
     method:"POST",
     headers:{"Content-Type":"application/json"},
     body:JSON.stringify(data)
   });
+
+  const result=await res.json();
+
+  if(result.orderId){
+    localStorage.setItem("orderId",result.orderId);
+    localStorage.setItem("orderTime",Date.now());
+  }
 
   btn.disabled=true;
   document.getElementById("placeInfo").innerText="You can place your order again in 2 minutes.";
@@ -284,15 +313,20 @@ async function submitOrder(btn){
   alert("Order placed successfully!");
 }
 
-// CANCEL
+// Cancel Order
 async function cancelOrder(btn){
 
-  btn.classList.add("click-animate");
-  setTimeout(()=>btn.classList.remove("click-animate"),300);
-
   let orderId=localStorage.getItem("orderId");
+  let orderTime=localStorage.getItem("orderTime");
+
   if(!orderId){
-    alert("No active order found.");
+    alert("No order found.");
+    return;
+  }
+
+  if(Date.now()-orderTime > 120000){
+    alert("Cancellation window expired.");
+    btn.disabled=true;
     return;
   }
 
@@ -307,7 +341,6 @@ async function cancelOrder(btn){
 
   btn.disabled=true;
   document.getElementById("cancelInfo").innerText="Order cancelled successfully.";
-
 }
 </script>
 
