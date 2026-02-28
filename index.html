@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Restaurant Menu</title>
+<title>Food Spot Cafe and Restaurant Digital Menu</title>
 
 <style>
 body {
@@ -11,7 +11,34 @@ body {
   background:#f4f6f9;
 }
 
-h2 { text-align:center; }
+.top-bar {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+#datetime {
+  font-size:13px;
+  color:gray;
+}
+
+h2 { text-align:center; margin-top:5px; }
+
+.input-row {
+  display:flex;
+  gap:10px;
+}
+
+input, textarea {
+  padding:8px;
+  width:100%;
+  margin:5px 0;
+}
+
+textarea {
+  resize:none;
+  height:50px;
+}
 
 .category {
   margin-bottom:15px;
@@ -30,66 +57,102 @@ h2 { text-align:center; }
 
 .items {
   display:none;
-  margin-top:10px;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  gap:10px;
+  margin-top:8px;
+  display:grid;
+  grid-template-columns: repeat(auto-fit, minmax(95px, 1fr));
+  gap:6px;
 }
 
 .item {
   background:#fafafa;
-  padding:8px;
-  border-radius:8px;
+  padding:5px;
+  border-radius:6px;
   text-align:center;
-  font-size:14px;
+  font-size:11px;
 }
 
 .item img {
   width:100%;
-  height:80px;
+  height:50px;
   object-fit:cover;
-  border-radius:6px;
+  border-radius:5px;
+}
+
+.button-row {
+  display:flex;
+  gap:10px;
+  margin-top:10px;
 }
 
 button {
-  width:100%;
-  padding:12px;
-  margin-top:10px;
-  background:green;
-  color:white;
+  padding:8px 14px;
   border:none;
-  border-radius:8px;
-  font-size:16px;
+  border-radius:6px;
+  cursor:pointer;
+  font-size:14px;
 }
 
-.cancel-btn {
-  background:red;
+.place-btn { background:green; color:white; }
+.cancel-btn { background:red; color:white; }
+
+.info {
+  font-size:12px;
+  color:gray;
+  margin-top:5px;
 }
 
-input[type="text"] {
-  width:100%;
-  padding:10px;
-  margin:5px 0;
+.click-animate {
+  animation: clickEffect 0.3s ease;
+}
+
+@keyframes clickEffect {
+  0% { transform: scale(1); }
+  50% { transform: scale(0.9); }
+  100% { transform: scale(1); }
 }
 </style>
 </head>
 
 <body>
 
-<h2>🍽 Digital Menu</h2>
+<div class="top-bar">
+  <div></div>
+  <div id="datetime"></div>
+</div>
 
-<input type="text" id="name" placeholder="Your Name (Optional)">
-<input type="text" id="phone" placeholder="WhatsApp Number (+971...)" required>
+<h2>🍽 Food Spot Cafe and Restaurant Digital Menu</h2>
+
+<div class="input-row">
+  <input type="text" id="name" placeholder="Your Name (Optional)">
+  <input type="text" id="phone" placeholder="WhatsApp Number (+971...)" required>
+</div>
+
+<textarea id="notes" placeholder="Extra Notes (Less spicy, No onion, etc.)"></textarea>
 
 <div id="menu"></div>
 
 <h3>Total: <span id="total">0</span> AED</h3>
 
-<button onclick="submitOrder()">Place / Update Order</button>
-<button class="cancel-btn" onclick="cancelOrder()">Cancel Order</button>
+<div class="button-row">
+  <button class="place-btn" id="placeBtn" onclick="submitOrder(this)">👆 Place Order</button>
+  <button class="cancel-btn" id="cancelBtn" onclick="cancelOrder(this)">Cancel Order</button>
+</div>
+
+<div class="info" id="placeInfo"></div>
+<div class="info" id="cancelInfo">
+You can cancel your order within 2 minutes after placing it.
+</div>
 
 <script>
 
-// AUTO CUSTOMER NAME LOGIC
+// LIVE DATE TIME
+function updateDateTime(){
+  document.getElementById("datetime").innerText = new Date().toLocaleString();
+}
+setInterval(updateDateTime,1000);
+updateDateTime();
+
+// AUTO CUSTOMER NAME
 let customerCounter = localStorage.getItem("customerCounter") || 1;
 
 function getCustomerName() {
@@ -101,50 +164,45 @@ function getCustomerName() {
   return name;
 }
 
-// MENU DATA (5 Categories × 10 Items)
-
+// MENU GENERATOR
 const menuData = {
-  "Burgers": generateItems("Burger", 20),
-  "Pizzas": generateItems("Pizza", 30),
-  "Chinese": generateItems("Chinese Dish", 25),
-  "Indian": generateItems("Indian Dish", 22),
-  "Desserts": generateItems("Dessert", 15)
+  "Burgers": generateItems("Burger",20),
+  "Pizzas": generateItems("Pizza",30),
+  "Chinese": generateItems("Chinese Dish",25),
+  "Indian": generateItems("Indian Dish",22),
+  "Desserts": generateItems("Dessert",15)
 };
 
 function generateItems(name, price) {
-  let items = [];
-  for (let i=1; i<=10; i++) {
+  let items=[];
+  for(let i=1;i<=10;i++){
     items.push({
-      name: name + " " + i,
-      price: price + i,
-      img: "https://picsum.photos/200?random=" + Math.random()
+      name: name+" "+i,
+      price: price+i,
+      img: "https://picsum.photos/200?random="+Math.random()
     });
   }
   return items;
 }
 
-// RENDER MENU
+const menuDiv=document.getElementById("menu");
 
-const menuDiv = document.getElementById("menu");
-
-for (let category in menuData) {
-  let catDiv = document.createElement("div");
-  catDiv.className = "category";
-
-  catDiv.innerHTML = `
+for(let category in menuData){
+  let catDiv=document.createElement("div");
+  catDiv.className="category";
+  catDiv.innerHTML=`
     <div class="category-header" onclick="toggleCategory(this)">
       ${category} ▼
     </div>
     <div class="items"></div>
   `;
 
-  let itemsDiv = catDiv.querySelector(".items");
-  itemsDiv.style.display = "grid";
+  let itemsDiv=catDiv.querySelector(".items");
 
-  menuData[category].forEach(item => {
-    let itemDiv = document.createElement("div");
-    itemDiv.className = "item";
-    itemDiv.innerHTML = `
+  menuData[category].forEach(item=>{
+    let itemDiv=document.createElement("div");
+    itemDiv.className="item";
+    itemDiv.innerHTML=`
       <img src="${item.img}">
       <div>
         <input type="checkbox" value="${item.name}" data-price="${item.price}">
@@ -154,97 +212,103 @@ for (let category in menuData) {
     itemsDiv.appendChild(itemDiv);
   });
 
-  itemsDiv.style.display = "none";
   menuDiv.appendChild(catDiv);
 }
 
-function toggleCategory(header) {
-  let items = header.nextElementSibling;
-  items.style.display = items.style.display === "grid" ? "none" : "grid";
+function toggleCategory(header){
+  let items=header.nextElementSibling;
+  items.style.display=items.style.display==="grid"?"none":"grid";
 }
 
-// TOTAL CALCULATION
-
-document.addEventListener("change", function(e) {
-  if (e.target.type === "checkbox") calculateTotal();
+// TOTAL
+document.addEventListener("change",function(e){
+  if(e.target.type==="checkbox") calculateTotal();
 });
 
-function calculateTotal() {
-  let total = 0;
-  document.querySelectorAll('input[type="checkbox"]').forEach(cb => {
-    if (cb.checked) total += parseInt(cb.dataset.price);
+function calculateTotal(){
+  let total=0;
+  document.querySelectorAll('input[type="checkbox"]').forEach(cb=>{
+    if(cb.checked) total+=parseInt(cb.dataset.price);
   });
-  document.getElementById("total").innerText = total;
+  document.getElementById("total").innerText=total;
 }
 
-// SUBMIT / UPDATE ORDER
+// SUBMIT
+async function submitOrder(btn){
 
-async function submitOrder() {
+  btn.classList.add("click-animate");
+  setTimeout(()=>btn.classList.remove("click-animate"),300);
 
-  let phone = document.getElementById("phone").value;
-  if (!phone) {
+  let phone=document.getElementById("phone").value;
+  if(!phone){
     alert("Phone number is mandatory");
     return;
   }
 
-  let items = [];
-  let total = 0;
+  let items=[];
+  let total=0;
 
-  document.querySelectorAll('input[type="checkbox"]').forEach(cb => {
-    if (cb.checked) {
-      items.push(cb.value + " - " + cb.dataset.price + " AED");
-      total += parseInt(cb.dataset.price);
+  document.querySelectorAll('input[type="checkbox"]').forEach(cb=>{
+    if(cb.checked){
+      items.push(cb.value+" - "+cb.dataset.price+" AED");
+      total+=parseInt(cb.dataset.price);
     }
   });
 
-  let orderId = localStorage.getItem("orderId");
+  let orderId=localStorage.getItem("orderId");
 
-  const data = {
-    orderId: orderId || null,
-    name: getCustomerName(),
-    phone: phone,
-    items: items.join(", "),
-    total: total,
-    status: "Active"
+  const data={
+    orderId:orderId||null,
+    name:getCustomerName(),
+    phone:phone,
+    notes:document.getElementById("notes").value,
+    items:items.join(", "),
+    total:total,
+    status:"Active"
   };
 
-  const res = await fetch("https://avijitemail01.app.n8n.cloud/webhook/restaurant-qrcode-order", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data)
+  await fetch("https://avijitemail01.app.n8n.cloud/webhook/restaurant-qrcode-order",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify(data)
   });
 
-  const result = await res.json();
+  btn.disabled=true;
+  document.getElementById("placeInfo").innerText="You can place your order again in 2 minutes.";
 
-  if (!orderId && result.orderId) {
-    localStorage.setItem("orderId", result.orderId);
-  }
+  setTimeout(()=>{
+    btn.disabled=false;
+    document.getElementById("placeInfo").innerText="";
+  },120000);
 
-  alert("Order Submitted / Updated Successfully!");
+  alert("Order placed successfully!");
 }
 
-// CANCEL ORDER
+// CANCEL
+async function cancelOrder(btn){
 
-async function cancelOrder() {
+  btn.classList.add("click-animate");
+  setTimeout(()=>btn.classList.remove("click-animate"),300);
 
-  let orderId = localStorage.getItem("orderId");
-  if (!orderId) {
+  let orderId=localStorage.getItem("orderId");
+  if(!orderId){
     alert("No active order found.");
     return;
   }
 
-  await fetch("https://avijitemail01.app.n8n.cloud/webhook/restaurant-qrcode-order", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      orderId: orderId,
-      status: "Cancelled"
+  await fetch("https://avijitemail01.app.n8n.cloud/webhook/restaurant-qrcode-order",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({
+      orderId:orderId,
+      status:"Cancelled"
     })
   });
 
-  alert("Order Cancelled");
-}
+  btn.disabled=true;
+  document.getElementById("cancelInfo").innerText="Order cancelled successfully.";
 
+}
 </script>
 
 </body>
