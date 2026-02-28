@@ -24,21 +24,22 @@ body {
 
 h2 {
   text-align:center;
-  margin:15px 0 20px;
+  margin:20px 0 25px;
   font-size:18px;
 }
 
+/* INPUT ROW */
 .input-row {
   display:flex;
   gap:6px;
-  margin-bottom:6px;
+  margin-bottom:8px;
 }
 
 .field {
   display:flex;
   align-items:center;
   background:white;
-  padding:5px 8px;
+  padding:6px 8px;
   border-radius:6px;
   flex:1;
 }
@@ -55,6 +56,99 @@ h2 {
   font-size:12px;
 }
 
+/* SEARCH */
+.search-row {
+  margin-bottom:10px;
+}
+
+.search-box {
+  display:flex;
+  align-items:center;
+  background:white;
+  padding:6px 8px;
+  border-radius:6px;
+}
+
+.search-box span {
+  margin-right:6px;
+}
+
+.search-box input {
+  border:none;
+  outline:none;
+  width:100%;
+  font-size:12px;
+}
+
+/* CATEGORY BUTTONS */
+#categoryButtons {
+  display:flex;
+  gap:6px;
+  overflow-x:auto;
+  margin-bottom:10px;
+}
+
+.category-btn {
+  padding:6px 12px;
+  border:none;
+  border-radius:20px;
+  background:#e0e0e0;
+  cursor:pointer;
+  font-size:12px;
+  white-space:nowrap;
+}
+
+.category-btn.active {
+  background:green;
+  color:white;
+}
+
+/* MENU ITEM */
+.menu-item {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  background:white;
+  padding:8px;
+  border-radius:8px;
+  margin-bottom:6px;
+}
+
+.menu-left {
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.menu-left img {
+  width:55px;
+  height:55px;
+  border-radius:8px;
+  object-fit:cover;
+}
+
+.menu-info {
+  font-size:12px;
+}
+
+.qty-control {
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+
+.qty-control button {
+  width:24px;
+  height:24px;
+  border:none;
+  border-radius:50%;
+  font-size:14px;
+  cursor:pointer;
+}
+
+.minus { background:#ddd; }
+.plus { background:green; color:white; }
+
 textarea {
   width:100%;
   box-sizing:border-box;
@@ -64,77 +158,41 @@ textarea {
   border:1px solid #ddd;
   resize:none;
   height:50px;
-  margin:8px 0;
+  margin:10px 0;
 }
 
-.category {
-  margin-bottom:10px;
+/* BILLING */
+.bill-box {
   background:white;
-  border-radius:8px;
   padding:8px;
-}
-
-.category-header {
-  font-weight:bold;
-  font-size:14px;
-  cursor:pointer;
-  display:flex;
-  justify-content:space-between;
-}
-
-.items {
-  display:none;
-  margin-top:8px;
-  display:grid;
-  grid-template-columns: repeat(auto-fit, minmax(95px, 1fr));
-  gap:6px;
-}
-
-.item {
-  background:#fafafa;
-  padding:5px;
   border-radius:6px;
-  text-align:center;
-  font-size:11px;
+  font-size:13px;
+  margin-top:8px;
 }
 
-.item img {
-  width:100%;
-  height:50px;
-  object-fit:cover;
-  border-radius:5px;
-}
-
+/* BUTTONS */
 .button-row {
   display:flex;
   gap:8px;
-  margin-top:6px;
+  margin-top:8px;
 }
 
 button {
-  padding:6px 10px;
+  padding:6px 12px;
   border:none;
   border-radius:5px;
-  cursor:pointer;
   font-size:12px;
+  cursor:pointer;
 }
 
 .place-btn { background:green; color:white; }
+.reset-btn { background:orange; color:white; }
 .cancel-btn { background:red; color:white; }
 
 .info {
   font-size:11px;
   color:gray;
   margin-top:4px;
-}
-
-@keyframes clickEffect {
-  0% { transform: scale(1); }
-  50% { transform: scale(0.9); }
-  100% { transform: scale(1); }
-}
-.click-animate {
-  animation: clickEffect 0.3s ease;
 }
 </style>
 </head>
@@ -148,7 +206,6 @@ button {
 
 <h2>🍽 Food Spot Cafe and Restaurant Digital Menu</h2>
 
-<!-- Name + Phone + Address -->
 <div class="input-row">
   <div class="field">
     <span>👤</span>
@@ -164,221 +221,170 @@ button {
   </div>
 </div>
 
-<div id="menu"></div>
+<!-- SEARCH -->
+<div class="search-row">
+  <div class="search-box">
+    <span>🔍</span>
+    <input type="text" id="searchInput" placeholder="Search menu items..." onkeyup="searchItems()">
+  </div>
+</div>
 
-<div style="margin-top:10px; background:white; padding:8px; border-radius:6px; font-size:13px;">
+<div id="categoryButtons"></div>
+<div id="menuContainer"></div>
+
 <textarea id="notes" placeholder="Extra Notes (Less spicy, No onion, etc.)"></textarea>
-  <div>Subtotal: <b><span id="subtotal">0</span> AED</b></div>
-  <div>VAT (5%): <b><span id="vat">0</span> AED</b></div>
+
+<div class="bill-box">
+  <div>Subtotal: <b><span id="subtotal">0.00</span> AED</b></div>
+  <div>VAT (5%): <b><span id="vat">0.00</span> AED</b></div>
   <hr>
   <div style="font-size:15px;">
-    Total Amount: <b><span id="grandTotal">0</span> AED</b>
+    Total Amount: <b><span id="grandTotal">0.00</span> AED</b>
   </div>
 </div>
 
 <div class="button-row">
-  <button class="place-btn" id="placeBtn" onclick="submitOrder(this)">👆 Place Order</button>
-  <button onclick="resetOrder()">Reset</button>
-  <button class="cancel-btn" id="cancelBtn" onclick="cancelOrder(this)">Cancel Order</button>
-</div>
-
-<div class="info" id="placeInfo"></div>
-<div class="info" id="cancelInfo">
-You can cancel your order within 2 minutes after placing it.
+  <button class="place-btn">Place Order</button>
+  <button class="reset-btn" onclick="resetOrder()">Reset</button>
+  <button class="cancel-btn">Cancel Order</button>
 </div>
 
 <script>
 
-// Live Date Time
+// LIVE TIME
 function updateDateTime(){
-  document.getElementById("datetime").innerText = new Date().toLocaleString();
+  document.getElementById("datetime").innerText=new Date().toLocaleString();
 }
 setInterval(updateDateTime,1000);
 updateDateTime();
 
-// Menu Generator
-const menuData = {
-  "Burgers": generateItems("Burger",20),
-  "Pizzas": generateItems("Pizza",30),
-  "Chinese": generateItems("Chinese Dish",25),
-  "Indian": generateItems("Indian Dish",22),
-  "Desserts": generateItems("Dessert",15)
+// MENU DATA
+const menuData={
+  "Burgers":generateItems("Burger",20),
+  "Chinese":generateItems("Chinese Dish",25),
+  "Pizzas":generateItems("Pizza",30),
+  "Indian":generateItems("Indian Dish",22),
+  "Desserts":generateItems("Dessert",15)
 };
 
-function generateItems(name, price){
-  let items=[];
+function generateItems(name,price){
+  let arr=[];
   for(let i=1;i<=10;i++){
-    items.push({
+    arr.push({
+      id:name+i,
       name:name+" "+i,
       price:price+i,
-      img:"https://picsum.photos/200?random="+Math.random()
+      img:"https://picsum.photos/200?random="+Math.random(),
+      qty:0
     });
   }
-  return items;
+  return arr;
 }
 
-const menuDiv=document.getElementById("menu");
+let currentCategory="Burgers";
 
-for(let category in menuData){
-  let cat=document.createElement("div");
-  cat.className="category";
-  cat.innerHTML=`
-    <div class="category-header" onclick="toggleCategory(this)">
-      ${category} ▼
-    </div>
-    <div class="items"></div>
-  `;
-  let itemsDiv=cat.querySelector(".items");
+const categoryButtons=document.getElementById("categoryButtons");
+const menuContainer=document.getElementById("menuContainer");
 
-  menuData[category].forEach(item=>{
-    let div=document.createElement("div");
-    div.className="item";
-    div.innerHTML=`
-      <img src="${item.img}">
-      <div>
-        <input type="checkbox" value="${item.name}" data-price="${item.price}">
-        ${item.name}<br>${item.price} AED
-      </div>
-    `;
-    itemsDiv.appendChild(div);
-  });
+Object.keys(menuData).forEach(cat=>{
+  let btn=document.createElement("button");
+  btn.innerText=cat;
+  btn.className="category-btn";
+  if(cat==="Burgers") btn.classList.add("active");
 
-  menuDiv.appendChild(cat);
-}
-
-function toggleCategory(header){
-  let items=header.nextElementSibling;
-  items.style.display=items.style.display==="grid"?"none":"grid";
-}
-
-// Total
-document.addEventListener("change",function(e){
-  if(e.target.type==="checkbox") calculateTotal();
+  btn.onclick=()=>{
+    currentCategory=cat;
+    document.querySelectorAll(".category-btn").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    renderMenu();
+  };
+  categoryButtons.appendChild(btn);
 });
 
+function renderMenu(list=null){
+  menuContainer.innerHTML="";
+  let items=list || menuData[currentCategory];
+
+  items.forEach(item=>{
+    let div=document.createElement("div");
+    div.className="menu-item";
+    div.innerHTML=`
+      <div class="menu-left">
+        <img src="${item.img}">
+        <div class="menu-info">
+          <div><b>${item.name}</b></div>
+          <div>${item.price} AED</div>
+        </div>
+      </div>
+      <div class="qty-control">
+        <button class="minus" onclick="updateQty('${item.id}',-1)">-</button>
+        <span id="qty-${item.id}">${item.qty}</span>
+        <button class="plus" onclick="updateQty('${item.id}',1)">+</button>
+      </div>
+    `;
+    menuContainer.appendChild(div);
+  });
+}
+
+function updateQty(id,change){
+  Object.values(menuData).forEach(cat=>{
+    cat.forEach(item=>{
+      if(item.id===id){
+        item.qty=Math.max(0,item.qty+change);
+        document.getElementById("qty-"+id).innerText=item.qty;
+      }
+    });
+  });
+  calculateTotal();
+}
+
 function calculateTotal(){
-  let subtotal = 0;
-
-  document.querySelectorAll('input[type="checkbox"]').forEach(cb=>{
-    if(cb.checked) subtotal += parseFloat(cb.dataset.price);
-  });
-
-  let vat = subtotal * 0.05;
-  let grandTotal = subtotal + vat;
-
-  document.getElementById("subtotal").innerText = subtotal.toFixed(2);
-  document.getElementById("vat").innerText = vat.toFixed(2);
-  document.getElementById("grandTotal").innerText = grandTotal.toFixed(2);
-}
-
-// Submit Order
-async function submitOrder(btn){
-
-  btn.classList.add("click-animate");
-  setTimeout(()=>btn.classList.remove("click-animate"),300);
-
-  let phone=document.getElementById("phone").value;
-  if(!phone){
-    alert("Phone number is mandatory");
-    return;
-  }
-
-  let items=[];
   let subtotal=0;
-
-  document.querySelectorAll('input[type="checkbox"]').forEach(cb=>{
-    if(cb.checked){
-      items.push(cb.value+" - "+cb.dataset.price+" AED");
-      subtotal+=parseInt(cb.dataset.price);
-    }
-  });
-  
-  let vat = subtotal * 0.05;
-  let grandTotal = subtotal + vat;
-
-  const data={
-  orderId:localStorage.getItem("orderId")||null,
-  name:document.getElementById("name").value||"Customer",
-  phone:phone,
-  address:document.getElementById("address").value,
-  notes:document.getElementById("notes").value,
-  items:items.join(", "),
-  subtotal:subtotal.toFixed(2),
-  vat:vat.toFixed(2),
-  total:grandTotal.toFixed(2),
-  status:"Active"
-};
-
-  const res=await fetch("https://avijitemail01.app.n8n.cloud/webhook/restaurant-qrcode-order",{
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body:JSON.stringify(data)
+  Object.values(menuData).forEach(cat=>{
+    cat.forEach(item=>{
+      subtotal+=item.qty*item.price;
+    });
   });
 
-  const result=await res.json();
+  let vat=subtotal*0.05;
+  let total=subtotal+vat;
 
-  if(result.orderId){
-    localStorage.setItem("orderId",result.orderId);
-    localStorage.setItem("orderTime",Date.now());
-  }
-
-  btn.disabled=true;
-  document.getElementById("placeInfo").innerText="You can place your order again in 2 minutes.";
-
-  setTimeout(()=>{
-    btn.disabled=false;
-    document.getElementById("placeInfo").innerText="";
-  },120000);
-
-  alert("Order placed successfully!");
+  document.getElementById("subtotal").innerText=subtotal.toFixed(2);
+  document.getElementById("vat").innerText=vat.toFixed(2);
+  document.getElementById("grandTotal").innerText=total.toFixed(2);
 }
 
-// Cancel Order
-async function cancelOrder(btn){
+// SEARCH FUNCTION
+function searchItems(){
+  let value=document.getElementById("searchInput").value.toLowerCase();
 
-  let orderId=localStorage.getItem("orderId");
-  let orderTime=localStorage.getItem("orderTime");
-
-  if(!orderId){
-    alert("No order found.");
+  if(value===""){
+    renderMenu();
     return;
   }
 
-  if(Date.now()-orderTime > 120000){
-    alert("Cancellation window expired.");
-    btn.disabled=true;
-    return;
-  }
-
-  await fetch("https://avijitemail01.app.n8n.cloud/webhook/restaurant-qrcode-order",{
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({
-      orderId:orderId,
-      status:"Cancelled"
-    })
+  let results=[];
+  Object.values(menuData).forEach(cat=>{
+    cat.forEach(item=>{
+      if(item.name.toLowerCase().includes(value)){
+        results.push(item);
+      }
+    });
   });
 
-  btn.disabled=true;
-  document.getElementById("cancelInfo").innerText="Order cancelled successfully.";
+  renderMenu(results);
 }
 
 function resetOrder(){
-
-  // Uncheck all items
-  document.querySelectorAll('input[type="checkbox"]').forEach(cb=>{
-    cb.checked=false;
+  Object.values(menuData).forEach(cat=>{
+    cat.forEach(item=>item.qty=0);
   });
-
-  // Clear notes
+  renderMenu();
+  calculateTotal();
   document.getElementById("notes").value="";
-
-  // Reset totals
-  document.getElementById("subtotal").innerText="0.00";
-  document.getElementById("vat").innerText="0.00";
-  document.getElementById("grandTotal").innerText="0.00";
-
 }
+
+renderMenu();
 </script>
 
 </body>
