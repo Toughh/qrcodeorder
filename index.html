@@ -23,7 +23,6 @@ body{
   color:gray;
 }
 
-/* TITLE */
 h2{
   text-align:center;
   font-size:18px;
@@ -85,7 +84,7 @@ h2{
   font-size:12px;
 }
 
-/* CATEGORY BUTTONS */
+/* CATEGORY */
 #categoryButtons{
   display:flex;
   gap:6px;
@@ -108,23 +107,7 @@ h2{
   color:white;
 }
 
-/* CATEGORY HEADER */
-.category-header{
-  margin:10px 0 6px;
-}
-
-.category-header h3{
-  margin:0;
-  font-size:15px;
-}
-
-.category-header p{
-  margin:2px 0 0;
-  font-size:11px;
-  color:gray;
-}
-
-/* GRID MENU */
+/* GRID */
 .menu-grid{
   display:grid;
   grid-template-columns:repeat(2,1fr);
@@ -160,30 +143,46 @@ h2{
   color:gray;
 }
 
-.price{
-  font-weight:bold;
-  margin-bottom:4px;
+.price-row{
+  display:flex;
+  align-items:center;
+  gap:6px;
 }
 
-/* SMALL STANDARD QTY BUTTON */
+.price{
+  font-weight:bold;
+  font-size:12px;
+}
+
+/* VERY SMALL QTY BUTTONS */
 .qty-control{
   display:flex;
   align-items:center;
-  gap:4px;
+  gap:3px;
 }
 
 .qty-control button{
-  width:20px;
-  height:20px;
-  border:1px solid #ccc;
-  background:white;
-  font-size:12px;
+  width:16px;
+  height:16px;
+  padding:0;
+  font-size:10px;
+  border:none;
   cursor:pointer;
 }
 
+.minus{
+  background:red;
+  color:white;
+}
+
+.plus{
+  background:green;
+  color:white;
+}
+
 .qty-number{
-  font-size:12px;
-  width:18px;
+  font-size:11px;
+  min-width:12px;
   text-align:center;
 }
 
@@ -209,27 +208,25 @@ textarea{
   margin-top:8px;
 }
 
-/* INFO TEXT */
+/* INFO */
 .info{
   font-size:11px;
   color:gray;
   margin-top:5px;
 }
 
-/* BUTTONS */
+/* SMALL BUTTONS */
 .button-row{
-  display:flex;
-  gap:6px;
   margin-top:8px;
 }
 
-button{
-  padding:6px;
+.button-row button{
+  padding:5px 10px;
   border:none;
   border-radius:5px;
   font-size:12px;
   cursor:pointer;
-  flex:1;
+  margin-right:6px;
 }
 
 .place-btn{ background:green; color:white; }
@@ -248,16 +245,15 @@ button{
 
 <h2>🍽 Food Spot Cafe and Restaurant Digital Menu</h2>
 
-<!-- ONE LINE INPUT -->
 <div class="input-row">
   <div class="field">
     <span>👤</span>
-    <input type="text" placeholder="Your Name (Optional)">
+    <input type="text" id="name" placeholder="Your Name (Optional)">
   </div>
 
   <div class="field">
     <span>📱</span>
-    <input type="text" placeholder="WhatsApp Number (+971...)" required>
+    <input type="text" id="phone" placeholder="WhatsApp Number (+971...)" required>
   </div>
 
   <div class="field">
@@ -266,7 +262,6 @@ button{
   </div>
 </div>
 
-<!-- SEARCH CENTER -->
 <div class="search-row">
   <div class="search-box">
     <span>🔍</span>
@@ -294,14 +289,14 @@ button{
 </div>
 
 <div class="button-row">
-  <button class="place-btn">🤚 Place Order</button>
+  <button class="place-btn" onclick="placeOrder()">🤚 Place Order</button>
   <button class="reset-btn" onclick="resetOrder()">Reset</button>
-  <button class="cancel-btn">❌ Cancel Order</button>
+  <button class="cancel-btn" onclick="cancelOrder()">❌ Cancel Order</button>
 </div>
 
 <script>
 
-// DATE TIME RIGHT TOP
+/* DATE TIME */
 function updateDateTime(){
   document.getElementById("datetime").innerText=new Date().toLocaleString();
 }
@@ -358,9 +353,7 @@ Object.keys(menuData).forEach(cat=>{
 
 function renderMenu(list=null){
  let items=list || menuData[currentCategory];
-
- menuSection.innerHTML='<div class="category-header"><h3>'+currentCategory+'</h3></div><div class="menu-grid"></div>';
-
+ menuSection.innerHTML='<div class="menu-grid"></div>';
  let grid=document.querySelector(".menu-grid");
 
  items.forEach(item=>{
@@ -370,11 +363,13 @@ function renderMenu(list=null){
      <div class="card-body">
        <h4>${item.name}</h4>
        <p>${item.desc}</p>
-       <div class="price">AED ${item.price}</div>
-       <div class="qty-control">
-         <button onclick="updateQty('${item.id}',-1)">-</button>
-         <span class="qty-number" id="qty-${item.id}">${item.qty}</span>
-         <button onclick="updateQty('${item.id}',1)">+</button>
+       <div class="price-row">
+         <div class="price">AED ${item.price}</div>
+         <div class="qty-control">
+           <button class="minus" onclick="updateQty('${item.id}',-1)">-</button>
+           <span class="qty-number" id="qty-${item.id}">${item.qty}</span>
+           <button class="plus" onclick="updateQty('${item.id}',1)">+</button>
+         </div>
        </div>
      </div>
    </div>`;
@@ -409,7 +404,6 @@ function calculateTotal(){
 function searchItems(){
  let value=document.getElementById("searchInput").value.toLowerCase();
  if(value===""){ renderMenu(); return; }
-
  let results=[];
  Object.values(menuData).forEach(cat=>{
    cat.forEach(item=>{
@@ -427,6 +421,29 @@ function resetOrder(){
  });
  renderMenu();
  calculateTotal();
+ alert("Order has been reset.");
+}
+
+function cancelOrder(){
+ resetOrder();
+ alert("Your order has been cancelled successfully.");
+}
+
+function placeOrder(){
+ let phone=document.getElementById("phone").value.trim();
+ if(phone===""){
+   alert("⚠ Please enter WhatsApp number.");
+   return;
+ }
+
+ let total=parseFloat(document.getElementById("grandTotal").innerText);
+ if(total===0){
+   alert("⚠ Please select at least one item.");
+   return;
+ }
+
+ alert("✅ Order placed successfully!");
+ resetOrder();
 }
 
 renderMenu();
