@@ -24,7 +24,7 @@ body {
 
 h2 {
   text-align:center;
-  margin:5px 0 10px;
+  margin:15px 0 20px;
   font-size:18px;
 }
 
@@ -159,15 +159,21 @@ button {
   </div>
   <div class="field">
     <span>🏠</span>
-    <input type="text" id="address" placeholder="Address (Room/Flat, Building, Landmark)">
+    <input type="text" id="address" placeholder="Address (Optional - Room/Flat No, Building Name, Nearest Landmark)">
   </div>
 </div>
 
-<textarea id="notes" placeholder="Extra Notes (Less spicy, No onion, etc.)"></textarea>
-
 <div id="menu"></div>
 
-<h3>Total: <span id="total">0</span> AED</h3>
+<div style="margin-top:10px; background:white; padding:8px; border-radius:6px; font-size:13px;">
+<textarea id="notes" placeholder="Extra Notes (Less spicy, No onion, etc.)"></textarea>
+  <div>Subtotal: <b><span id="subtotal">0</span> AED</b></div>
+  <div>VAT (5%): <b><span id="vat">0</span> AED</b></div>
+  <hr>
+  <div style="font-size:15px;">
+    Total Amount: <b><span id="grandTotal">0</span> AED</b>
+  </div>
+</div>
 
 <div class="button-row">
   <button class="place-btn" id="placeBtn" onclick="submitOrder(this)">👆 Place Order</button>
@@ -249,11 +255,18 @@ document.addEventListener("change",function(e){
 });
 
 function calculateTotal(){
-  let total=0;
+  let subtotal = 0;
+
   document.querySelectorAll('input[type="checkbox"]').forEach(cb=>{
-    if(cb.checked) total+=parseInt(cb.dataset.price);
+    if(cb.checked) subtotal += parseFloat(cb.dataset.price);
   });
-  document.getElementById("total").innerText=total;
+
+  let vat = subtotal * 0.05;
+  let grandTotal = subtotal + vat;
+
+  document.getElementById("subtotal").innerText = subtotal.toFixed(2);
+  document.getElementById("vat").innerText = vat.toFixed(2);
+  document.getElementById("grandTotal").innerText = grandTotal.toFixed(2);
 }
 
 // Submit Order
@@ -269,25 +282,30 @@ async function submitOrder(btn){
   }
 
   let items=[];
-  let total=0;
+  let subtotal=0;
 
   document.querySelectorAll('input[type="checkbox"]').forEach(cb=>{
     if(cb.checked){
       items.push(cb.value+" - "+cb.dataset.price+" AED");
-      total+=parseInt(cb.dataset.price);
+      subtotal+=parseInt(cb.dataset.price);
     }
   });
+  
+  let vat = subtotal * 0.05;
+  let grandTotal = subtotal + vat;
 
   const data={
-    orderId:localStorage.getItem("orderId")||null,
-    name:document.getElementById("name").value||"Customer",
-    phone:phone,
-    address:document.getElementById("address").value,
-    notes:document.getElementById("notes").value,
-    items:items.join(", "),
-    total:total,
-    status:"Active"
-  };
+  orderId:localStorage.getItem("orderId")||null,
+  name:document.getElementById("name").value||"Customer",
+  phone:phone,
+  address:document.getElementById("address").value,
+  notes:document.getElementById("notes").value,
+  items:items.join(", "),
+  subtotal:subtotal.toFixed(2),
+  vat:vat.toFixed(2),
+  total:grandTotal.toFixed(2),
+  status:"Active"
+};
 
   const res=await fetch("https://avijitemail01.app.n8n.cloud/webhook/restaurant-qrcode-order",{
     method:"POST",
