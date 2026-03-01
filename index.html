@@ -147,7 +147,11 @@ body {
 
 <body>
 
-<div class="header">🍽 Food Spot Cafe and Restaurant Digital Menu</div>
+<div class="header">
+    <div style="float:center;">🍽 Food Spot Cafe and Restaurant Digital Menu</div>
+    <div id="datetime" style="float:right;font-size:14px;"></div>
+    <div style="clear:both;"></div>
+</div>
 
 <div class="top-row">
     <input type="text" id="customerName" placeholder="👤 Your Name (Optional)">
@@ -155,8 +159,11 @@ body {
     <input type="text" id="address" placeholder="🏠 Address (Optional)">
 </div>
 
-<div class="search-box">
-    <input type="text" id="searchBox" placeholder="🔍 Search menu items..." onkeyup="searchMenu()">
+<div class="search-box" style="text-align:center;">
+    <input type="text" id="searchBox" 
+           style="width:50%;" 
+           placeholder="🔍 Search menu items..." 
+           onkeyup="searchMenu()">
 </div>
 
 <div class="categories">
@@ -198,24 +205,54 @@ body {
 </div>
 
 <script>
-const items = [
-{ id:"drink1", name:"Drink 1", price:13 },
-{ id:"drink2", name:"Drink 2", price:14 },
-{ id:"drink3", name:"Drink 3", price:15 },
-{ id:"drink4", name:"Drink 4", price:16 },
-{ id:"drink5", name:"Drink 5", price:12 },
-{ id:"drink6", name:"Drink 6", price:18 },
-{ id:"drink7", name:"Drink 7", price:10 },
-{ id:"drink8", name:"Drink 8", price:11 },
-{ id:"drink9", name:"Drink 9", price:17 }
-];
 
+const menuData = {
+"Arabian Grill": generateItems("ag",25),
+"Burgers": generateItems("bg",18),
+"Pizzas": generateItems("pz",22),
+"Chinese": generateItems("ch",20),
+"Indian": generateItems("in",19),
+"Desserts": generateItems("ds",12),
+"Beverages": generateItems("bv",10),
+"Cold Mezza": generateItems("cm",15),
+"Hot Mezza": generateItems("hm",17)
+};
+
+function generateItems(prefix, basePrice){
+    let arr=[];
+    for(let i=1;i<=10;i++){
+        arr.push({
+            id: prefix+i,
+            name: prefix.toUpperCase()+" Item "+i,
+            price: basePrice+i
+        });
+    }
+    return arr;
+}
+
+let currentCategory="Arabian Grill";
+let items=menuData[currentCategory];
 let cart = {};
 let counter = 1;
 let timerInterval;
 
+function loadCategory(category){
+    currentCategory=category;
+    items=menuData[category];
+    document.querySelectorAll(".category-btn").forEach(b=>b.classList.remove("active"));
+    event.target.classList.add("active");
+    loadMenu();
+}
+
+document.querySelectorAll(".category-btn").forEach(btn=>{
+    btn.addEventListener("click",function(){
+        loadCategory(this.innerText);
+    });
+});
+
 function loadMenu(){
     const container=document.getElementById("menuContainer");
+    container.innerHTML="";
     items.forEach(item=>{
         container.innerHTML+=`
         <div class="menu-item" data-name="${item.name}">
@@ -245,9 +282,14 @@ function updateQty(id,change){
 
 function calculate(){
     let subtotal=0;
-    items.forEach(i=>{
-        if(cart[i.id]) subtotal+=i.price*cart[i.id];
+    Object.keys(cart).forEach(id=>{
+        let found;
+        Object.values(menuData).forEach(cat=>{
+            cat.forEach(i=>{ if(i.id===id) found=i; });
+        });
+        if(found) subtotal+=found.price*cart[id];
     });
+
     let vat=subtotal*0.05;
     let total=subtotal+vat;
     document.getElementById("subtotal").innerText=subtotal.toFixed(2);
@@ -331,7 +373,17 @@ function closeDialog(){
     document.getElementById("dialog").style.display="none";
 }
 
+/* DATE & TIME */
+function updateDateTime(){
+    const now=new Date();
+    document.getElementById("datetime").innerText=now.toLocaleString();
+}
+setInterval(updateDateTime,1000);
+updateDateTime();
+
+/* Default load Arabian Grill */
 loadMenu();
+
 </script>
 
 </body>
