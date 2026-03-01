@@ -236,24 +236,32 @@ let cart = {};
 let counter = 1;
 let timerInterval;
 
-function loadCategory(category){
-    currentCategory=category;
-    items=menuData[category];
-    document.querySelectorAll(".category-btn").forEach(b=>b.classList.remove("active"));
-    event.target.classList.add("active");
-    loadMenu();
-}
-
+/* ✅ DEFAULT ACTIVE = ARABIAN GRILL */
 document.querySelectorAll(".category-btn").forEach(btn=>{
+    if(btn.innerText==="Arabian Grill"){
+        btn.classList.add("active");
+    } else {
+        btn.classList.remove("active");
+    }
+
     btn.addEventListener("click",function(){
-        loadCategory(this.innerText);
+        loadCategory(this.innerText,this);
     });
 });
 
-function loadMenu(){
+function loadCategory(category,btn){
+    currentCategory=category;
+    items=menuData[category];
+    document.querySelectorAll(".category-btn").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    loadMenu(items);
+}
+
+/* LOAD MENU FUNCTION */
+function loadMenu(data){
     const container=document.getElementById("menuContainer");
     container.innerHTML="";
-    items.forEach(item=>{
+    data.forEach(item=>{
         container.innerHTML+=`
         <div class="menu-item" data-name="${item.name}">
             <img src="https://picsum.photos/300/200?random=${item.id}">
@@ -283,20 +291,43 @@ function updateQty(id,change){
 function calculate(){
     let subtotal=0;
     Object.keys(cart).forEach(id=>{
-        let found;
         Object.values(menuData).forEach(cat=>{
-            cat.forEach(i=>{ if(i.id===id) found=i; });
+            cat.forEach(i=>{
+                if(i.id===id) subtotal+=i.price*cart[id];
+            });
         });
-        if(found) subtotal+=found.price*cart[id];
     });
 
     let vat=subtotal*0.05;
     let total=subtotal+vat;
+
     document.getElementById("subtotal").innerText=subtotal.toFixed(2);
     document.getElementById("vat").innerText=vat.toFixed(2);
     document.getElementById("total").innerText=total.toFixed(2);
 }
 
+/* ✅ GLOBAL SEARCH */
+function searchMenu(){
+    const val=document.getElementById("searchBox").value.toLowerCase();
+
+    if(val===""){
+        loadMenu(menuData[currentCategory]);
+        return;
+    }
+
+    let results=[];
+    Object.values(menuData).forEach(cat=>{
+        cat.forEach(item=>{
+            if(item.name.toLowerCase().includes(val)){
+                results.push(item);
+            }
+        });
+    });
+
+    loadMenu(results);
+}
+
+/* ✅ SUCCESS DIALOG WITH TOTALS */
 function placeOrder(){
     if(Object.keys(cart).length===0){
         showDialog("Please select at least one menu item.");
@@ -315,7 +346,20 @@ function placeOrder(){
     let address=document.getElementById("address").value.trim();
     if(!address) address="NA";
 
-    showDialog("Order Placed Successfully!!!\nExpected time to deliver: 20 mins.\nContact Info: +971552385011");
+    const subtotal=document.getElementById("subtotal").innerText;
+    const vat=document.getElementById("vat").innerText;
+    const total=document.getElementById("total").innerText;
+
+    showDialog(
+`Order Placed Successfully!!!
+
+Subtotal: ${subtotal} AED
+VAT: ${vat} AED
+Total: ${total} AED
+
+Expected time to deliver: 20 mins.
+Contact Info: +971552385011`
+    );
 
     startTimer();
     resetOrder();
@@ -358,13 +402,6 @@ function cancelOrder(){
     showDialog("Order Cancelled Successfully.");
 }
 
-function searchMenu(){
-    const val=document.getElementById("searchBox").value.toLowerCase();
-    document.querySelectorAll(".menu-item").forEach(item=>{
-        item.style.display=item.dataset.name.toLowerCase().includes(val)?"block":"none";
-    });
-}
-
 function showDialog(msg){
     document.getElementById("dialogMsg").innerText=msg;
     document.getElementById("dialog").style.display="flex";
@@ -381,8 +418,8 @@ function updateDateTime(){
 setInterval(updateDateTime,1000);
 updateDateTime();
 
-/* Default load Arabian Grill */
-loadMenu();
+/* DEFAULT LOAD ARABIAN GRILL */
+loadMenu(menuData["Arabian Grill"]);
 
 </script>
 
