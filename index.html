@@ -7,71 +7,130 @@
 <style>
 body {
     font-family: Arial, sans-serif;
-    background: #f5f5f5;
-    padding: 20px;
+    background:#f3f4f6;
+    padding:20px;
 }
 
-h2 {
-    text-align: center;
+.header {
+    text-align:center;
+    font-size:22px;
+    font-weight:bold;
+    margin-bottom:15px;
 }
 
-input {
-    padding: 8px;
-    margin: 5px;
-    width: 30%;
+.top-row {
+    display:flex;
+    gap:10px;
+    margin-bottom:10px;
 }
 
-.category {
-    margin: 10px 0;
+.top-row input {
+    flex:1;
+    padding:8px;
+    border-radius:6px;
+    border:1px solid #ccc;
+}
+
+.search-box {
+    margin-bottom:10px;
+}
+
+.search-box input {
+    width:100%;
+    padding:8px;
+    border-radius:6px;
+    border:1px solid #ccc;
+}
+
+.categories {
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    margin-bottom:15px;
+}
+
+.category-btn {
+    padding:6px 12px;
+    border:none;
+    border-radius:20px;
+    background:#e5e7eb;
+    cursor:pointer;
+}
+
+.category-btn.active {
+    background:#f59e0b;
+    color:white;
+}
+
+.menu-container {
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap:15px;
 }
 
 .menu-item {
-    background: white;
-    padding: 10px;
-    margin: 8px 0;
-    border-radius: 6px;
+    background:white;
+    border-radius:10px;
+    overflow:hidden;
+}
+
+.menu-item img {
+    width:100%;
+    height:120px;
+    object-fit:cover;
+}
+
+.menu-content {
+    padding:10px;
 }
 
 .qty-btn {
-    padding: 2px 6px;
-    font-size: 12px;
-    border: none;
-    color: white;
-    cursor: pointer;
+    padding:2px 6px;
+    border:none;
+    color:white;
+    cursor:pointer;
 }
 
-.plus { background: green; }
-.minus { background: red; }
+.plus { background:green; }
+.minus { background:red; }
 
-.qty {
-    margin: 0 5px;
-    font-weight: bold;
+.qty { margin:0 6px; }
+
+.summary {
+    background:white;
+    padding:10px;
+    margin-top:15px;
+    border-radius:8px;
 }
 
-button {
-    padding: 6px 12px;
-    margin-right: 5px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
+.buttons {
+    margin-top:10px;
 }
 
-.place-btn { background: #4CAF50; color: white; }
-.reset-btn { background: orange; color: white; }
-.cancel-btn { background: red; color: white; }
+.buttons button {
+    padding:6px 12px;
+    border:none;
+    border-radius:6px;
+    cursor:pointer;
+    margin-right:5px;
+}
+
+.place { background:#4CAF50; color:white; }
+.reset { background:orange; color:white; }
+.cancel { background:red; color:white; }
 
 .info-text {
-    margin-top: 8px;
-    font-size: 13px;
-    color: #555;
+    margin-top:6px;
+    font-size:13px;
+    color:#555;
 }
 
 .dialog-overlay {
-    display: none;
-    position: fixed;
+    display:none;
+    position:fixed;
     top:0; left:0;
     width:100%; height:100%;
-    background: rgba(0,0,0,0.5);
+    background:rgba(0,0,0,0.5);
     justify-content:center;
     align-items:center;
 }
@@ -88,50 +147,49 @@ button {
 
 <body>
 
-<h2>🍽 Food Spot Cafe and Restaurant Digital Menu</h2>
+<div class="header">🍽 Food Spot Cafe and Restaurant Digital Menu</div>
 
-<div>
-    <input type="text" id="customerName" placeholder="Your Name (Optional)">
-    <input type="text" id="mobile" placeholder="+971XXXXXXXXX">
-    <input type="text" id="address" placeholder="Address (Optional)">
+<div class="top-row">
+    <input type="text" id="customerName" placeholder="👤 Your Name (Optional)">
+    <input type="text" id="mobile" placeholder="📱 +971XXXXXXXXX">
+    <input type="text" id="address" placeholder="🏠 Address (Optional)">
 </div>
 
-<div>
-    <input type="text" id="searchBox" placeholder="Search menu items..." onkeyup="searchMenu()">
+<div class="search-box">
+    <input type="text" id="searchBox" placeholder="🔍 Search menu items..." onkeyup="searchMenu()">
 </div>
 
-<!-- Default Expanded Category -->
-<div class="category">
-    <h3>Beverages</h3>
+<div class="categories">
+    <button class="category-btn">Arabian Grill</button>
+    <button class="category-btn">Burgers</button>
+    <button class="category-btn">Pizzas</button>
+    <button class="category-btn">Chinese</button>
+    <button class="category-btn">Indian</button>
+    <button class="category-btn">Desserts</button>
+    <button class="category-btn active">Beverages</button>
+    <button class="category-btn">Cold Mezza</button>
+    <button class="category-btn">Hot Mezza</button>
+</div>
 
-    <div class="menu-item" data-name="Drink 1">
-        Drink 1 - AED 13
-        <button class="qty-btn minus" onclick="updateQty('drink1', -1)">-</button>
-        <span class="qty" id="qty-drink1">0</span>
-        <button class="qty-btn plus" onclick="updateQty('drink1', 1)">+</button>
+<div class="menu-container" id="menuContainer"></div>
+
+<div class="summary">
+    Subtotal: <b><span id="subtotal">0</span> AED</b><br>
+    VAT (5%): <b><span id="vat">0</span> AED</b>
+    <hr>
+    Total Amount: <b><span id="total">0</span> AED</b>
+
+    <div class="buttons">
+        <button id="placeBtn" class="place" onclick="placeOrder()">Place Order</button>
+        <button id="resetBtn" class="reset" onclick="resetOrder()" disabled>Reset</button>
+        <button id="cancelBtn" class="cancel" onclick="cancelOrder()" disabled>Cancel Order</button>
     </div>
 
-    <div class="menu-item" data-name="Drink 2">
-        Drink 2 - AED 14
-        <button class="qty-btn minus" onclick="updateQty('drink2', -1)">-</button>
-        <span class="qty" id="qty-drink2">0</span>
-        <button class="qty-btn plus" onclick="updateQty('drink2', 1)">+</button>
+    <div id="infoText" class="info-text">
+        You can cancel your order within 2 mins.
     </div>
 </div>
 
-<h3>Total: AED <span id="totalAmount">0</span></h3>
-
-<div>
-    <button id="placeOrderBtn" class="place-btn" onclick="placeOrder()">Place Order</button>
-    <button id="resetBtn" class="reset-btn" onclick="resetOrderState()" disabled>Reset</button>
-    <button id="cancelBtn" class="cancel-btn" onclick="cancelOrder()" disabled>Cancel Order</button>
-</div>
-
-<div id="infoMessage" class="info-text">
-    You can cancel your order within 2 mins.
-</div>
-
-<!-- Dialog -->
 <div id="dialog" class="dialog-overlay">
     <div class="dialog-box">
         <p id="dialogMsg"></p>
@@ -140,131 +198,140 @@ button {
 </div>
 
 <script>
+const items = [
+{ id:"drink1", name:"Drink 1", price:13 },
+{ id:"drink2", name:"Drink 2", price:14 },
+{ id:"drink3", name:"Drink 3", price:15 },
+{ id:"drink4", name:"Drink 4", price:16 },
+{ id:"drink5", name:"Drink 5", price:12 },
+{ id:"drink6", name:"Drink 6", price:18 },
+{ id:"drink7", name:"Drink 7", price:10 },
+{ id:"drink8", name:"Drink 8", price:11 },
+{ id:"drink9", name:"Drink 9", price:17 }
+];
+
 let cart = {};
-let totalAmount = 0;
-let orderTimer = null;
-let countdown = 120;
-let customerCounter = 1;
+let counter = 1;
+let timerInterval;
 
-const prices = {
-    drink1: 13,
-    drink2: 14
-};
-
-function updateQty(item, change) {
-    let el = document.getElementById("qty-" + item);
-    let qty = parseInt(el.innerText) + change;
-    if (qty < 0) qty = 0;
-    el.innerText = qty;
-
-    if (qty === 0) delete cart[item];
-    else cart[item] = qty;
-
-    calculateTotal();
-    document.getElementById("resetBtn").disabled = Object.keys(cart).length === 0;
+function loadMenu(){
+    const container=document.getElementById("menuContainer");
+    items.forEach(item=>{
+        container.innerHTML+=`
+        <div class="menu-item" data-name="${item.name}">
+            <img src="https://picsum.photos/300/200?random=${item.id}">
+            <div class="menu-content">
+                <b>${item.name}</b><br>
+                Fresh prepared delicious item.<br>
+                AED ${item.price}
+                <button class="qty-btn minus" onclick="updateQty('${item.id}',-1)">-</button>
+                <span class="qty" id="qty-${item.id}">0</span>
+                <button class="qty-btn plus" onclick="updateQty('${item.id}',1)">+</button>
+            </div>
+        </div>`;
+    });
 }
 
-function calculateTotal() {
-    totalAmount = 0;
-    for (let i in cart) totalAmount += prices[i] * cart[i];
-    document.getElementById("totalAmount").innerText = totalAmount.toFixed(2);
+function updateQty(id,change){
+    const el=document.getElementById("qty-"+id);
+    let qty=parseInt(el.innerText)+change;
+    if(qty<0) qty=0;
+    el.innerText=qty;
+    if(qty===0) delete cart[id];
+    else cart[id]=qty;
+    calculate();
+    document.getElementById("resetBtn").disabled=Object.keys(cart).length===0;
 }
 
-function placeOrder() {
+function calculate(){
+    let subtotal=0;
+    items.forEach(i=>{
+        if(cart[i.id]) subtotal+=i.price*cart[i.id];
+    });
+    let vat=subtotal*0.05;
+    let total=subtotal+vat;
+    document.getElementById("subtotal").innerText=subtotal.toFixed(2);
+    document.getElementById("vat").innerText=vat.toFixed(2);
+    document.getElementById("total").innerText=total.toFixed(2);
+}
 
-    if (Object.keys(cart).length === 0) {
+function placeOrder(){
+    if(Object.keys(cart).length===0){
         showDialog("Please select at least one menu item.");
         return;
     }
 
-    let mobile = document.getElementById("mobile").value.trim();
-    if (!mobile) {
+    const mobile=document.getElementById("mobile").value.trim();
+    if(!mobile){
         showDialog("Mobile number is mandatory.");
         return;
     }
 
-    let name = document.getElementById("customerName").value.trim();
-    if (!name) {
-        name = "New Customer " + customerCounter++;
-    }
+    let name=document.getElementById("customerName").value.trim();
+    if(!name) name="New Customer "+(counter++);
 
-    let address = document.getElementById("address").value.trim();
-    if (!address) address = "NA";
-
-    sendOrderToN8N(name, mobile, address);
+    let address=document.getElementById("address").value.trim();
+    if(!address) address="NA";
 
     showDialog("Order Placed Successfully!!!\nExpected time to deliver: 20 mins.\nContact Info: +971552385011");
 
-    resetOrderState();
+    startTimer();
+    resetOrder();
 
-    startCountdown();
+    fetch("YOUR_N8N_WEBHOOK_URL",{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({name,mobile,address,cart})
+    });
 }
 
-function startCountdown() {
-    const btn = document.getElementById("placeOrderBtn");
-    btn.disabled = true;
-    countdown = 120;
+function startTimer(){
+    let seconds=120;
+    const btn=document.getElementById("placeBtn");
+    btn.disabled=true;
+    document.getElementById("infoText").innerText="You can place your new order again after 2 mins.";
 
-    document.getElementById("infoMessage").innerText =
-        "You can place your new order again after 2 mins.";
-
-    orderTimer = setInterval(() => {
-        countdown--;
-        btn.innerText = "Place Order (" + countdown + "s)";
-        if (countdown <= 0) {
-            clearInterval(orderTimer);
-            btn.innerText = "Place Order";
-            btn.disabled = false;
-            document.getElementById("infoMessage").innerText =
-                "You can cancel your order within 2 mins.";
+    timerInterval=setInterval(()=>{
+        seconds--;
+        btn.innerText="Place Order ("+seconds+"s)";
+        if(seconds<=0){
+            clearInterval(timerInterval);
+            btn.disabled=false;
+            btn.innerText="Place Order";
+            document.getElementById("infoText").innerText="You can cancel your order within 2 mins.";
         }
-    }, 1000);
+    },1000);
 }
 
-function cancelOrder() {
-    resetOrderState();
+function resetOrder(){
+    cart={};
+    document.querySelectorAll(".qty").forEach(e=>e.innerText="0");
+    calculate();
+    document.getElementById("resetBtn").disabled=true;
+    document.getElementById("cancelBtn").disabled=true;
+}
+
+function cancelOrder(){
+    resetOrder();
     showDialog("Order Cancelled Successfully.");
 }
 
-function resetOrderState() {
-    cart = {};
-    totalAmount = 0;
-    document.querySelectorAll(".qty").forEach(e => e.innerText = "0");
-    document.getElementById("totalAmount").innerText = "0";
-    document.getElementById("resetBtn").disabled = true;
-    document.getElementById("cancelBtn").disabled = true;
-}
-
-function showDialog(msg) {
-    document.getElementById("dialogMsg").innerText = msg;
-    document.getElementById("dialog").style.display = "flex";
-}
-
-function closeDialog() {
-    document.getElementById("dialog").style.display = "none";
-}
-
-function searchMenu() {
-    let input = document.getElementById("searchBox").value.toLowerCase();
-    document.querySelectorAll(".menu-item").forEach(item => {
-        let name = item.getAttribute("data-name").toLowerCase();
-        item.style.display = name.includes(input) ? "block" : "none";
+function searchMenu(){
+    const val=document.getElementById("searchBox").value.toLowerCase();
+    document.querySelectorAll(".menu-item").forEach(item=>{
+        item.style.display=item.dataset.name.toLowerCase().includes(val)?"block":"none";
     });
 }
 
-function sendOrderToN8N(name, mobile, address) {
-    fetch("https://avijitemail01.app.n8n.cloud/webhook-test/restaurant-qrcode-order", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            customerName: name,
-            mobile: mobile,
-            address: address,
-            items: cart,
-            total: totalAmount
-        })
-    });
+function showDialog(msg){
+    document.getElementById("dialogMsg").innerText=msg;
+    document.getElementById("dialog").style.display="flex";
 }
+function closeDialog(){
+    document.getElementById("dialog").style.display="none";
+}
+
+loadMenu();
 </script>
 
 </body>
