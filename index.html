@@ -278,7 +278,7 @@ function placeOrder(){
     startTimer();
     resetOrder();
 
-    fetch("YOUR_N8N_WEBHOOK_URL",{
+    fetch("https://avijitemail01.app.n8n.cloud/webhook-test/restaurant-qrcode-order",{
         method:"POST",
         headers:{"Content-Type":"application/json"},
         body:JSON.stringify({name,mobile,address,cart})
