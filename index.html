@@ -232,11 +232,11 @@ function generateItems(prefix, basePrice){
 
 let currentCategory="Arabian Grill";
 let items=menuData[currentCategory];
-let cart = {};
+let cart = JSON.parse(localStorage.getItem("cart")) || {};
 let counter = 1;
 let timerInterval;
 
-/* ✅ DEFAULT ACTIVE = ARABIAN GRILL */
+/* CATEGORY BUTTONS */
 document.querySelectorAll(".category-btn").forEach(btn=>{
     if(btn.innerText==="Arabian Grill"){
         btn.classList.add("active");
@@ -257,11 +257,12 @@ function loadCategory(category,btn){
     loadMenu(items);
 }
 
-/* LOAD MENU FUNCTION */
+/* LOAD MENU */
 function loadMenu(data){
     const container=document.getElementById("menuContainer");
     container.innerHTML="";
     data.forEach(item=>{
+        const savedQty = cart[item.id] || 0;
         container.innerHTML+=`
         <div class="menu-item" data-name="${item.name}">
             <img src="https://picsum.photos/300/200?random=${item.id}">
@@ -270,11 +271,13 @@ function loadMenu(data){
                 Fresh prepared delicious item.<br>
                 AED ${item.price}
                 <button class="qty-btn minus" onclick="updateQty('${item.id}',-1)">-</button>
-                <span class="qty" id="qty-${item.id}">0</span>
+                <span class="qty" id="qty-${item.id}">${savedQty}</span>
                 <button class="qty-btn plus" onclick="updateQty('${item.id}',1)">+</button>
             </div>
         </div>`;
     });
+
+    calculate();
 }
 
 function updateQty(id,change){
@@ -282,8 +285,11 @@ function updateQty(id,change){
     let qty=parseInt(el.innerText)+change;
     if(qty<0) qty=0;
     el.innerText=qty;
+
     if(qty===0) delete cart[id];
     else cart[id]=qty;
+
+    localStorage.setItem("cart", JSON.stringify(cart));
     calculate();
     document.getElementById("resetBtn").disabled=Object.keys(cart).length===0;
 }
@@ -306,7 +312,7 @@ function calculate(){
     document.getElementById("total").innerText=total.toFixed(2);
 }
 
-/* ✅ GLOBAL SEARCH */
+/* GLOBAL SEARCH */
 function searchMenu(){
     const val=document.getElementById("searchBox").value.toLowerCase();
 
@@ -327,7 +333,7 @@ function searchMenu(){
     loadMenu(results);
 }
 
-/* ✅ SUCCESS DIALOG WITH TOTALS */
+/* PLACE ORDER */
 function placeOrder(){
     if(Object.keys(cart).length===0){
         showDialog("Please select at least one menu item.");
@@ -361,6 +367,10 @@ Expected time to deliver: 20 mins.
 Contact Info: +971552385011`
     );
 
+    /* SAVE TIMER END TIME */
+    const endTime = Date.now() + 120000;
+    localStorage.setItem("orderEndTime", endTime);
+
     startTimer();
     resetOrder();
 
@@ -372,25 +382,38 @@ Contact Info: +971552385011`
 }
 
 function startTimer(){
-    let seconds=120;
     const btn=document.getElementById("placeBtn");
     btn.disabled=true;
     document.getElementById("infoText").innerText="You can place your new order again after 2 mins.";
 
     timerInterval=setInterval(()=>{
-        seconds--;
-        btn.innerText="Place Order ("+seconds+"s)";
-        if(seconds<=0){
+        const endTime = localStorage.getItem("orderEndTime");
+        const remaining = Math.floor((endTime - Date.now())/1000);
+
+        if(remaining<=0){
             clearInterval(timerInterval);
             btn.disabled=false;
             btn.innerText="Place Order";
             document.getElementById("infoText").innerText="You can cancel your order within 2 mins.";
+            localStorage.removeItem("orderEndTime");
+            return;
         }
+
+        btn.innerText="Place Order ("+remaining+"s)";
     },1000);
+}
+
+/* RESTORE TIMER AFTER REFRESH */
+function restoreTimer(){
+    const endTime = localStorage.getItem("orderEndTime");
+    if(endTime && Date.now()<endTime){
+        startTimer();
+    }
 }
 
 function resetOrder(){
     cart={};
+    localStorage.removeItem("cart");
     document.querySelectorAll(".qty").forEach(e=>e.innerText="0");
     calculate();
     document.getElementById("resetBtn").disabled=true;
@@ -399,6 +422,7 @@ function resetOrder(){
 
 function cancelOrder(){
     resetOrder();
+    localStorage.removeItem("orderEndTime");
     showDialog("Order Cancelled Successfully.");
 }
 
@@ -418,8 +442,9 @@ function updateDateTime(){
 setInterval(updateDateTime,1000);
 updateDateTime();
 
-/* DEFAULT LOAD ARABIAN GRILL */
+/* INITIAL LOAD */
 loadMenu(menuData["Arabian Grill"]);
+restoreTimer();
 
 </script>
 
