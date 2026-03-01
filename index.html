@@ -2,119 +2,139 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Restaurant Menu</title>
+<title>Food Spot Cafe and Restaurant Digital Menu</title>
 
 <style>
 body {
     font-family: Arial, sans-serif;
+    background: #f5f5f5;
     padding: 20px;
 }
 
+h2 {
+    text-align: center;
+}
+
+input {
+    padding: 8px;
+    margin: 5px;
+    width: 30%;
+}
+
+.category {
+    margin: 10px 0;
+}
+
 .menu-item {
-    margin-bottom: 15px;
+    background: white;
+    padding: 10px;
+    margin: 8px 0;
+    border-radius: 6px;
 }
 
-button {
-    cursor: pointer;
-}
-
-/* Small Action Buttons */
-.action-btn {
-    padding: 5px 10px;
-    font-size: 12px;
-    margin-right: 5px;
-}
-
-/* + and - Buttons */
 .qty-btn {
     padding: 2px 6px;
     font-size: 12px;
     border: none;
     color: white;
+    cursor: pointer;
 }
 
-.plus {
-    background-color: green;
-}
-
-.minus {
-    background-color: red;
-}
+.plus { background: green; }
+.minus { background: red; }
 
 .qty {
-    margin: 0 6px;
+    margin: 0 5px;
     font-weight: bold;
 }
 
-/* Info text */
-.order-info {
-    font-size: 12px;
-    color: #555;
-    margin-top: 8px;
+button {
+    padding: 6px 12px;
+    margin-right: 5px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
 }
 
-/* Dialog */
+.place-btn { background: #4CAF50; color: white; }
+.reset-btn { background: orange; color: white; }
+.cancel-btn { background: red; color: white; }
+
+.info-text {
+    margin-top: 8px;
+    font-size: 13px;
+    color: #555;
+}
+
 .dialog-overlay {
     display: none;
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    top:0; left:0;
+    width:100%; height:100%;
     background: rgba(0,0,0,0.5);
-    justify-content: center;
-    align-items: center;
+    justify-content:center;
+    align-items:center;
 }
 
 .dialog-box {
-    background: white;
-    padding: 20px;
-    border-radius: 8px;
-    text-align: center;
-    width: 300px;
-}
-
-.dialog-box button {
-    margin-top: 10px;
-    padding: 5px 10px;
+    background:white;
+    padding:20px;
+    border-radius:8px;
+    width:320px;
+    text-align:center;
 }
 </style>
 </head>
 
 <body>
 
-<h2>Restaurant Menu</h2>
+<h2>🍽 Food Spot Cafe and Restaurant Digital Menu</h2>
 
-<div class="menu-item">
-    Chicken Burger - AED 20
-    <button class="qty-btn minus" onclick="updateQty('burger', -1)">-</button>
-    <span class="qty" id="qty-burger">0</span>
-    <button class="qty-btn plus" onclick="updateQty('burger', 1)">+</button>
+<div>
+    <input type="text" id="customerName" placeholder="Your Name (Optional)">
+    <input type="text" id="mobile" placeholder="+971XXXXXXXXX">
+    <input type="text" id="address" placeholder="Address (Optional)">
 </div>
 
-<div class="menu-item">
-    Pizza - AED 30
-    <button class="qty-btn minus" onclick="updateQty('pizza', -1)">-</button>
-    <span class="qty" id="qty-pizza">0</span>
-    <button class="qty-btn plus" onclick="updateQty('pizza', 1)">+</button>
+<div>
+    <input type="text" id="searchBox" placeholder="Search menu items..." onkeyup="searchMenu()">
+</div>
+
+<!-- Default Expanded Category -->
+<div class="category">
+    <h3>Beverages</h3>
+
+    <div class="menu-item" data-name="Drink 1">
+        Drink 1 - AED 13
+        <button class="qty-btn minus" onclick="updateQty('drink1', -1)">-</button>
+        <span class="qty" id="qty-drink1">0</span>
+        <button class="qty-btn plus" onclick="updateQty('drink1', 1)">+</button>
+    </div>
+
+    <div class="menu-item" data-name="Drink 2">
+        Drink 2 - AED 14
+        <button class="qty-btn minus" onclick="updateQty('drink2', -1)">-</button>
+        <span class="qty" id="qty-drink2">0</span>
+        <button class="qty-btn plus" onclick="updateQty('drink2', 1)">+</button>
+    </div>
 </div>
 
 <h3>Total: AED <span id="totalAmount">0</span></h3>
 
 <div>
-    <button id="placeOrderBtn" class="action-btn" onclick="placeOrder()">Place Order</button>
-    <button id="resetBtn" class="action-btn" onclick="manualReset()" disabled>Reset</button>
-    <button id="cancelOrderBtn" class="action-btn" onclick="cancelOrder()" disabled>Cancel Order</button>
+    <button id="placeOrderBtn" class="place-btn" onclick="placeOrder()">Place Order</button>
+    <button id="resetBtn" class="reset-btn" onclick="resetOrderState()" disabled>Reset</button>
+    <button id="cancelBtn" class="cancel-btn" onclick="cancelOrder()" disabled>Cancel Order</button>
 </div>
 
-<div class="order-info">
-    ℹ️ You can cancel your order within 2 minutes.
+<div id="infoMessage" class="info-text">
+    You can cancel your order within 2 mins.
 </div>
 
 <!-- Dialog -->
-<div id="customDialog" class="dialog-overlay">
+<div id="dialog" class="dialog-overlay">
     <div class="dialog-box">
-        <p id="dialogMessage"></p>
+        <p id="dialogMsg"></p>
         <button onclick="closeDialog()">OK</button>
     </div>
 </div>
@@ -123,120 +143,123 @@ button {
 let cart = {};
 let totalAmount = 0;
 let orderTimer = null;
+let countdown = 120;
+let customerCounter = 1;
 
-/* Item Prices */
 const prices = {
-    burger: 20,
-    pizza: 30
+    drink1: 13,
+    drink2: 14
 };
 
-/* Quantity Update */
 function updateQty(item, change) {
-    let qtyElement = document.getElementById("qty-" + item);
-    let currentQty = parseInt(qtyElement.innerText);
+    let el = document.getElementById("qty-" + item);
+    let qty = parseInt(el.innerText) + change;
+    if (qty < 0) qty = 0;
+    el.innerText = qty;
 
-    currentQty += change;
-    if (currentQty < 0) currentQty = 0;
-
-    qtyElement.innerText = currentQty;
-
-    if (currentQty === 0) {
-        delete cart[item];
-    } else {
-        cart[item] = currentQty;
-    }
+    if (qty === 0) delete cart[item];
+    else cart[item] = qty;
 
     calculateTotal();
-
-    // Enable reset only if any item selected
     document.getElementById("resetBtn").disabled = Object.keys(cart).length === 0;
 }
 
-/* Calculate Total */
 function calculateTotal() {
     totalAmount = 0;
-    for (let item in cart) {
-        totalAmount += prices[item] * cart[item];
-    }
-    document.getElementById("totalAmount").innerText = totalAmount;
+    for (let i in cart) totalAmount += prices[i] * cart[i];
+    document.getElementById("totalAmount").innerText = totalAmount.toFixed(2);
 }
 
-/* Place Order */
 function placeOrder() {
+
     if (Object.keys(cart).length === 0) {
-        showDialog("You need to select at least one item.");
+        showDialog("Please select at least one menu item.");
         return;
     }
 
-    document.getElementById("placeOrderBtn").disabled = true;
-    document.getElementById("cancelOrderBtn").disabled = false;
+    let mobile = document.getElementById("mobile").value.trim();
+    if (!mobile) {
+        showDialog("Mobile number is mandatory.");
+        return;
+    }
 
-    sendOrderToN8N();
+    let name = document.getElementById("customerName").value.trim();
+    if (!name) {
+        name = "New Customer " + customerCounter++;
+    }
 
-    showDialog("Order placed successfully!");
+    let address = document.getElementById("address").value.trim();
+    if (!address) address = "NA";
+
+    sendOrderToN8N(name, mobile, address);
+
+    showDialog("Order Placed Successfully!!!\nExpected time to deliver: 20 mins.\nContact Info: +971552385011");
 
     resetOrderState();
 
-    orderTimer = setTimeout(() => {
-        document.getElementById("placeOrderBtn").disabled = false;
-        showDialog("You can place your new order again now.");
-    }, 120000);
+    startCountdown();
 }
 
-/* Cancel Order */
+function startCountdown() {
+    const btn = document.getElementById("placeOrderBtn");
+    btn.disabled = true;
+    countdown = 120;
+
+    document.getElementById("infoMessage").innerText =
+        "You can place your new order again after 2 mins.";
+
+    orderTimer = setInterval(() => {
+        countdown--;
+        btn.innerText = "Place Order (" + countdown + "s)";
+        if (countdown <= 0) {
+            clearInterval(orderTimer);
+            btn.innerText = "Place Order";
+            btn.disabled = false;
+            document.getElementById("infoMessage").innerText =
+                "You can cancel your order within 2 mins.";
+        }
+    }, 1000);
+}
+
 function cancelOrder() {
-    clearTimeout(orderTimer);
-
     resetOrderState();
-
-    document.getElementById("placeOrderBtn").disabled = true;
-    document.getElementById("cancelOrderBtn").disabled = true;
-
-    showDialog("Order cancelled successfully.");
-
-    setTimeout(() => {
-        document.getElementById("placeOrderBtn").disabled = false;
-        showDialog("You can place your new order again now.");
-    }, 120000);
+    showDialog("Order Cancelled Successfully.");
 }
 
-/* Manual Reset */
-function manualReset() {
-    resetOrderState();
-}
-
-/* Reset Everything */
 function resetOrderState() {
     cart = {};
     totalAmount = 0;
-
-    document.querySelectorAll(".qty").forEach(el => {
-        el.innerText = "0";
-    });
-
+    document.querySelectorAll(".qty").forEach(e => e.innerText = "0");
     document.getElementById("totalAmount").innerText = "0";
     document.getElementById("resetBtn").disabled = true;
-    document.getElementById("cancelOrderBtn").disabled = true;
+    document.getElementById("cancelBtn").disabled = true;
 }
 
-/* Dialog */
-function showDialog(message) {
-    document.getElementById("dialogMessage").innerText = message;
-    document.getElementById("customDialog").style.display = "flex";
+function showDialog(msg) {
+    document.getElementById("dialogMsg").innerText = msg;
+    document.getElementById("dialog").style.display = "flex";
 }
 
 function closeDialog() {
-    document.getElementById("customDialog").style.display = "none";
+    document.getElementById("dialog").style.display = "none";
 }
 
-/* n8n Integration */
-function sendOrderToN8N() {
-    fetch("YOUR_N8N_WEBHOOK_URL", {
+function searchMenu() {
+    let input = document.getElementById("searchBox").value.toLowerCase();
+    document.querySelectorAll(".menu-item").forEach(item => {
+        let name = item.getAttribute("data-name").toLowerCase();
+        item.style.display = name.includes(input) ? "block" : "none";
+    });
+}
+
+function sendOrderToN8N(name, mobile, address) {
+    fetch("https://avijitemail01.app.n8n.cloud/webhook-test/restaurant-qrcode-order", {
         method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+            customerName: name,
+            mobile: mobile,
+            address: address,
             items: cart,
             total: totalAmount
         })
