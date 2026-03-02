@@ -410,6 +410,12 @@ Contact Info: +971552385011`
     resetOrder();
 }
 
+	fetch("https://avijitemail01.app.n8n.cloud/webhook-test/restaurant-qrcode-order",{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({name,mobile,address,cart})
+    });
+
 /* TIMER */
 function startTimer(){
     const btn=document.getElementById("placeBtn");
