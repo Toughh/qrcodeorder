@@ -18,11 +18,42 @@ body {
     margin-bottom:15px;
 }
 
-.top-row {
-    display:flex;
-    gap:10px;
-    margin-bottom:10px;
-}
+<div class="booking-card">
+
+    <div class="booking-grid">
+
+        <div class="form-group">
+            <label>Full Name</label>
+            <div class="input-row">
+                <input type="text" id="customerName" placeholder="e.g. Rahul Sharma">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Mobile Number (Mandatory)</label>
+            <div class="input-row">
+                <span class="country-code">+971</span>
+                <input type="text" id="mobile" placeholder="55XXXXXXX">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>WhatsApp Number</label>
+            <div class="input-row">
+                <input type="text" id="whatsapp" placeholder="WhatsApp Number">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Delivery Address</label>
+            <div class="input-row">
+                <textarea id="address" rows="1" placeholder="Flat No, Building Name"></textarea>
+            </div>
+        </div>
+
+    </div>
+
+</div>
 
 .top-row input {
     flex:1;
@@ -142,6 +173,64 @@ body {
     width:320px;
     text-align:center;
 }
+
+/* ===== Modern Booking Card Style (Updated Top Section) ===== */
+
+.booking-card {
+    max-width: 1100px;
+    margin: 0 auto 20px auto;
+    padding: 20px;
+    background: #ffffff;
+    border-radius: 15px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+}
+
+.booking-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 15px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #555;
+    margin-bottom: 5px;
+}
+
+.input-row {
+    display: flex;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: 0.3s;
+}
+
+.input-row:focus-within {
+    border-color: #25D366;
+}
+
+.input-row input,
+.input-row textarea {
+    border: none;
+    padding: 10px;
+    outline: none;
+    width: 100%;
+    font-size: 14px;
+}
+
+.country-code {
+    background: #f9f9f9;
+    padding: 10px;
+    border-right: 1px solid #ddd;
+    font-size: 14px;
+}
+
 </style>
 </head>
 
