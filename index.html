@@ -454,24 +454,26 @@ function restoreTimer(){
 /* RESET */
 function resetOrder(){
 
-    // Clear cart object
+    // 1️⃣ Clear cart object completely
     cart = {};
 
-    // Clear localStorage cart
+    // 2️⃣ Remove cart from localStorage
     localStorage.removeItem("cart");
 
-    // Reset all qty display
+    // 3️⃣ Reset totals to zero immediately
+    document.getElementById("subtotal").innerText = "0.00";
+    document.getElementById("vat").innerText = "0.00";
+    document.getElementById("total").innerText = "0.00";
+
+    // 4️⃣ Reset ALL qty values on screen
     document.querySelectorAll(".qty").forEach(e=>{
-        e.innerText="0";
+        e.innerText = "0";
     });
 
-    // Reset totals
-    calculate();
-
-    // Disable reset button
+    // 5️⃣ Disable reset button
     document.getElementById("resetBtn").disabled = true;
 
-    // 🔹 Reload current category to refresh quantities properly
+    // 6️⃣ Force reload of current category (clean state)
     loadMenu(menuData[currentCategory]);
 }
 
