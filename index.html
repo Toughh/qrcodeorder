@@ -177,7 +177,8 @@ body {
                 border-left:none;
             ">
     </div>
-
+	
+	<input type="text" id="whatsapp" placeholder="📱 WhatsApp Number (Optional)">
     <input type="text" id="address" placeholder="🏠 Address (Optional) - Flat No, Building Name">
 </div>
 
@@ -510,8 +511,9 @@ function resetOrder(){
 window.addEventListener("storage", function(){
     cart = JSON.parse(localStorage.getItem("cart")) || {};
     document.getElementById("customerName").value = localStorage.getItem("customerName") || "";
-    document.getElementById("mobile").value = localStorage.getItem("mobile") || "";
-    document.getElementById("address").value = localStorage.getItem("address") || "";
+	document.getElementById("mobile").value = localStorage.getItem("mobile") || "";
+	document.getElementById("whatsapp").value = localStorage.getItem("whatsapp") || "";
+	document.getElementById("address").value = localStorage.getItem("address") || "";
     loadMenu(menuData[currentCategory]);
     restoreTimer();
 });
