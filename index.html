@@ -260,10 +260,11 @@ let timerInterval;
 /* RESTORE CUSTOMER DETAILS */
 document.getElementById("customerName").value = localStorage.getItem("customerName") || "";
 document.getElementById("mobile").value = localStorage.getItem("mobile") || "";
+document.getElementById("whatsapp").value = localStorage.getItem("whatsapp") || "";
 document.getElementById("address").value = localStorage.getItem("address") || "";
 
 /* SAVE INPUTS LIVE */
-["customerName","mobile","address"].forEach(id=>{
+["customerName","mobile","whatsapp","address"].forEach(id=>{
     document.getElementById(id).addEventListener("input",function(){
         localStorage.setItem(id,this.value);
     });
@@ -386,10 +387,31 @@ function placeOrder(){
         return;
     }
 
-    const mobile=document.getElementById("mobile").value.trim();
+    const name = document.getElementById("customerName").value.trim();
+    const mobile = document.getElementById("mobile").value.trim();
+    const whatsapp = document.getElementById("whatsapp").value.trim();
+    const address = document.getElementById("address").value.trim();
+
     if(!mobile){
         showDialog("Mobile number is mandatory.");
         return;
+    }
+
+    const isUAE = (num) => {
+        return num.startsWith("+971") || num.startsWith("971") || num.startsWith("05");
+    };
+
+    let contactNote = "";
+
+    // Scenario Handling
+    if(isUAE(mobile) && whatsapp && !isUAE(whatsapp)){
+        contactNote = "Customer has UAE mobile but international WhatsApp. If call fails, send WhatsApp message.";
+    }
+    else if(isUAE(mobile) && whatsapp && isUAE(whatsapp)){
+        contactNote = "Customer mobile & WhatsApp both UAE numbers.";
+    }
+    else if(!isUAE(mobile)){
+        contactNote = "International mobile number. Please contact via WhatsApp if call not possible.";
     }
 
     const endTime = Date.now() + 120000;
@@ -407,13 +429,20 @@ VAT: ${vat} AED
 Total: ${total} AED
 
 Expected time to deliver: 20 mins.
-Contact Info: +971552385011`
+Restaurant Contact Info: +971552385011`
     );
 	
 	fetch("https://avijitemail01.app.n8n.cloud/webhook-test/restaurant-qrcode-order",{
         method:"POST",
         headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({name,mobile,address,cart})
+        body:JSON.stringify({
+            name,
+            mobile,
+            whatsapp,
+            address,
+            contactNote,
+            cart
+        })
     });
 
     startTimer();
