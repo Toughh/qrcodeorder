@@ -155,8 +155,30 @@ body {
 
 <div class="top-row">
     <input type="text" id="customerName" placeholder="👤 Your Name (Optional)">
-    <input type="text" id="mobile" placeholder="📱 +971XXXXXXXXX">
-    <input type="text" id="address" placeholder="🏠 Address (Optional)">
+    
+    <div style="flex:1; display:flex;">
+        <span style="
+            background:#e5e7eb;
+            padding:8px;
+            border:1px solid #ccc;
+            border-right:none;
+            border-radius:6px 0 0 6px;
+            font-size:14px;
+        ">+971</span>
+        <input 
+            type="text" 
+            id="mobile" 
+            placeholder="55XXXXXXX (Mandatory)"
+            style="
+                flex:1;
+                padding:8px;
+                border-radius:0 6px 6px 0;
+                border:1px solid #ccc;
+                border-left:none;
+            ">
+    </div>
+
+    <input type="text" id="address" placeholder="🏠 Address - Room/Flat No, Building Name, Nearest Landmark (Optional)">
 </div>
 
 <div class="search-box" style="text-align:center;">
@@ -373,7 +395,16 @@ function placeOrder(){
     const endTime = Date.now() + 120000;
     localStorage.setItem("orderEndTime", endTime);
 
-    showDialog("Order Placed Successfully!!!\n\nExpected time to deliver: 20 mins.\nContact Info: +971552385011");
+        showDialog(
+`Order Placed Successfully!!!
+
+Subtotal: ${subtotal} AED
+VAT: ${vat} AED
+Total: ${total} AED
+
+Expected time to deliver: 20 mins.
+Contact Info: +971552385011`
+    );
 
     startTimer();
     resetOrder();
@@ -412,11 +443,26 @@ function restoreTimer(){
 
 /* RESET */
 function resetOrder(){
-    cart={};
+
+    // Clear cart object
+    cart = {};
+
+    // Clear localStorage cart
     localStorage.removeItem("cart");
-    document.querySelectorAll(".qty").forEach(e=>e.innerText="0");
+
+    // Reset all qty display
+    document.querySelectorAll(".qty").forEach(e=>{
+        e.innerText="0";
+    });
+
+    // Reset totals
     calculate();
-    document.getElementById("resetBtn").disabled=true;
+
+    // Disable reset button
+    document.getElementById("resetBtn").disabled = true;
+
+    // 🔹 Reload current category to refresh quantities properly
+    loadMenu(menuData[currentCategory]);
 }
 
 /* STORAGE SYNC (MULTI BROWSER TAB SUPPORT) */
