@@ -230,15 +230,26 @@ function generateItems(prefix, basePrice){
     return arr;
 }
 
-let currentCategory="Arabian Grill";
-let items=menuData[currentCategory];
+let currentCategory = localStorage.getItem("currentCategory") || "Arabian Grill";
 let cart = JSON.parse(localStorage.getItem("cart")) || {};
 let counter = 1;
 let timerInterval;
 
+/* RESTORE CUSTOMER DETAILS */
+document.getElementById("customerName").value = localStorage.getItem("customerName") || "";
+document.getElementById("mobile").value = localStorage.getItem("mobile") || "";
+document.getElementById("address").value = localStorage.getItem("address") || "";
+
+/* SAVE INPUTS LIVE */
+["customerName","mobile","address"].forEach(id=>{
+    document.getElementById(id).addEventListener("input",function(){
+        localStorage.setItem(id,this.value);
+    });
+});
+
 /* CATEGORY BUTTONS */
 document.querySelectorAll(".category-btn").forEach(btn=>{
-    if(btn.innerText==="Arabian Grill"){
+    if(btn.innerText===currentCategory){
         btn.classList.add("active");
     } else {
         btn.classList.remove("active");
@@ -251,10 +262,10 @@ document.querySelectorAll(".category-btn").forEach(btn=>{
 
 function loadCategory(category,btn){
     currentCategory=category;
-    items=menuData[category];
+    localStorage.setItem("currentCategory",category);
     document.querySelectorAll(".category-btn").forEach(b=>b.classList.remove("active"));
     btn.classList.add("active");
-    loadMenu(items);
+    loadMenu(menuData[category]);
 }
 
 /* LOAD MENU */
@@ -264,7 +275,7 @@ function loadMenu(data){
     data.forEach(item=>{
         const savedQty = cart[item.id] || 0;
         container.innerHTML+=`
-        <div class="menu-item" data-name="${item.name}">
+        <div class="menu-item">
             <img src="https://picsum.photos/300/200?random=${item.id}">
             <div class="menu-content">
                 <b>${item.name}</b><br>
@@ -280,6 +291,7 @@ function loadMenu(data){
     calculate();
 }
 
+/* UPDATE QTY */
 function updateQty(id,change){
     const el=document.getElementById("qty-"+id);
     let qty=parseInt(el.innerText)+change;
@@ -294,6 +306,7 @@ function updateQty(id,change){
     document.getElementById("resetBtn").disabled=Object.keys(cart).length===0;
 }
 
+/* CALCULATE */
 function calculate(){
     let subtotal=0;
     Object.keys(cart).forEach(id=>{
@@ -312,23 +325,34 @@ function calculate(){
     document.getElementById("total").innerText=total.toFixed(2);
 }
 
-/* GLOBAL SEARCH */
+/* GLOBAL SEARCH WITH CATEGORY AUTO SELECT */
 function searchMenu(){
     const val=document.getElementById("searchBox").value.toLowerCase();
 
     if(val===""){
-        loadMenu(menuData[currentCategory]);
+        loadCategory(currentCategory, document.querySelector(".category-btn.active"));
         return;
     }
 
     let results=[];
-    Object.values(menuData).forEach(cat=>{
-        cat.forEach(item=>{
+    let foundCategory=null;
+
+    Object.keys(menuData).forEach(cat=>{
+        menuData[cat].forEach(item=>{
             if(item.name.toLowerCase().includes(val)){
                 results.push(item);
+                foundCategory=cat;
             }
         });
     });
+
+    if(foundCategory){
+        currentCategory=foundCategory;
+        localStorage.setItem("currentCategory",foundCategory);
+        document.querySelectorAll(".category-btn").forEach(b=>{
+            b.classList.toggle("active",b.innerText===foundCategory);
+        });
+    }
 
     loadMenu(results);
 }
@@ -346,46 +370,22 @@ function placeOrder(){
         return;
     }
 
-    let name=document.getElementById("customerName").value.trim();
-    if(!name) name="New Customer "+(counter++);
-
-    let address=document.getElementById("address").value.trim();
-    if(!address) address="NA";
-
-    const subtotal=document.getElementById("subtotal").innerText;
-    const vat=document.getElementById("vat").innerText;
-    const total=document.getElementById("total").innerText;
-
-    showDialog(
-`Order Placed Successfully!!!
-
-Subtotal: ${subtotal} AED
-VAT: ${vat} AED
-Total: ${total} AED
-
-Expected time to deliver: 20 mins.
-Contact Info: +971552385011`
-    );
-
-    /* SAVE TIMER END TIME */
     const endTime = Date.now() + 120000;
     localStorage.setItem("orderEndTime", endTime);
 
+    showDialog("Order Placed Successfully!!!\n\nExpected time to deliver: 20 mins.\nContact Info: +971552385011");
+
     startTimer();
     resetOrder();
-
-    fetch("https://avijitemail01.app.n8n.cloud/webhook-test/restaurant-qrcode-order",{
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({name,mobile,address,cart})
-    });
 }
 
+/* TIMER */
 function startTimer(){
     const btn=document.getElementById("placeBtn");
     btn.disabled=true;
     document.getElementById("infoText").innerText="You can place your new order again after 2 mins.";
 
+    clearInterval(timerInterval);
     timerInterval=setInterval(()=>{
         const endTime = localStorage.getItem("orderEndTime");
         const remaining = Math.floor((endTime - Date.now())/1000);
@@ -403,7 +403,6 @@ function startTimer(){
     },1000);
 }
 
-/* RESTORE TIMER AFTER REFRESH */
 function restoreTimer(){
     const endTime = localStorage.getItem("orderEndTime");
     if(endTime && Date.now()<endTime){
@@ -411,21 +410,26 @@ function restoreTimer(){
     }
 }
 
+/* RESET */
 function resetOrder(){
     cart={};
     localStorage.removeItem("cart");
     document.querySelectorAll(".qty").forEach(e=>e.innerText="0");
     calculate();
     document.getElementById("resetBtn").disabled=true;
-    document.getElementById("cancelBtn").disabled=true;
 }
 
-function cancelOrder(){
-    resetOrder();
-    localStorage.removeItem("orderEndTime");
-    showDialog("Order Cancelled Successfully.");
-}
+/* STORAGE SYNC (MULTI BROWSER TAB SUPPORT) */
+window.addEventListener("storage", function(){
+    cart = JSON.parse(localStorage.getItem("cart")) || {};
+    document.getElementById("customerName").value = localStorage.getItem("customerName") || "";
+    document.getElementById("mobile").value = localStorage.getItem("mobile") || "";
+    document.getElementById("address").value = localStorage.getItem("address") || "";
+    loadMenu(menuData[currentCategory]);
+    restoreTimer();
+});
 
+/* DIALOG */
 function showDialog(msg){
     document.getElementById("dialogMsg").innerText=msg;
     document.getElementById("dialog").style.display="flex";
@@ -443,7 +447,7 @@ setInterval(updateDateTime,1000);
 updateDateTime();
 
 /* INITIAL LOAD */
-loadMenu(menuData["Arabian Grill"]);
+loadMenu(menuData[currentCategory]);
 restoreTimer();
 
 </script>
