@@ -85,7 +85,7 @@ body {
     display:grid;
     grid-template-columns: 1fr 1fr;
     gap:15px;
-    max-height:400px;
+    max-height:750px;
     overflow-y:auto;
     padding-right:5px;
 }
@@ -228,7 +228,7 @@ body {
     <div class="form-group">
         <label>Full Name</label>
         <div class="input-row">
-            <input type="text" id="customerName" placeholder="e.g. Rahul Sharma">
+            <input type="text" id="customerName" placeholder="Your name (Optional)">
         </div>
     </div>
 
@@ -243,8 +243,7 @@ body {
 
     <div class="form-group">
         <label>WhatsApp Number</label>
-        <div class="input-row">
-            <span class="country-code"></span>
+        <div class="input-row"
             <input type="text" id="whatsapp" placeholder="WhatsApp Number">
         </div>
         <div class="tooltip-text">Mandatory if Mobile not provided.</div>
@@ -253,7 +252,7 @@ body {
     <div class="form-group">
         <label>Delivery Address</label>
         <div class="input-row">
-            <textarea id="address" rows="1" placeholder="Flat No, Building Name"></textarea>
+            <textarea id="address" rows="1" placeholder="Flat No, Building Name (Optional)"></textarea>
         </div>
     </div>
 
@@ -278,11 +277,13 @@ body {
 
 <div class="menu-container" id="menuContainer"></div>
 
-<div class="summary">
-    <div class="custom-box">
+<div class="form-group" style="margin-bottom:12px;">
+    <label>Want to Customize?</label>
+    <div class="input-row">
         <textarea id="customNote" rows="2"
-        placeholder="Want to customize? Our experienced Chef will not let you down..."></textarea>
+        placeholder="Our experienced Chef will not let you down..."></textarea>
     </div>
+</div>
 
     Subtotal: <b><span id="subtotal">0</span> AED</b><br>
     VAT (5%): <b><span id="vat">0</span> AED</b>
@@ -475,7 +476,7 @@ function placeOrder(){
 
     // ✅ Make either Mobile OR WhatsApp mandatory
     if (mobile === "" && whatsapp === "") {
-        alert("Please enter either Mobile Number OR WhatsApp Number.");
+        showDialog("Please enter either Mobile Number OR WhatsApp Number.");
         return;
     }
 
