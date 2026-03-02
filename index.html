@@ -244,7 +244,7 @@ body {
     <div class="form-group">
         <label>WhatsApp Number</label>
         <div class="input-row">
-            <span class="country-code">+971</span>
+            <span class="country-code"></span>
             <input type="text" id="whatsapp" placeholder="WhatsApp Number">
         </div>
         <div class="tooltip-text">Mandatory if Mobile not provided.</div>
@@ -473,8 +473,9 @@ function placeOrder(){
     const whatsapp = document.getElementById("whatsapp").value.trim();
     const address = document.getElementById("address").value.trim();
 
-    if(!mobile){
-        showDialog("Mobile number is mandatory.");
+    // ✅ Make either Mobile OR WhatsApp mandatory
+    if (mobile === "" && whatsapp === "") {
+        alert("Please enter either Mobile Number OR WhatsApp Number.");
         return;
     }
 
