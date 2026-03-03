@@ -501,6 +501,7 @@ function placeOrder(){
     const endTime = Date.now() + 120000;
     localStorage.setItem("orderEndTime", endTime);
 	
+	const customMes = document.getElementById("customNote").value.trim();
 	const subtotal = document.getElementById("subtotal").innerText;
     const vat = document.getElementById("vat").innerText;
     const total = document.getElementById("total").innerText;
@@ -525,11 +526,12 @@ Restaurant Contact Info: +971552385011`
             whatsapp,
             address,
             contactNote,
-			customizeText,
+			customMes,
 			subtotal,
-			vatAmount,
-			totalAmount,
-            cart
+			vat,
+			total,
+            cart,
+			updateDateTime
         })
     });
 
@@ -568,26 +570,20 @@ function restoreTimer(){
     }
 }
 
-/* RESET */
 function resetOrder(){
 
-    // 1️⃣ Clear cart object completely
     cart = {};
 
-    // 2️⃣ Remove cart from localStorage
     localStorage.removeItem("cart");
 
-    // 3️⃣ Reset totals to zero immediately
     document.getElementById("subtotal").innerText = "0.00";
     document.getElementById("vat").innerText = "0.00";
     document.getElementById("total").innerText = "0.00";
 
-    // 4️⃣ Reset ALL qty values on screen
     document.querySelectorAll(".qty").forEach(e=>{
         e.innerText = "0";
     });
 
-    // 5️⃣ Disable reset button
     document.getElementById("resetBtn").disabled = true;
 
     // 6️⃣ Force reload of current category (clean state)
