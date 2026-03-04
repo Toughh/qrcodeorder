@@ -308,8 +308,21 @@ body {
         <button onclick="closeDialog()">OK</button>
     </div>
 </div>
-
+ 
 <script>
+
+const branches = [
+  {
+    name: "Al Nahda",
+    lat: 25.2985,
+    lon: 55.3734
+  },
+  {
+    name: "Bur Dubai",
+    lat: 25.2622,
+    lon: 55.2972
+  }
+];
 
 const menuData = {
 "Arabian Grill": generateItems("ag",25),
@@ -465,6 +478,7 @@ function searchMenu(){
 
 /* PLACE ORDER */
 function placeOrder(){
+
     if(Object.keys(cart).length===0){
         showDialog("Please select at least one menu item.");
         return;
@@ -475,7 +489,6 @@ function placeOrder(){
     const whatsapp = document.getElementById("whatsapp").value.trim();
     const address = document.getElementById("address").value.trim();
 
-    // ✅ Make either Mobile OR WhatsApp mandatory
     if (mobile === "" && whatsapp === "") {
         showDialog("Please enter either Mobile Number OR WhatsApp Number.");
         return;
@@ -487,56 +500,103 @@ function placeOrder(){
 
     let contactNote = "";
 
-    // Scenario Handling
     if(isUAE(mobile) && whatsapp && !isUAE(whatsapp)){
-        contactNote = "Customer has UAE mobile but international WhatsApp. If call fails, send WhatsApp message.";
+        contactNote = "Customer has UAE mobile but international WhatsApp.";
     }
     else if(isUAE(mobile) && whatsapp && isUAE(whatsapp)){
         contactNote = "Customer mobile & WhatsApp both UAE numbers.";
     }
     else if(!isUAE(mobile)){
-        contactNote = "International mobile number. Please contact via WhatsApp if call not possible.";
+        contactNote = "International mobile number.";
     }
 
-    const endTime = Date.now() + 120000;
-    localStorage.setItem("orderEndTime", endTime);
-	
-	const customMes = document.getElementById("customNote").value.trim();
-	const subtotal = document.getElementById("subtotal").innerText;
+    const customMes = document.getElementById("customNote").value.trim();
+    const subtotal = document.getElementById("subtotal").innerText;
     const vat = document.getElementById("vat").innerText;
     const total = document.getElementById("total").innerText;
 
-    showDialog(
+    // ===== BRANCH CONFIG =====
+    const branches = [
+        { name: "Al Nahda", lat: 25.2985, lon: 55.3734 },
+        { name: "Bur Dubai", lat: 25.2622, lon: 55.2972 }
+    ];
+
+    if (!navigator.geolocation) {
+        showDialog("Location not supported. Please enable GPS.");
+        return;
+    }
+
+    navigator.geolocation.getCurrentPosition(position => {
+
+        const userLat = position.coords.latitude;
+        const userLon = position.coords.longitude;
+
+        let nearestBranch = null;
+        let shortestDistance = Infinity;
+
+        branches.forEach(branch => {
+            const distance = getDistance(userLat, userLon, branch.lat, branch.lon);
+            if(distance < shortestDistance){
+                shortestDistance = distance;
+                nearestBranch = branch;
+            }
+        });
+
+        // ===== SEND TO n8n =====
+        fetch("https://avijitemail01.app.n8n.cloud/webhook-test/restaurant-qrcode-order",{
+            method:"POST",
+            headers:{"Content-Type":"application/json"},
+            body:JSON.stringify({
+                name,
+                mobile,
+                whatsapp,
+                address,
+                contactNote,
+                customMes,
+                subtotal,
+                vat,
+                total,
+                cart,
+                branch: nearestBranch.name,
+                latitude: userLat,
+                longitude: userLon
+            })
+        });
+
+        showDialog(
 `Order Placed Successfully!!!
 
+Branch: ${nearestBranch.name}
 Subtotal: ${subtotal} AED
 VAT: ${vat} AED
 Total: ${total} AED
 
-Expected time to deliver: 20 mins.
-Restaurant Contact Info: +971552385011`
-    );
-	
-	fetch("https://avijitemail01.app.n8n.cloud/webhook-test/restaurant-qrcode-order",{
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({
-            name,
-            mobile,
-            whatsapp,
-            address,
-            contactNote,
-			customMes,
-			subtotal,
-			vat,
-			total,
-            cart,
-			updateDateTime
-        })
-    });
+Expected time: 20 mins`
+        );
 
-    startTimer();
-    resetOrder();
+        startTimer();
+        resetOrder();
+
+    }, () => {
+        showDialog("Please allow location access to place order.");
+    });
+}
+
+
+// ===== DISTANCE FUNCTION =====
+function getDistance(lat1, lon1, lat2, lon2){
+    const R = 6371;
+    const dLat = (lat2-lat1) * Math.PI/180;
+    const dLon = (lon2-lon1) * Math.PI/180;
+
+    const a =
+        Math.sin(dLat/2) * Math.sin(dLat/2) +
+        Math.cos(lat1*Math.PI/180) *
+        Math.cos(lat2*Math.PI/180) *
+        Math.sin(dLon/2) * Math.sin(dLon/2);
+
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R*c;
 }
 
 /* TIMER */
