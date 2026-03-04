@@ -562,6 +562,9 @@ function placeOrder(){
                 longitude: userLon
             })
         });
+		
+		const endTime = Date.now() + 120000;
+		localStorage.setItem("orderEndTime", endTime);
 
         showDialog(
 `Order Placed Successfully!!!
