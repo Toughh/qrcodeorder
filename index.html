@@ -256,6 +256,11 @@ body {
             <textarea id="address" rows="1" placeholder="Flat No, Building Name (Optional)"></textarea>
         </div>
     </div>
+	
+	<div id="tableNumberContainer">
+		<label>Table Number</label>
+		<input type="text" id="tableNumber" placeholder="Enter Table Number">
+	</div>
 
 </div>
 </div>
@@ -476,6 +481,14 @@ function searchMenu(){
     loadMenu(results);
 }
 
+const urlParams = new URLSearchParams(window.location.search);
+const table = urlParams.get("table");
+
+if (table) {
+    document.getElementById("tableNumber").value = table;
+    document.getElementById("tableNumberContainer").style.display = "none";
+}
+
 /* PLACE ORDER */
 function placeOrder(){
 
@@ -488,6 +501,7 @@ function placeOrder(){
     const mobile = document.getElementById("mobile").value.trim();
     const whatsapp = document.getElementById("whatsapp").value.trim();
     const address = document.getElementById("address").value.trim();
+	const tableNumber = document.getElementById("tableNumber").value;
 
     if (mobile === "" && whatsapp === "") {
         showDialog("Please enter either Mobile Number OR WhatsApp Number.");
@@ -559,7 +573,8 @@ function placeOrder(){
                 cart,
                 branch: nearestBranch.name,
                 latitude: userLat,
-                longitude: userLon
+                longitude: userLon,
+				tableNumber
             })
         });
 		
