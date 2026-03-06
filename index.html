@@ -489,6 +489,21 @@ if (table) {
     document.getElementById("tableNumberContainer").style.display = "none";
 }
 
+const now = new Date();
+
+const orderTime =
+  now.getDate() + "-" +
+  now.toLocaleString("en-US", { month: "short" }) + "-" +
+  now.getFullYear() + ", " +
+  now.toLocaleTimeString("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: true
+  });
+  
+const orderId = "ORD-" + Date.now();
+
 /* PLACE ORDER */
 function placeOrder(){
 
@@ -574,7 +589,9 @@ function placeOrder(){
                 branch: nearestBranch.name,
                 latitude: userLat,
                 longitude: userLon,
-				tableNumber
+				tableNumber,
+				orderTime,
+				orderId
             })
         });
 		
