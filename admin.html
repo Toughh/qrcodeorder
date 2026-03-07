@@ -12,10 +12,16 @@ padding:20px;
 }
 
 .order{
-background:white;
+border:1px solid #ddd;
 padding:15px;
-margin-bottom:10px;
+margin-bottom:15px;
+background:#fff;
 border-radius:8px;
+}
+
+.order.new{
+background:#e8fff0;
+border:2px solid #22c55e;
 }
 
 button{
@@ -34,6 +40,10 @@ cursor:pointer;
 <div id="orders"></div>
 
 <script src="admin.js"></script>
+
+<audio id="newOrderSound">
+<source src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" type="audio/ogg">
+</audio>
 
 </body>
 </html>

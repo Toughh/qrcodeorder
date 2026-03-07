@@ -1,19 +1,33 @@
+let lastOrderCount = 0;
+
 async function loadOrders(){
 
 try{
 
-const res = await fetch("https://aviemail.app.n8n.cloud/webhook/get-orders");
+const res = await fetch("https://aviemail.app.n8n.cloud/webhook/get-orders?ts=" + Date.now());
 
 const data = await res.json();
 
 const container = document.getElementById("orders");
 
-container.innerHTML = "";
+container.innerHTML="";
 
-if(!data || data.length === 0){
-container.innerHTML = "<p>No Live Orders</p>";
+if(!data || data.length===0){
+container.innerHTML="<p>No Live Orders</p>";
 return;
 }
+
+/* 🔔 New Order Detection */
+
+if(data.length > lastOrderCount){
+
+document.getElementById("newOrderSound").play();
+
+}
+
+lastOrderCount = data.length;
+
+/* Render Orders */
 
 data.forEach(order=>{
 
@@ -22,21 +36,16 @@ container.innerHTML += `
 
 <b>Mobile:</b> ${order.mobile}<br>
 <b>Table:</b> ${order.table}<br>
-<b>Branch:</b> ${order.branch}<br>
 <b>Items:</b><br>
 <pre>${order.items}</pre>
 
-<b>Total:</b> AED ${order.total}<br>
 <b>Status:</b> ${order.status}<br>
-
-<b>Address:</b> ${order.address || "-"}<br>
-<b>Custom Request:</b> ${order.custom || "-"}<br>
 
 <button onclick="updateOrder('${order.recordId}','Accepted')">Accept</button>
 
 <button onclick="updateOrder('${order.recordId}','Ready')">Ready</button>
 
-<button onclick="updateOrder('${order.recordId}','Cancelled')">Cancel</button>
+<button onclick="updateOrder('${order.recordId}','Completed')">Done</button>
 
 </div>
 `;
