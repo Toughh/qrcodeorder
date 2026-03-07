@@ -1,29 +1,40 @@
+// Load Orders from n8n (which fetches from Airtable securely)
+
+async function loadOrders() {
+
+try {
+
+const res = await fetch("https://aviemail.app.n8n.cloud/webhook/get-orders");
+
 const data = await res.json();
 
 const container = document.getElementById("orders");
-container.innerHTML="";
+container.innerHTML = "";
 
-data.records.forEach(order=>{
+if(!data || data.length === 0){
+container.innerHTML = "<p>No live orders</p>";
+return;
+}
 
-const o = order.fields;
+data.forEach(order => {
 
 container.innerHTML += `
 <div class="order">
 
-<b>Order:</b> ${o.OrderID}<br>
-<b>Customer:</b> ${o.CustomerName}<br>
-<b>Items:</b> ${o.Items}<br>
-<b>Status:</b> ${o.Status}<br>
+<b>Order:</b> ${order.OrderID}<br>
+<b>Customer:</b> ${order.CustomerName}<br>
+<b>Items:</b> ${order.Items}<br>
+<b>Status:</b> ${order.Status}<br><br>
 
-<button onclick="updateOrder('${order.id}','Accepted')">
+<button onclick="updateOrder('${order.recordId}','Accepted')">
 Accept
 </button>
 
-<button onclick="updateOrder('${order.id}','Ready')">
+<button onclick="updateOrder('${order.recordId}','Ready')">
 Ready
 </button>
 
-<button onclick="updateOrder('${order.id}','Cancelled')">
+<button onclick="updateOrder('${order.recordId}','Cancelled')">
 Cancel
 </button>
 
@@ -32,14 +43,30 @@ Cancel
 
 });
 
+} catch(err){
+
+console.error("Error loading orders:", err);
+
+document.getElementById("orders").innerHTML =
+"<p>⚠️ Error loading orders</p>";
+
 }
 
+}
+
+
+// Refresh orders every 5 seconds
 loadOrders();
 setInterval(loadOrders,5000);
 
+
+// Update Order Status
+
 async function updateOrder(recordId,status){
 
-await fetch("https://aviemail.app.n8n.cloud/webhook-test/get-orders",{
+try{
+
+await fetch("https://aviemail.app.n8n.cloud/webhook/update-order",{
 
 method:"POST",
 
@@ -57,5 +84,13 @@ status:status
 alert("Order updated");
 
 loadOrders();
+
+}catch(err){
+
+console.error("Update failed",err);
+
+alert("Failed to update order");
+
+}
 
 }
