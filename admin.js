@@ -1,17 +1,3 @@
-const airtableToken = "";
-const baseId = "applHD8ZzML6wXMXt";
-const tableName = "Orders";
-
-async function loadOrders(){
-
-const res = await fetch(
-`https://api.airtable.com/v0/${baseId}/${tableName}`,
-{
-headers:{
-Authorization:`Bearer ${airtableToken}`
-}
-});
-
 const data = await res.json();
 
 const container = document.getElementById("orders");
@@ -53,7 +39,7 @@ setInterval(loadOrders,5000);
 
 async function updateOrder(recordId,status){
 
-await fetch("https://aviemail.app.n8n.cloud/webhook-test/update-order",{
+await fetch("https://aviemail.app.n8n.cloud/webhook-test/get-orders",{
 
 method:"POST",
 
