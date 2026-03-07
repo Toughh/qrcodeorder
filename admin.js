@@ -2,7 +2,7 @@ async function loadOrders(){
 
 try{
 
-const res = await fetch("https://aviemail.app.n8n.cloud/webhook/get-orders");
+const res = await fetch("https://aviemail.app.n8n.cloud/webhook-test/get-orders");
 
 const data = await res.json();
 
@@ -63,7 +63,7 @@ async function updateOrder(recordId,status){
 
 try{
 
-await fetch("https://aviemail.app.n8n.cloud/webhook/update-order",{
+await fetch("https://aviemail.app.n8n.cloud/webhook-test/update-order",{
 
 method:"POST",
 
