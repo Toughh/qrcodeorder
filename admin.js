@@ -34,12 +34,12 @@ data.forEach(order=>{
 container.innerHTML += `
 <div class="order">
 
-<b>Mobile:</b> ${order.mobile}<br>
-<b>Table:</b> ${order.table}<br>
+<b>Status:</b> ${order.status}<br>
 <b>Items:</b><br>
 <pre>${order.items}</pre>
-
-<b>Status:</b> ${order.status}<br>
+<b>CustomizedRequest:</b> ${order.customizationRequest}<br>
+<b>Table:</b> ${order.table}<br>
+<b>Mobile:</b> ${order.mobile}<br>
 
 <button onclick="updateOrder('${order.recordId}','Accepted')">Accept</button>
 
