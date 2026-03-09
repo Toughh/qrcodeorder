@@ -30,11 +30,16 @@ lastOrderCount = data.length;
 /* Render Orders */
 
 data.forEach(order=>{
+	
+let statusClass="pending";
+
+if(order.status==="Accepted") statusClass="accepted";
+if(order.status==="Ready") statusClass="ready";
 
 container.innerHTML += `
 <div class="order">
 
-<b>Status:</b> ${order.status}<br>
+<b>Status:</b> ${order.status}<br><br>
 <b>Items:</b><br>
 <pre>${order.items}</pre>
 <b>CustomizedRequest:</b> ${order.customizationRequest}<br>
