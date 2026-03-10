@@ -83,18 +83,23 @@ async function loadOrders() {
 
                 <b>Waiting:</b> ${getWaitingTime(order.orderTime)}<br><br>
 
-                <button onclick="updateOrder('${order.recordId}','Accepted')">Accept</button>
+                <button onclick="updateOrder('${order.recordId}','Preparing')">Accept</button>
 
-                <button onclick="updateOrder('${order.recordId}','Ready')">Ready</button>
+				<button onclick="updateOrder('${order.recordId}','Rejected')">Reject</button>
 
-                <button onclick="updateOrder('${order.recordId}','Completed')">Done</button>
+				<button onclick="updateOrder('${order.recordId}','Ready')">Ready</button>
+
+				<button onclick="updateOrder('${order.recordId}','Completed')">Done</button>
 
                 </div>
             `;
 
-            if (order.status === "Pending") {
-
-                pending.innerHTML += card;
+            if(order.status === "Pending"){
+				card += `
+				<button onclick="updateOrder('${order.recordId}','Preparing')">Accept</button>
+				<button onclick="updateOrder('${order.recordId}','Rejected')">Reject</button>
+				`;
+			}
 
             } else if (order.status === "Accepted") {
 
