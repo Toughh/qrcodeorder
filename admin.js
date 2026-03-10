@@ -83,21 +83,21 @@ async function loadOrders() {
 
                 <b>Waiting:</b> ${getWaitingTime(order.orderTime)}<br><br>
 
-                <button onclick="updateOrder('${order.recordId}','Preparing')">Accept</button>
+                <button onclick="updateOrder('${order.orderId}','Preparing')">Accept</button>
 
-				<button onclick="updateOrder('${order.recordId}','Rejected')">Reject</button>
+				<button onclick="updateOrder('${order.orderId}','Rejected')">Reject</button>
 
-				<button onclick="updateOrder('${order.recordId}','Ready')">Ready</button>
+				<button onclick="updateOrder('${order.orderId}','Ready')">Ready</button>
 
-				<button onclick="updateOrder('${order.recordId}','Completed')">Done</button>
+				<button onclick="updateOrder('${order.orderId}','Completed')">Done</button>
 
                 </div>
             `;
 
             if(order.status === "Pending"){
 				card += `
-				<button onclick="updateOrder('${order.recordId}','Preparing')">Accept</button>
-				<button onclick="updateOrder('${order.recordId}','Rejected')">Reject</button>
+				<button onclick="updateOrder('${order.orderId}','Preparing')">Accept</button>
+				<button onclick="updateOrder('${order.orderId}','Rejected')">Reject</button>
 				`;
 			}
 
@@ -126,7 +126,7 @@ async function loadOrders() {
 
 loadOrders();
 
-setInterval(loadOrders, 5000);
+//setInterval(loadOrders, 5000);
 
 
 async function updateOrder(recordId, status) {
