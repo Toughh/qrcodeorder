@@ -126,7 +126,7 @@ async function loadOrders() {
 
 loadOrders();
 
-setInterval(loadOrders, 50000);
+setInterval(loadOrders, 8000);
 
 
 async function updateOrder(orderId, status) {
