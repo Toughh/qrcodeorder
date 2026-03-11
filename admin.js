@@ -60,58 +60,46 @@ async function loadOrders() {
 
         data.forEach((order) => {
 
-            let highlight = newOrderIds.includes(order.orderId) ? "newOrder" : "";
+    let highlight = newOrderIds.includes(order.orderId) ? "newOrder" : "";
 
-            let statusClass = "pending";
+    let statusClass = "pending";
 
-            if (order.status === "Accepted") statusClass = "accepted";
-            if (order.status === "Ready") statusClass = "ready";
+    if (order.status === "Accepted") statusClass = "accepted";
+    if (order.status === "Ready") statusClass = "ready";
 
-            let card = `
-                <div class="order ${statusClass} ${highlight}">
+    let card = `
+        <div class="order ${statusClass} ${highlight}">
 
-                <h3>Table ${order.table}</h3>
+        <h3>Table ${order.table}</h3>
 
-                <b>Status:</b> ${order.status}<br><br>
+        <b>Status:</b> ${order.status}<br><br>
 
-                <b>Items:</b>
-                <pre>${order.items}</pre>
+        <b>Items:</b>
+        <pre>${order.items}</pre>
 
-                <b>Customized Request:</b> ${order.customizationRequest || "-"}<br>
+        <b>Customized Request:</b> ${order.customizationRequest || "-"}<br>
 
-                <b>Mobile:</b> ${order.mobile}<br>
+        <b>Mobile:</b> ${order.mobile}<br>
 
-                <b>Waiting:</b> ${getWaitingTime(order.orderTime)}<br><br>
+        <b>Waiting:</b> ${getWaitingTime(order.orderTime)}<br><br>
 
-                <button onclick="updateOrder('${order.orderId}','Preparing')">Accept</button>
+        <button onclick="updateOrder('${order.orderId}','Preparing')">Accept</button>
+        <button onclick="updateOrder('${order.orderId}','Rejected')">Reject</button>
+        <button onclick="updateOrder('${order.orderId}','Ready')">Ready</button>
+        <button onclick="updateOrder('${order.orderId}','Completed')">Done</button>
 
-				<button onclick="updateOrder('${order.orderId}','Rejected')">Reject</button>
+        </div>
+    `;
 
-				<button onclick="updateOrder('${order.orderId}','Ready')">Ready</button>
+    if (order.status === "Pending") {
+        pending.innerHTML += card;
+    } else if (order.status === "Accepted" || order.status === "Preparing") {
+        accepted.innerHTML += card;
+    } else if (order.status === "Ready") {
+        ready.innerHTML += card;
+    }
 
-				<button onclick="updateOrder('${order.orderId}','Completed')">Done</button>
-
-                </div>
-            `;
-
-            if(order.status === "Pending"){
-				card += `
-				<button onclick="updateOrder('${order.orderId}','Preparing')">Accept</button>
-				<button onclick="updateOrder('${order.orderId}','Rejected')">Reject</button>
-				`;
-			}
-
-            } else if (order.status === "Accepted") {
-
-                accepted.innerHTML += card;
-
-            } else if (order.status === "Ready") {
-
-                ready.innerHTML += card;
-
-            }
-
-        });
+});
 
     } catch (err) {
 
