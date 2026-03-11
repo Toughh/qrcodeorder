@@ -50,7 +50,7 @@ async function loadOrders() {
 
             document.getElementById("newOrderSound").play();
 
-            newOrderIds = data.map((o) => o.recordId);
+            newOrderIds = data.map((o) => o.orderId);
 
         }
 
@@ -60,7 +60,7 @@ async function loadOrders() {
 
         data.forEach((order) => {
 
-            let highlight = newOrderIds.includes(order.recordId) ? "newOrder" : "";
+            let highlight = newOrderIds.includes(order.orderId) ? "newOrder" : "";
 
             let statusClass = "pending";
 
@@ -126,10 +126,10 @@ async function loadOrders() {
 
 loadOrders();
 
-//setInterval(loadOrders, 5000);
+setInterval(loadOrders, 50000);
 
 
-async function updateOrder(recordId, status) {
+async function updateOrder(orderId, status) {
 
     try {
 
@@ -142,7 +142,7 @@ async function updateOrder(recordId, status) {
             },
 
             body: JSON.stringify({
-                recordId: recordId,
+                orderId: orderId,
                 status: status,
             }),
 
