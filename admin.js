@@ -81,6 +81,9 @@ async function loadOrders() {
 
         <b>Mobile:</b> ${order.mobile}<br>
 		<b>Whatsapp:</b> ${order.whatsapp}<br>
+		<b>DeliveryAddress:</b> ${order.deliveryaddress}<br>
+		<b>Total:</b> ${order.total}<br>
+		
 
         <b>Waiting:</b> ${getWaitingTime(order.orderTime)}<br><br>
 
@@ -118,7 +121,7 @@ loadOrders();
 setInterval(loadOrders, 8000);
 
 
-async function updateOrder(orderId, status) {
+async function updateOrder(orderId, status, items, customizationRequest, whatsapp, mobile, deliveryaddress, total) {
 
     try {
 
@@ -133,6 +136,12 @@ async function updateOrder(orderId, status) {
             body: JSON.stringify({
                 orderId: orderId,
                 status: status,
+				items: items,
+				customizationRequest: customizationRequest,
+				whatsapp: whatsapp,
+				mobile: mobile,
+				deliveryaddress: deliveryaddress,
+				total: total
             }),
 
         });
