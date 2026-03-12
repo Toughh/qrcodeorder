@@ -80,6 +80,7 @@ async function loadOrders() {
         <b>Customized Request:</b> ${order.customizationRequest || "-"}<br>
 
         <b>Mobile:</b> ${order.mobile}<br>
+		<b>Whatsapp:</b> ${order.whatsapp}<br>
 
         <b>Waiting:</b> ${getWaitingTime(order.orderTime)}<br><br>
 
