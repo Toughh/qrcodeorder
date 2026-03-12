@@ -80,16 +80,14 @@ async function loadOrders() {
         <b>Customized Request:</b> ${order.customizationRequest || "-"}<br>
 
         <b>Mobile:</b> ${order.mobile}<br>
-        <b>Whatsapp:</b> ${order.whatsapp}<br>
-        <b>DeliveryAddress:</b> ${order.deliveryaddress}<br>
-        <b>Total:</b> ${order.total}<br>
+		<b>Whatsapp:</b> ${order.whatsapp}<br>
 
         <b>Waiting:</b> ${getWaitingTime(order.orderTime)}<br><br>
 
-        <button onclick="updateOrder('${order.orderId}','Preparing','${order.items}','${order.customizationRequest}','${order.whatsapp}','${order.mobile}','${order.deliveryaddress}','${order.total}')">Accept</button>
-        <button onclick="updateOrder('${order.orderId}','Rejected','${order.items}','${order.customizationRequest}','${order.whatsapp}','${order.mobile}','${order.deliveryaddress}','${order.total}')">Reject</button>
-        <button onclick="updateOrder('${order.orderId}','Ready','${order.items}','${order.customizationRequest}','${order.whatsapp}','${order.mobile}','${order.deliveryaddress}','${order.total}')">Ready</button>
-        <button onclick="updateOrder('${order.orderId}','Completed','${order.items}','${order.customizationRequest}','${order.whatsapp}','${order.mobile}','${order.deliveryaddress}','${order.total}')">Done</button>
+        <button onclick="updateOrder('${order.orderId}','Preparing')">Accept</button>
+        <button onclick="updateOrder('${order.orderId}','Rejected')">Reject</button>
+        <button onclick="updateOrder('${order.orderId}','Ready')">Ready</button>
+        <button onclick="updateOrder('${order.orderId}','Completed')">Done</button>
 
         </div>
     `;
@@ -120,7 +118,7 @@ loadOrders();
 setInterval(loadOrders, 8000);
 
 
-async function updateOrder(orderId, status, items, customizationRequest, whatsapp, mobile, deliveryaddress, total) {
+async function updateOrder(orderId, status) {
 
     try {
 
@@ -135,12 +133,6 @@ async function updateOrder(orderId, status, items, customizationRequest, whatsap
             body: JSON.stringify({
                 orderId: orderId,
                 status: status,
-                items: items,
-                customizationRequest: customizationRequest,
-                whatsapp: whatsapp,
-                mobile: mobile,
-                deliveryaddress: deliveryaddress,
-                total: total
             }),
 
         });
