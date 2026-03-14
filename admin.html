@@ -100,6 +100,19 @@ gap:20px;
 
 </div>
 
+<script>
+
+/* Get Admin Token from URL */
+
+const params = new URLSearchParams(window.location.search);
+window.adminToken = params.get("token");
+
+if(!window.adminToken){
+  document.body.innerHTML = "<h2>Invalid Admin Access</h2>";
+}
+
+</script>
+
 <script src="admin.js"></script>
 
 <audio id="newOrderSound">

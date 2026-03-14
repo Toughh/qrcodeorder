@@ -25,7 +25,9 @@ async function loadOrders() {
 
     try {
 
-        const res = await fetch("https://aviemail.app.n8n.cloud/webhook/get-orders?ts=" + Date.now());
+        fetch("https://aviemail.app.n8n.cloud/webhook/get-orders?token=" 
+      + window.adminToken + 
+      "&ts=" + Date.now());
 
         const data = await res.json();
 
