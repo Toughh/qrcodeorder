@@ -2,21 +2,21 @@ let lastOrderCount = 0;
 
 /* Convert Airtable Date (6-Mar-2026, 8:06:52 AM) → JS Date */
 
-function parseAirtableDate(str){
+function parseAirtableDate(str) {
 
-const months={
-Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,
-Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11
-};
+    const months = {
+        Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4, Jun: 5,
+        Jul: 6, Aug: 7, Sep: 8, Oct: 9, Nov: 10, Dec: 11
+    };
 
-const parts = str.split(",");
-const datePart = parts[0].trim();
-const timePart = parts[1].trim();
+    const parts = str.split(",");
+    const datePart = parts[0].trim();
+    const timePart = parts[1].trim();
 
-const [day,mon,year] = datePart.split("-");
-const month = months[mon];
+    const [day, mon, year] = datePart.split("-");
+    const month = months[mon];
 
-return new Date(`${year}-${month+1}-${day} ${timePart}`);
+    return new Date(`${year}-${month + 1}-${day} ${timePart}`);
 
 }
 
@@ -25,9 +25,9 @@ async function loadOrders() {
 
     try {
 
-        const res = await fetch("https://aviemail.app.n8n.cloud/webhook/get-orders?token=" 
-      + window.adminToken + 
-      "&ts=" + Date.now());
+        const res = await fetch("https://aviemail.app.n8n.cloud/webhook/get-orders?token="
+            + window.adminToken +
+            "&ts=" + Date.now());
 
         const data = await res.json();
 
@@ -62,14 +62,14 @@ async function loadOrders() {
 
         data.forEach((order) => {
 
-    let highlight = newOrderIds.includes(order.orderId) ? "newOrder" : "";
+            let highlight = newOrderIds.includes(order.orderId) ? "newOrder" : "";
 
-    let statusClass = "pending";
+            let statusClass = "pending";
 
-    if (order.status === "Accepted") statusClass = "accepted";
-    if (order.status === "Ready") statusClass = "ready";
+            if (order.status === "Accepted") statusClass = "accepted";
+            if (order.status === "Ready") statusClass = "ready";
 
-    let card = `
+            let card = `
         <div class="order ${statusClass} ${highlight}">
 
         <h3>Table ${order.table}</h3>
@@ -94,15 +94,15 @@ async function loadOrders() {
         </div>
     `;
 
-    if (order.status === "Pending") {
-        pending.innerHTML += card;
-    } else if (order.status === "Accepted" || order.status === "Preparing") {
-        accepted.innerHTML += card;
-    } else if (order.status === "Ready") {
-        ready.innerHTML += card;
-    }
+            if (order.status === "Pending") {
+                pending.innerHTML += card;
+            } else if (order.status === "Accepted" || order.status === "Preparing") {
+                accepted.innerHTML += card;
+            } else if (order.status === "Ready") {
+                ready.innerHTML += card;
+            }
 
-});
+        });
 
     } catch (err) {
 
@@ -125,21 +125,21 @@ async function updateOrder(orderId, status) {
     try {
 
         await fetch("https://aviemail.app.n8n.cloud/webhook/update-order?token=" +
-  window.adminToken, 
-		{
+            window.adminToken,
+            {
 
-            method: "POST",
+                method: "POST",
 
-            headers: {
-                "Content-Type": "application/json",
-            },
+                headers: {
+                    "Content-Type": "application/json",
+                },
 
-            body: JSON.stringify({
-                orderId: orderId,
-                status: status,
-            }),
+                body: JSON.stringify({
+                    orderId: orderId,
+                    status: status,
+                }),
 
-        });
+            });
 
         loadOrders();
 

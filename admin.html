@@ -3,121 +3,127 @@
 
 <head>
 
-<title>Kitchen Orders</title>
+  <title>Kitchen Orders</title>
 
-<style>
+  <style>
+    body {
+      font-family: Arial;
+      background: #111;
+      color: white;
+      margin: 0;
+      padding: 20px;
+    }
 
-body{
-font-family:Arial;
-background:#111;
-color:white;
-margin:0;
-padding:20px;
-}
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
 
-h2{
-text-align:center;
-margin-bottom:20px;
-}
+    .order {
+      padding: 20px;
+      border-radius: 10px;
+      font-size: 18px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      margin-bottom: 15px;
+    }
 
-.order{
-padding:20px;
-border-radius:10px;
-font-size:18px;
-box-shadow:0 4px 10px rgba(0,0,0,0.3);
-margin-bottom:15px;
-}
+    .pending {
+      background: #facc15;
+      color: black;
+    }
 
-.pending{
-background:#facc15;
-color:black;
-}
+    .accepted {
+      background: #3b82f6;
+    }
 
-.accepted{
-background:#3b82f6;
-}
+    .ready {
+      background: #22c55e;
+    }
 
-.ready{
-background:#22c55e;
-}
+    .order pre {
+      background: rgba(0, 0, 0, 0.2);
+      padding: 10px;
+      border-radius: 6px;
+    }
 
-.order pre{
-background:rgba(0,0,0,0.2);
-padding:10px;
-border-radius:6px;
-}
+    button {
+      margin-top: 10px;
+      margin-right: 10px;
+      padding: 8px 14px;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+    }
 
-button{
-margin-top:10px;
-margin-right:10px;
-padding:8px 14px;
-border:none;
-border-radius:6px;
-font-weight:bold;
-cursor:pointer;
-}
+    @keyframes flash {
+      0% {
+        box-shadow: 0 0 5px red;
+      }
 
-@keyframes flash{
-0%{box-shadow:0 0 5px red;}
-50%{box-shadow:0 0 20px red;}
-100%{box-shadow:0 0 5px red;}
-}
+      50% {
+        box-shadow: 0 0 20px red;
+      }
 
-.newOrder{
-animation:flash 1s infinite;
-}
+      100% {
+        box-shadow: 0 0 5px red;
+      }
+    }
 
-.kitchen{
-display:grid;
-grid-template-columns:1fr 1fr 1fr;
-gap:20px;
-}
+    .newOrder {
+      animation: flash 1s infinite;
+    }
 
-</style>
+    .kitchen {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 20px;
+    }
+  </style>
 
 </head>
 
 <body>
 
-<h2>Live Orders</h2>
+  <h2>Live Orders</h2>
 
-<div class="kitchen">
+  <div class="kitchen">
 
-<div>
-<h2>Pending</h2>
-<div id="pending"></div>
-</div>
+    <div>
+      <h2>Pending</h2>
+      <div id="pending"></div>
+    </div>
 
-<div>
-<h2>Cooking</h2>
-<div id="accepted"></div>
-</div>
+    <div>
+      <h2>Cooking</h2>
+      <div id="accepted"></div>
+    </div>
 
-<div>
-<h2>Ready</h2>
-<div id="ready"></div>
-</div>
+    <div>
+      <h2>Ready</h2>
+      <div id="ready"></div>
+    </div>
 
-</div>
+  </div>
 
-<script>
+  <script>
 
-/* Get Admin Token from URL */
+    /* Get Admin Token from URL */
 
-const params = new URLSearchParams(window.location.search);
-window.adminToken = params.get("token");
+    const params = new URLSearchParams(window.location.search);
+    window.adminToken = params.get("token");
 
-if(!window.adminToken){
-  document.body.innerHTML = "<h2>Invalid Admin Access</h2>";
-}
+    if (!window.adminToken) {
+      document.body.innerHTML = "<h2>Invalid Admin Access</h2>";
+    }
 
-</script>
+  </script>
 
-<script src="admin.js"></script>
+  <script src="admin.js"></script>
 
-<audio id="newOrderSound">
-<source src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" type="audio/ogg">
-</audio>
+  <audio id="newOrderSound">
+    <source src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" type="audio/ogg">
+  </audio>
 
 </body>
 
