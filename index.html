@@ -401,7 +401,7 @@
             data.forEach(item => {
                 const savedQty = cart[item.id] || 0;
                 container.innerHTML += `
-        <div class="menu-item">
+            <div class="menu-item">
             <img src="https://picsum.photos/300/200?random=${item.id}">
             <div class="menu-content">
                 <b>${item.name}</b><br>
@@ -411,7 +411,7 @@
                 <span class="qty" id="qty-${item.id}">${savedQty}</span>
                 <button class="qty-btn plus" onclick="updateQty('${item.id}',1)">+</button>
             </div>
-        </div>`;
+            </div>`;
             });
 
             calculate();
@@ -574,7 +574,7 @@
                 });
 
                 // ===== SEND TO n8n =====
-                fetch("https://aviemail.app.n8n.cloud/webhook/restaurant-qrcode-order", {
+                fetch("https://rimmyemail01.app.n8n.cloud/webhook/restaurant-qrcode-order", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
@@ -718,7 +718,7 @@ Expected time: 20 mins`
         async function fetchMenuFromAPI() {
             try {
                 const response = await fetch(
-                    "https://aviemail.app.n8n.cloud/webhook/get-menu?rid=" + restaurantId
+                    "https://rimmyemail01.app.n8n.cloud/webhook/get-menu?rid=" + restaurantId
                 );
 
                 const data = await response.json();
