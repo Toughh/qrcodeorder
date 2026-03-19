@@ -290,15 +290,6 @@
     </div>
 
     <div class="categories">
-        <button class="category-btn active">Arabian Grill</button>
-        <button class="category-btn">Burgers</button>
-        <button class="category-btn">Pizzas</button>
-        <button class="category-btn">Chinese</button>
-        <button class="category-btn">Indian</button>
-        <button class="category-btn">Desserts</button>
-        <button class="category-btn">Beverages</button>
-        <button class="category-btn">Cold Mezza</button>
-        <button class="category-btn">Hot Mezza</button>
     </div>
 
     <div class="menu-container" id="menuContainer"></div>
@@ -355,7 +346,7 @@
         let menuData = {};
         let allItems = [];
 
-        let currentCategory = localStorage.getItem("currentCategory") || "Arabian Grill";
+        let currentCategory = localStorage.getItem("currentCategory") || null;
         let cart = JSON.parse(localStorage.getItem("cart")) || {};
         let counter = 1;
         let timerInterval;
@@ -370,19 +361,6 @@
         ["customerName", "mobile", "whatsapp", "address"].forEach(id => {
             document.getElementById(id).addEventListener("input", function () {
                 localStorage.setItem(id, this.value);
-            });
-        });
-
-        /* CATEGORY BUTTONS */
-        document.querySelectorAll(".category-btn").forEach(btn => {
-            if (btn.innerText === currentCategory) {
-                btn.classList.add("active");
-            } else {
-                btn.classList.remove("active");
-            }
-
-            btn.addEventListener("click", function () {
-                loadCategory(this.innerText, this);
             });
         });
 
