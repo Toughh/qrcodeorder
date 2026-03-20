@@ -232,6 +232,96 @@
             background: #f59e0b;
             color: white;
         }
+		
+		/* ===== MOBILE TEXT SIZE IMPROVEMENTS ===== */
+@media screen and (max-width: 768px) {
+
+    /* Header */
+    .header {
+        font-size: 26px; /* bigger header */
+    }
+
+    /* Booking card labels */
+    .form-group label {
+        font-size: 1rem; /* slightly bigger */
+    }
+
+    /* Input fields */
+    .input-row input,
+    .input-row textarea,
+    .country-code {
+        font-size: 16px;
+    }
+
+    /* Tooltip text */
+    .tooltip-text {
+        font-size: 12px;
+    }
+
+    /* Menu items */
+    .menu-content b {
+        font-size: 16px;
+    }
+    .menu-content {
+        font-size: 14px;
+    }
+
+    /* Category buttons */
+    .category-btn {
+        font-size: 15px;
+        padding: 8px 14px;
+    }
+
+    /* Buttons (place, reset, cancel) */
+    .buttons button {
+        font-size: 16px;
+        padding: 8px 14px;
+    }
+
+    /* Subtotal, VAT, Total */
+    #subtotal, #vat, #total {
+        font-size: 16px;
+    }
+
+    /* Search box */
+    .search-box input {
+        font-size: 15px;
+        padding: 10px;
+    }
+
+    /* Custom note textarea */
+    #customNote {
+        font-size: 15px;
+    }
+
+    /* Table number input */
+    #tableNumber {
+        font-size: 15px;
+    }
+
+    /* Dialog box text */
+    .dialog-box p {
+        font-size: 15px;
+    }
+
+    /* Info text below buttons */
+    .info-text {
+        font-size: 14px;
+    }
+	.menu-container {
+        grid-template-columns: 1fr; /* single column on phones */
+        max-height: 60vh;          /* menu scroll fits screen */
+        gap: 10px;
+    }
+
+    .booking-card {
+        padding: 15px;             /* a little smaller padding */
+    }
+
+    .menu-item img {
+        height: 150px;             /* bigger images feel touch-friendly */
+    }
+}
     </style>
 </head>
 
