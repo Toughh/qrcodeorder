@@ -238,7 +238,7 @@
 <body>
 
     <div class="header">
-		🍽 <span id="restaurantName">Loading menu...</span>
+		🍽 <span id="restaurantName">Hello there...</span>
 		<div id="datetime" style="float:right;font-size:14px;"></div>
 	</div>
 
@@ -709,10 +709,7 @@ Expected time: 20 mins`
         const root = Array.isArray(data) ? data[0] : data;
 
         // ===== 🔥 SET RESTAURANT NAME DYNAMICALLY =====
-        const restaurantName =
-            root?.restaurant?.name ||
-            root?.name ||
-            "Restaurant";
+        const restaurantName = root?.restaurantName || "Restaurant";
 
         document.getElementById("restaurantName").innerText =
             restaurantName + " Digital Menu";
@@ -726,7 +723,7 @@ Expected time: 20 mins`
 
         if (!Array.isArray(categoriesArray) || categoriesArray.length === 0) {
             console.warn("No menu categories found in API response.");
-            showDialog("Menu is empty for this restaurant.");
+            showDialog("Menu is empty for ", restaurantName);
             return;
         }
 
