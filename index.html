@@ -17,14 +17,30 @@
 			box-sizing: border-box;
 		}
 
-        .header {
-			display: flex;
-			justify-content: space-between;
-			align-items: center;
+        /* ===== PREMIUM RESTAURANT HEADER ===== */
+
+		.header {
+			text-align: center;
+			margin-bottom: 20px;
+			padding: 16px 12px;
+			background: white;
+			border-radius: 16px;
+			box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+		}
+
+		.restaurant-title {
 			font-size: 28px;
 			font-weight: 800;
-			margin-bottom: 18px;
-			flex-wrap: wrap;
+			color: #111827;
+			line-height: 1.2;
+			word-break: break-word;
+		}
+
+		.restaurant-subtitle {
+			font-size: 14px;
+			color: #6b7280;
+			margin-top: 6px;
+			font-weight: 500;
 		}
 
 		#datetime {
@@ -298,6 +314,14 @@
             .form-group label {
                 font-size: 16px;
             }
+			
+			.restaurant-title {
+				font-size: 30px;
+			}
+
+			.restaurant-subtitle {
+				font-size: 15px;
+			}
 
             /* Inputs */
             .input-row input,
@@ -404,8 +428,10 @@
 <body>
 
     <div class="header">
-		<span>🍽 <span id="restaurantName">Hello there...</span></span>
-		<span id="datetime"></span>
+		<div class="restaurant-title">
+			🍽 <span id="restaurantName">Hello there...</span>
+		</div>
+		<div id="datetime" class="restaurant-subtitle"></div>
 	</div>
 
     <!-- BOOKING SECTION -->
@@ -903,6 +929,8 @@ Expected time: 20 mins`
                 if (!menuData[currentCategory]) {
                     currentCategory = Object.keys(menuData)[0];
                 }
+				
+				localStorage.setItem("currentCategory", currentCategory);
 
                 loadMenu(menuData[currentCategory]);
 
