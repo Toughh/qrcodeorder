@@ -648,9 +648,24 @@
                 localStorage.setItem("currentCategory", currentCategory);
 
                 // Highlight correct category button
-                document.querySelectorAll(".category-btn").forEach(btn => {
-                    btn.classList.toggle("active", btn.innerText === currentCategory);
-                });
+                let activeBtn = null;
+
+				document.querySelectorAll(".category-btn").forEach(btn => {
+
+					const isActive = btn.innerText === currentCategory;
+					btn.classList.toggle("active", isActive);
+
+					if (isActive) activeBtn = btn;
+				});
+
+				// 👉 Scroll active category into view
+				if (activeBtn) {
+					activeBtn.scrollIntoView({
+						behavior: "smooth",
+						inline: "center",
+						block: "nearest"
+					});
+				}
             }
 
             loadMenu(results);
@@ -945,9 +960,23 @@ Expected time: 20 mins`
                 buildCategoryButtons();
 
                 // Highlight active button
-                document.querySelectorAll(".category-btn").forEach(btn => {
-                    btn.classList.toggle("active", btn.innerText === currentCategory);
-                });
+                let activeBtn = null;
+
+				document.querySelectorAll(".category-btn").forEach(btn => {
+
+					const isActive = btn.innerText === currentCategory;
+					btn.classList.toggle("active", isActive);
+
+					if (isActive) activeBtn = btn;
+				});
+
+				if (activeBtn) {
+					activeBtn.scrollIntoView({
+						behavior: "smooth",
+						inline: "center",
+						block: "nearest"
+					});
+				}
 
 
                 loadMenu(menuData[currentCategory]);
