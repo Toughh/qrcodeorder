@@ -284,69 +284,69 @@
             color: white;
         }
 
-		/* ===== PREMIUM NO RESULTS ===== */
+        /* ===== PREMIUM NO RESULTS ===== */
 
-		.no-results {
-			display: flex;
-			justify-content: center;
-			margin-top: 30px;
-		}
+        .no-results {
+            display: flex;
+            justify-content: center;
+            margin-top: 30px;
+        }
 
-		.no-results-box {
-			background: white;
-			padding: 22px;
-			border-radius: 16px;
-			max-width: 420px;
-			width: 100%;
-			box-shadow: 0 8px 22px rgba(0,0,0,0.08);
-		}
+        .no-results-box {
+            background: white;
+            padding: 22px;
+            border-radius: 16px;
+            max-width: 420px;
+            width: 100%;
+            box-shadow: 0 8px 22px rgba(0, 0, 0, 0.08);
+        }
 
-		.no-title {
-			font-size: 20px;
-			font-weight: 700;
-			margin-bottom: 10px;
-		}
+        .no-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
 
-		.suggestion {
-			color: #f59e0b;
-			font-weight: 600;
-			margin-bottom: 14px;
-		}
+        .suggestion {
+            color: #f59e0b;
+            font-weight: 600;
+            margin-bottom: 14px;
+        }
 
-		.popular-title {
-			margin-top: 14px;
-			font-weight: 700;
-			font-size: 16px;
-		}
+        .popular-title {
+            margin-top: 14px;
+            font-weight: 700;
+            font-size: 16px;
+        }
 
-		.popular-items {
-			display: flex;
-			gap: 8px;
-			flex-wrap: wrap;
-			margin-top: 8px;
-		}
+        .popular-items {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
 
-		.popular-item {
-			background: #f3f4f6;
-			padding: 6px 10px;
-			border-radius: 8px;
-			cursor: pointer;
-		}
+        .popular-item {
+            background: #f3f4f6;
+            padding: 6px 10px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
 
-		.suggested-categories {
-			display: flex;
-			gap: 8px;
-			flex-wrap: wrap;
-			margin-top: 8px;
-		}
+        .suggested-categories {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
 
-		.suggested-categories button {
-			border: none;
-			background: #e5e7eb;
-			padding: 6px 12px;
-			border-radius: 20px;
-			cursor: pointer;
-		}
+        .suggested-categories button {
+            border: none;
+            background: #e5e7eb;
+            padding: 6px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+        }
 
         /* ===== PREMIUM MOBILE EXPERIENCE ===== */
         @media screen and (max-width: 768px) {
@@ -548,21 +548,22 @@
     <div class="categories">
     </div>
 
+    <div class="menu-container" id="menuContainer"></div>
     <div id="noResults" class="no-results" style="display:none;">
-		<div class="no-results-box">
+        <div class="no-results-box">
 
-			<div class="no-title">🔍 No exact match found</div>
+            <div class="no-title">🔍 No exact match found</div>
 
-			<div id="didYouMean" class="suggestion"></div>
+            <div id="didYouMean" class="suggestion"></div>
 
-			<div class="popular-title">⭐ Popular Items</div>
-			<div id="popularItems" class="popular-items"></div>
+            <div class="popular-title">⭐ Popular Items</div>
+            <div id="popularItems" class="popular-items"></div>
 
-			<div class="popular-title">🍽 Browse Categories</div>
-			<div id="suggestedCategories" class="suggested-categories"></div>
+            <div class="popular-title">🍽 Browse Categories</div>
+            <div id="suggestedCategories" class="suggested-categories"></div>
 
-		</div>
-	</div>
+        </div>
+    </div>
 
     <div class="form-group" style="margin:25px 0 20px 0;">
         <label>Want to Customize?</label>
@@ -640,6 +641,10 @@
         /* LOAD MENU */
         function loadMenu(data) {
             const container = document.getElementById("menuContainer");
+            if (!container) {
+                console.error("menuContainer not found in DOM");
+                return;
+            }
             container.innerHTML = "";
             data.forEach(item => {
                 const savedQty = cart[item.id] || 0;
@@ -728,128 +733,128 @@
                 // Highlight correct category button
                 let activeBtn = null;
 
-				document.querySelectorAll(".category-btn").forEach(btn => {
+                document.querySelectorAll(".category-btn").forEach(btn => {
 
-					const isActive = btn.innerText === currentCategory;
-					btn.classList.toggle("active", isActive);
+                    const isActive = btn.innerText === currentCategory;
+                    btn.classList.toggle("active", isActive);
 
-					if (isActive) activeBtn = btn;
-				});
+                    if (isActive) activeBtn = btn;
+                });
 
-				// 👉 Scroll active category into view
-				if (activeBtn) {
-					activeBtn.scrollIntoView({
-						behavior: "smooth",
-						inline: "center",
-						block: "nearest"
-					});
-				}
+                // 👉 Scroll active category into view
+                if (activeBtn) {
+                    activeBtn.scrollIntoView({
+                        behavior: "smooth",
+                        inline: "center",
+                        block: "nearest"
+                    });
+                }
             }
 
             if (results.length === 0) {
 
-				document.getElementById("menuContainer").style.display = "none";
-				document.getElementById("noResults").style.display = "flex";
+                document.getElementById("menuContainer").style.display = "none";
+                document.getElementById("noResults").style.display = "flex";
 
-				showDidYouMean(val);
-				showPopularItems();
-				showSuggestedCategories();
+                showDidYouMean(val);
+                showPopularItems();
+                showSuggestedCategories();
 
-			} else {
+            } else {
 
-				document.getElementById("menuContainer").style.display = "grid";
-				document.getElementById("noResults").style.display = "none";
+                document.getElementById("menuContainer").style.display = "grid";
+                document.getElementById("noResults").style.display = "none";
 
-				loadMenu(results);
-			}
+                loadMenu(results);
+            }
         }
-		
-		function getAllItems() {
-			let items = [];
-			Object.values(menuData).forEach(cat => items.push(...cat));
-			return items;
-		}
-		
-		function showPopularItems() {
 
-			const all = getAllItems();
+        function getAllItems() {
+            let items = [];
+            Object.values(menuData).forEach(cat => items.push(...cat));
+            return items;
+        }
 
-			const shuffled = all.sort(() => 0.5 - Math.random());
-			const popular = shuffled.slice(0, 5);
+        function showPopularItems() {
 
-			const container = document.getElementById("popularItems");
-			container.innerHTML = "";
+            const all = getAllItems();
 
-			popular.forEach(item => {
-				const el = document.createElement("div");
-				el.className = "popular-item";
-				el.innerText = item.name;
-				el.onclick = () => {
-					document.getElementById("searchBox").value = item.name;
-					searchMenu();
-				};
-				container.appendChild(el);
-			});
-		}
-		
-		function showSuggestedCategories() {
+            const shuffled = all.sort(() => 0.5 - Math.random());
+            const popular = shuffled.slice(0, 5);
 
-			const container = document.getElementById("suggestedCategories");
-			container.innerHTML = "";
+            const container = document.getElementById("popularItems");
+            container.innerHTML = "";
 
-			Object.keys(menuData).slice(0, 6).forEach(cat => {
+            popular.forEach(item => {
+                const el = document.createElement("div");
+                el.className = "popular-item";
+                el.innerText = item.name;
+                el.onclick = () => {
+                    document.getElementById("searchBox").value = item.name;
+                    searchMenu();
+                };
+                container.appendChild(el);
+            });
+        }
 
-				const btn = document.createElement("button");
-				btn.innerText = cat;
+        function showSuggestedCategories() {
 
-				btn.onclick = () => {
-					clearSearch();
-					const categoryBtn = [...document.querySelectorAll(".category-btn")]
-						.find(b => b.innerText === cat);
-					if (categoryBtn) loadCategory(cat, categoryBtn);
-				};
+            const container = document.getElementById("suggestedCategories");
+            container.innerHTML = "";
 
-				container.appendChild(btn);
-			});
-		}
-		
-		function showDidYouMean(searchText) {
+            Object.keys(menuData).slice(0, 6).forEach(cat => {
 
-			const all = getAllItems();
+                const btn = document.createElement("button");
+                btn.innerText = cat;
 
-			let suggestion = all.find(item =>
-				item.name.toLowerCase().includes(searchText.slice(0, 3))
-			);
+                btn.onclick = () => {
+                    clearSearch();
+                    const categoryBtn = [...document.querySelectorAll(".category-btn")]
+                        .find(b => b.innerText === cat);
+                    if (categoryBtn) loadCategory(cat, categoryBtn);
+                };
 
-			const box = document.getElementById("didYouMean");
+                container.appendChild(btn);
+            });
+        }
 
-			if (suggestion) {
+        function showDidYouMean(searchText) {
 
-				box.innerHTML = `Did you mean: <b>${suggestion.name}</b>?`;
+            const all = getAllItems();
 
-				box.onclick = () => {
-					document.getElementById("searchBox").value = suggestion.name;
-					searchMenu();
-				};
+            let suggestion = all.find(item =>
+                item.name.toLowerCase().includes(searchText.slice(0, 3))
+            );
 
-			} else {
-				box.innerHTML = "";
-			}
-		}
+            const box = document.getElementById("didYouMean");
 
-		function clearSearch() {
+            if (suggestion) {
 
-			const box = document.getElementById("searchBox");
-			box.value = "";
+                box.innerHTML = `Did you mean: <b>${suggestion.name}</b>?`;
 
-			document.getElementById("noResults").style.display = "none";
-			document.getElementById("menuContainer").style.display = "grid";
+                box.onclick = () => {
+                    document.getElementById("searchBox").value = suggestion.name;
+                    searchMenu();
+                };
 
-			const activeBtn = [...document.querySelectorAll(".category-btn")]
-				.find(btn => btn.innerText === currentCategory);
+            } else {
+                box.innerHTML = "";
+            }
+        }
 
-			if (activeBtn) loadCategory(currentCategory, activeBtn);
-		}
+        function clearSearch() {
+
+            const box = document.getElementById("searchBox");
+            box.value = "";
+
+            document.getElementById("noResults").style.display = "none";
+            document.getElementById("menuContainer").style.display = "grid";
+
+            const activeBtn = [...document.querySelectorAll(".category-btn")]
+                .find(btn => btn.innerText === currentCategory);
+
+            if (activeBtn) loadCategory(currentCategory, activeBtn);
+        }
 
         const urlParams = new URLSearchParams(window.location.search);
         const table = urlParams.get("table");
@@ -890,25 +895,25 @@
 
             if (mobile === "" && whatsapp === "") {
 
-				document.getElementById("mobileLabel").classList.add("label-error");
-				document.getElementById("whatsappLabel").classList.add("label-error");
+                document.getElementById("mobileLabel").classList.add("label-error");
+                document.getElementById("whatsappLabel").classList.add("label-error");
 
-				document.querySelector("#mobile").parentElement.classList.add("input-error");
-				document.querySelector("#whatsapp").parentElement.classList.add("input-error");
+                document.querySelector("#mobile").parentElement.classList.add("input-error");
+                document.querySelector("#whatsapp").parentElement.classList.add("input-error");
 
-				const targetField = document.getElementById("mobile");
+                const targetField = document.getElementById("mobile");
 
-				targetField.scrollIntoView({
-					behavior: "smooth",
-					block: "center"
-				});
+                targetField.scrollIntoView({
+                    behavior: "smooth",
+                    block: "center"
+                });
 
-				setTimeout(() => targetField.focus(), 400);
+                setTimeout(() => targetField.focus(), 400);
 
-				showDialog("Please enter Mobile Number or WhatsApp Number.");
+                showDialog("Please enter Mobile Number or WhatsApp Number.");
 
-				return;
-			}
+                return;
+            }
 
             const isUAE = (num) => {
                 return num.startsWith("+971") || num.startsWith("971") || num.startsWith("05");
@@ -1159,21 +1164,21 @@ Expected time: 20 mins`
                 // Highlight active button
                 let activeBtn = null;
 
-				document.querySelectorAll(".category-btn").forEach(btn => {
+                document.querySelectorAll(".category-btn").forEach(btn => {
 
-					const isActive = btn.innerText === currentCategory;
-					btn.classList.toggle("active", isActive);
+                    const isActive = btn.innerText === currentCategory;
+                    btn.classList.toggle("active", isActive);
 
-					if (isActive) activeBtn = btn;
-				});
+                    if (isActive) activeBtn = btn;
+                });
 
-				if (activeBtn) {
-					activeBtn.scrollIntoView({
-						behavior: "smooth",
-						inline: "center",
-						block: "nearest"
-					});
-				}
+                if (activeBtn) {
+                    activeBtn.scrollIntoView({
+                        behavior: "smooth",
+                        inline: "center",
+                        block: "nearest"
+                    });
+                }
 
 
                 loadMenu(menuData[currentCategory]);
@@ -1204,8 +1209,10 @@ Expected time: 20 mins`
         }
 
         /* INITIAL LOAD */
-        fetchMenuFromAPI();
-        restoreTimer();
+        window.addEventListener("DOMContentLoaded", () => {
+            fetchMenuFromAPI();
+            restoreTimer();
+        });
 
     </script>
 
