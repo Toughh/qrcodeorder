@@ -360,6 +360,12 @@
             background: #fff5f5;
         }
 
+        #placeBtn:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+            opacity: 0.85;
+        }
+
         /* ===== PREMIUM MOBILE EXPERIENCE ===== */
         @media screen and (max-width: 768px) {
 
@@ -593,6 +599,7 @@
         <button id="placeBtn" class="place" onclick="placeOrder()">Place Order</button>
         <button id="resetBtn" class="reset" onclick="resetOrder()" disabled>Reset</button>
     </div>
+    <div id="infoText" class="info-text"></div>
     </div>
 
     <div id="dialog" class="dialog-overlay">
@@ -1054,32 +1061,62 @@ Expected time: 20 mins`
 
         /* TIMER */
         function startTimer() {
+
             const btn = document.getElementById("placeBtn");
+            const info = document.getElementById("infoText");
+
+            let endTime = localStorage.getItem("orderEndTime");
+
+            if (!endTime) return;
+
+            endTime = parseInt(endTime);
+
             btn.disabled = true;
-            document.getElementById("infoText").innerText = "You can place your new order again after 2 minutes.";
 
             clearInterval(timerInterval);
+
             timerInterval = setInterval(() => {
-                const endTime = localStorage.getItem("orderEndTime");
+
                 const remaining = Math.floor((endTime - Date.now()) / 1000);
 
                 if (remaining <= 0) {
+
                     clearInterval(timerInterval);
+
                     btn.disabled = false;
                     btn.innerText = "Place Order";
-                    document.getElementById("infoText").innerText = "You can cancel your order within 2 mins.";
+
+                    if (info) info.innerText = "";
+
                     localStorage.removeItem("orderEndTime");
+
                     return;
                 }
 
+                // ⭐ BUTTON COUNTDOWN
                 btn.innerText = "Place Order (" + remaining + "s)";
+
+                // ⭐ STATUS MESSAGE
+                if (info) {
+                    info.innerText =
+                        "⏳ Order placed. You can place a new order after " +
+                        remaining +
+                        " seconds.";
+                }
+
             }, 1000);
         }
 
         function restoreTimer() {
+
             const endTime = localStorage.getItem("orderEndTime");
-            if (endTime && Date.now() < endTime) {
+
+            if (!endTime) return;
+
+            if (Date.now() < endTime) {
                 startTimer();
+            } else {
+                localStorage.removeItem("orderEndTime");
             }
         }
 
