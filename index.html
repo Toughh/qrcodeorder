@@ -348,6 +348,18 @@
             cursor: pointer;
         }
 
+        /* Required field error */
+
+        .label-error {
+            color: #dc2626;
+            font-weight: 700;
+        }
+
+        .input-error {
+            border: 2px solid #dc2626 !important;
+            background: #fff5f5;
+        }
+
         /* ===== PREMIUM MOBILE EXPERIENCE ===== */
         @media screen and (max-width: 768px) {
 
@@ -510,18 +522,18 @@
             </div>
 
             <div class="form-group">
-                <label>Mobile Number</label>
+                <label id="mobileLabel">Mobile Number</label>
                 <div class="input-row">
                     <span class="country-code">+971</span>
-                    <input type="text" id="mobile" placeholder="55XXXXXXX">
+                    <input type="tel" id="mobile" placeholder="55XXXXXXX" inputmode="numeric">
                 </div>
                 <div class="tooltip-text mandatory">Mandatory If WhatsApp Number Not Provided</div>
             </div>
 
             <div class="form-group">
-                <label>WhatsApp Number</label>
+                <label id="whatsappLabel">WhatsApp Number</label>
                 <div class="input-row">
-                    <input type="text" id="whatsapp" placeholder="WhatsApp Number">
+                    <input type="tel" id="whatsapp" placeholder="WhatsApp Number" inputmode="numeric">
                 </div>
                 <div class="tooltip-text mandatory">Mandatory If Mobile Number Not Provided</div>
             </div>
@@ -631,10 +643,23 @@
         });
 
         function loadCategory(category, btn) {
+
             currentCategory = category;
             localStorage.setItem("currentCategory", category);
-            document.querySelectorAll(".category-btn").forEach(b => b.classList.remove("active"));
-            btn.classList.add("active");
+
+            document.querySelectorAll(".category-btn").forEach(b => {
+                b.classList.toggle("active", b === btn);
+            });
+
+            // 👉 Scroll category into center view
+            if (btn) {
+                btn.scrollIntoView({
+                    behavior: "smooth",
+                    inline: "center",
+                    block: "nearest"
+                });
+            }
+
             loadMenu(menuData[category]);
         }
 
@@ -893,28 +918,34 @@
             const address = document.getElementById("address").value.trim();
             const tableNumber = document.getElementById("tableNumber").value;
 
-            if (mobile === "" && whatsapp === "") {
+            // ⭐ CONTACT VALIDATION
+            if (!mobile && !whatsapp) {
 
-                document.getElementById("mobileLabel").classList.add("label-error");
-                document.getElementById("whatsappLabel").classList.add("label-error");
+                const mobileField = document.getElementById("mobile");
+                const whatsappField = document.getElementById("whatsapp");
 
-                document.querySelector("#mobile").parentElement.classList.add("input-error");
-                document.querySelector("#whatsapp").parentElement.classList.add("input-error");
+                const mobileLabel = document.getElementById("mobileLabel");
+                const whatsappLabel = document.getElementById("whatsappLabel");
 
-                const targetField = document.getElementById("mobile");
+                mobileLabel?.classList.add("label-error");
+                whatsappLabel?.classList.add("label-error");
 
-                targetField.scrollIntoView({
+                mobileField.parentElement.classList.add("input-error");
+                whatsappField.parentElement.classList.add("input-error");
+
+                mobileField.scrollIntoView({
                     behavior: "smooth",
                     block: "center"
                 });
 
-                setTimeout(() => targetField.focus(), 400);
+                setTimeout(() => mobileField.focus(), 400);
 
-                showDialog("Please enter Mobile Number or WhatsApp Number.");
+                showDialog("Please enter either Mobile Number or WhatsApp Number.");
 
                 return;
             }
 
+            // ⭐ UAE detection logic (unchanged)
             const isUAE = (num) => {
                 return num.startsWith("+971") || num.startsWith("971") || num.startsWith("05");
             };
@@ -935,12 +966,6 @@
             const subtotal = document.getElementById("subtotal").innerText;
             const vat = document.getElementById("vat").innerText;
             const total = document.getElementById("total").innerText;
-
-            // ===== BRANCH CONFIG =====
-            const branches = [
-                { name: "Al Nahda", lat: 25.2985, lon: 55.3734 },
-                { name: "Bur Dubai", lat: 25.2622, lon: 55.2972 }
-            ];
 
             if (!navigator.geolocation) {
                 showDialog("Location not supported. Please enable GPS.");
@@ -1207,6 +1232,23 @@ Expected time: 20 mins`
                 container.appendChild(btn);
             });
         }
+
+        /* Clear error styling when user types */
+
+        ["mobile", "whatsapp"].forEach(id => {
+
+            const field = document.getElementById(id);
+
+            field.addEventListener("input", () => {
+
+                document.getElementById("mobileLabel")?.classList.remove("label-error");
+                document.getElementById("whatsappLabel")?.classList.remove("label-error");
+
+                field.parentElement.classList.remove("input-error");
+
+            });
+
+        });
 
         /* INITIAL LOAD */
         window.addEventListener("DOMContentLoaded", () => {
