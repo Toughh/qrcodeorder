@@ -511,7 +511,7 @@
 
     <div class="header">
         <div class="restaurant-title">
-            🍽 <span id="restaurantName">Hello there...</span>
+            🍽 <span id="restaurantName">Loading...</span>
         </div>
         <div id="datetime" class="restaurant-subtitle"></div>
     </div>
@@ -626,7 +626,17 @@
 
         const params = new URLSearchParams(window.location.search);
 
-        const restaurantId = params.get("rid") || "foodspotcafealain";
+        const restaurantId = params.get("rid");
+        const branchId = params.get("bid");
+
+        // Validate
+        if (!restaurantId) {
+            alert("Restaurant ID missing in URL");
+            throw new Error("Missing rid parameter");
+        }
+
+        // If bid not provided, you can set default branch
+        const finalBranchId = branchId;
 
         let menuData = {};
         let allItems = [];
@@ -1171,7 +1181,7 @@ Expected time: 20 mins`
         async function fetchMenuFromAPI() {
             try {
                 const response = await fetch(
-                    "https://rimmyemail01.app.n8n.cloud/webhook/get-menu?rid=" + restaurantId
+                    `https://rimmyemail01.app.n8n.cloud/webhook/get-menu?rid=${restaurantId}&bid=${finalBranchId}`
                 );
 
                 const data = await response.json();
