@@ -621,7 +621,8 @@
 
         function applySettings(config) {
 
-            const settings = config.settings || {};
+            const root = Array.isArray(config) ? config[0] : config;
+			const settings = root?.settings || {};
 
             // 🔹 Use SAFE container hiding (no layout break)
 
