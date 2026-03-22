@@ -610,6 +610,14 @@
     </div>
 
     <script>
+	
+		async function loadRestaurantConfig(){
+		  const response = await fetch(
+			`https://rimmyemail01.app.n8n.cloud/webhook/getRestaurantConfig?rid=${restaurantId}&bid=${finalBranchId}`
+		  );
+		  const config = await response.json();
+		  applySettings(config);
+		}
 
         const branches = [
             {
@@ -1298,8 +1306,16 @@ Expected time: 20 mins`
         });
 
         /* INITIAL LOAD */
-        fetchMenuFromAPI();
-        restoreTimer();
+		window.onload = async function(){
+			try{
+				await loadRestaurantConfig();
+				await fetchMenuFromAPI();
+				restoreTimer();
+			}catch(err){
+				console.error("Initialization failed:", err);
+				alert("Something went wrong loading the menu.");
+			}
+		};
 
     </script>
 
