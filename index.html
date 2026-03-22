@@ -520,16 +520,14 @@
     <div class="booking-card">
         <div class="booking-grid">
 
-            <!-- Full Name -->
-            <div id="customerNameContainer" class="form-group">
+            <div class="form-group">
                 <label>Full Name</label>
                 <div class="input-row">
                     <input type="text" id="customerName" placeholder="Your name (Optional)">
                 </div>
             </div>
 
-            <!-- Mobile -->
-            <div id="customerMobileContainer" class="form-group">
+            <div class="form-group">
                 <label id="mobileLabel">Mobile Number</label>
                 <div class="input-row">
                     <span class="country-code">+971</span>
@@ -538,8 +536,7 @@
                 <div class="tooltip-text mandatory">Mandatory If WhatsApp Number Not Provided</div>
             </div>
 
-            <!-- WhatsApp -->
-            <div id="customerWhatsappContainer" class="form-group">
+            <div class="form-group">
                 <label id="whatsappLabel">WhatsApp Number</label>
                 <div class="input-row">
                     <input type="tel" id="whatsapp" placeholder="WhatsApp Number" inputmode="numeric">
@@ -547,57 +544,62 @@
                 <div class="tooltip-text mandatory">Mandatory If Mobile Number Not Provided</div>
             </div>
 
-            <!-- Delivery -->
-            <div id="deliveryOptionContainer" class="form-group">
+            <div class="form-group">
                 <label>Delivery Address</label>
                 <div class="input-row">
                     <textarea id="address" rows="1" placeholder="Flat No, Building Name (Optional)"></textarea>
                 </div>
             </div>
-        </div>
 
-        <div class="search-box" style="text-align:center;">
-            <input type="text" id="searchBox" placeholder="🔍 Search menu items..." onkeyup="searchMenu()">
-        </div>
-
-        <div class="categories">
-        </div>
-
-        <div class="menu-container" id="menuContainer"></div>
-        <div id="noResults" class="no-results" style="display:none;">
-            <div class="no-results-box">
-
-                <div class="no-title">🔍 No exact match found</div>
-
-                <div id="didYouMean" class="suggestion"></div>
-
-                <div class="popular-title">⭐ Popular Items</div>
-                <div id="popularItems" class="popular-items"></div>
-
-                <div class="popular-title">🍽 Browse Categories</div>
-                <div id="suggestedCategories" class="suggested-categories"></div>
-
+            <div id="tableNumberContainer">
+                <label>Table Number</label>
+                <input type="text" id="tableNumber" placeholder="Enter Table Number">
             </div>
-        </div>
 
-        <div class="form-group" style="margin:25px 0 20px 0;">
-            <label>Want to Customize?</label>
-            <div class="input-row">
-                <textarea id="customNote" rows="2"
-                    placeholder="Our experienced Chef will not let you down..."></textarea>
-            </div>
         </div>
+    </div>
 
-        Subtotal: <b><span id="subtotal">0</span> AED</b><br>
-        VAT (5%): <b><span id="vat">0</span> AED</b>
-        <hr>
-        Total Amount: <b><span id="total">0</span> AED</b>
+    <div class="search-box" style="text-align:center;">
+        <input type="text" id="searchBox" placeholder="🔍 Search menu items..." onkeyup="searchMenu()">
+    </div>
 
-        <div class="buttons">
-            <button id="placeBtn" class="place" onclick="placeOrder()">Place Order</button>
-            <button id="resetBtn" class="reset" onclick="resetOrder()" disabled>Reset</button>
+    <div class="categories">
+    </div>
+
+    <div class="menu-container" id="menuContainer"></div>
+    <div id="noResults" class="no-results" style="display:none;">
+        <div class="no-results-box">
+
+            <div class="no-title">🔍 No exact match found</div>
+
+            <div id="didYouMean" class="suggestion"></div>
+
+            <div class="popular-title">⭐ Popular Items</div>
+            <div id="popularItems" class="popular-items"></div>
+
+            <div class="popular-title">🍽 Browse Categories</div>
+            <div id="suggestedCategories" class="suggested-categories"></div>
+
         </div>
-        <div id="infoText" class="info-text"></div>
+    </div>
+
+    <div class="form-group" style="margin:25px 0 20px 0;">
+        <label>Want to Customize?</label>
+        <div class="input-row">
+            <textarea id="customNote" rows="2" placeholder="Our experienced Chef will not let you down..."></textarea>
+        </div>
+    </div>
+
+    Subtotal: <b><span id="subtotal">0</span> AED</b><br>
+    VAT (5%): <b><span id="vat">0</span> AED</b>
+    <hr>
+    Total Amount: <b><span id="total">0</span> AED</b>
+
+    <div class="buttons">
+        <button id="placeBtn" class="place" onclick="placeOrder()">Place Order</button>
+        <button id="resetBtn" class="reset" onclick="resetOrder()" disabled>Reset</button>
+    </div>
+    <div id="infoText" class="info-text"></div>
     </div>
 
     <div id="dialog" class="dialog-overlay">
@@ -618,40 +620,37 @@
         }
 
         function applySettings(config) {
+
             const settings = config.settings || {};
 
-            // SHOW / HIDE FIELDS
-            const nameField = document.getElementById("customerNameContainer");
-            if (nameField) nameField.style.display = settings.requireName ? "block" : "none";
+            // 🔹 Use SAFE container hiding (no layout break)
 
-            const mobileField = document.getElementById("customerMobileContainer");
-            if (mobileField) mobileField.style.display = settings.requireMobile ? "block" : "none";
+            const nameContainer = document.getElementById("customerName")?.closest(".form-group");
+            if (nameContainer)
+                nameContainer.style.display = settings.requireName === false ? "none" : "block";
 
-            const whatsappField = document.getElementById("customerWhatsappContainer");
-            if (whatsappField) whatsappField.style.display = settings.requireWhatsapp ? "block" : "none";
+            const mobileContainer = document.getElementById("mobile")?.closest(".form-group");
+            if (mobileContainer)
+                mobileContainer.style.display = settings.requireMobile === false ? "none" : "block";
 
-            const deliveryField = document.getElementById("deliveryOptionContainer");
-            if (deliveryField) deliveryField.style.display = settings.requireDelivery ? "block" : "none";
+            const whatsappContainer = document.getElementById("whatsapp")?.closest(".form-group");
+            if (whatsappContainer)
+                whatsappContainer.style.display = settings.requireWhatsapp === false ? "none" : "block";
 
-            // UPDATE LABELS IF PROVIDED
-            const nameLabel = nameField?.querySelector("label");
-            if (nameLabel) nameLabel.textContent = settings.nameLabel || "Full Name";
+            const addressContainer = document.getElementById("address")?.closest(".form-group");
+            if (addressContainer)
+                addressContainer.style.display = settings.requireDelivery === false ? "none" : "block";
 
-            const mobileLabel = mobileField?.querySelector("label");
-            if (mobileLabel) mobileLabel.textContent = settings.mobileLabel || "Mobile Number";
+            const tableContainer = document.getElementById("tableNumberContainer");
+            if (tableContainer)
+                tableContainer.style.display = settings.requireTable === false ? "none" : "block";
 
-            const whatsappLabel = whatsappField?.querySelector("label");
-            if (whatsappLabel) whatsappLabel.textContent = settings.whatsappLabel || "WhatsApp Number";
-
-            const deliveryLabel = deliveryField?.querySelector("label");
-            if (deliveryLabel) deliveryLabel.textContent = settings.deliveryLabel || "Delivery Address";
-
-            // APPLY THEME COLOR
+            // 🔹 Theme color (optional)
             if (settings.themeColor) {
                 document.documentElement.style.setProperty("--primary-color", settings.themeColor);
             }
 
-            // APPLY LAYOUT
+            // 🔹 Layout flag (optional)
             if (settings.layout) {
                 document.body.setAttribute("data-layout", settings.layout);
             }
