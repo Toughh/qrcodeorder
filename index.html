@@ -642,8 +642,19 @@
                 addressContainer.style.display = settings.requireDelivery === false ? "none" : "block";
 
             const tableContainer = document.getElementById("tableNumberContainer");
-            if (tableContainer)
-                tableContainer.style.display = settings.requireTable === false ? "none" : "block";
+
+			if (tableContainer) {
+
+				// 🏆 QR parameter ALWAYS wins
+				if (table) {
+					tableContainer.style.display = "none";
+				}
+				else {
+					// Otherwise follow restaurant settings
+					tableContainer.style.display =
+						settings.requireTable === false ? "none" : "block";
+				}
+			}
 
             // 🔹 Theme color (optional)
             if (settings.themeColor) {
