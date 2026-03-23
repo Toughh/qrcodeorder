@@ -120,6 +120,9 @@ body {
     max-height: 750px;
     overflow-y: auto;
     padding-right: 5px;
+
+    content-visibility: auto;
+    contain-intrinsic-size: 800px;
 }
 
 .menu-item {
