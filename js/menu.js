@@ -12,7 +12,6 @@ async function fetchMenuFromAPI() {
             currentCategory = Object.keys(menuData)[0];
         }
         loadMenu(menuData[currentCategory]);
-        localStorage.setItem(cacheKey, JSON.stringify(menuData));
     }
 
     try {
@@ -76,9 +75,6 @@ async function fetchMenuFromAPI() {
         // Save selected category
         localStorage.setItem("currentCategory", currentCategory);
 
-        // Build buttons FIRST
-        buildCategoryButtons();
-
         // Highlight active button
         let activeBtn = null;
 
@@ -98,6 +94,7 @@ async function fetchMenuFromAPI() {
             });
         }
 
+        localStorage.setItem(cacheKey, JSON.stringify(menuData));
 
         loadMenu(menuData[currentCategory]);
 
@@ -160,22 +157,26 @@ async function fetchMenuFromAPI() {
             console.error("menuContainer not found in DOM");
             return;
         }
-        container.innerHTML = "";
+        let html = "";
+
         data.forEach(item => {
             const savedQty = cart[item.id] || 0;
-            container.innerHTML += `
-            <div class="menu-item">
-            <img src="https://picsum.photos/300/200?random=${item.id}">
-            <div class="menu-content">
-                <b>${item.name}</b><br>
-                Fresh prepared delicious item.<br>
-                AED ${item.price}
-                <button class="qty-btn minus" onclick="updateQty('${item.id}',-1)">-</button>
-                <span class="qty" id="qty-${item.id}">${savedQty}</span>
-                <button class="qty-btn plus" onclick="updateQty('${item.id}',1)">+</button>
-            </div>
-            </div>`;
+
+            html += `
+    <div class="menu-item">
+        <img loading="lazy" src="https://picsum.photos/300/200?random=${item.id}">
+        <div class="menu-content">
+            <b>${item.name}</b><br>
+            Fresh prepared delicious item.<br>
+            AED ${item.price}
+            <button class="qty-btn minus" onclick="updateQty('${item.id}',-1)">-</button>
+            <span class="qty" id="qty-${item.id}">${savedQty}</span>
+            <button class="qty-btn plus" onclick="updateQty('${item.id}',1)">+</button>
+        </div>
+    </div>`;
         });
+
+        container.innerHTML = html;
 
         calculate();
     }
