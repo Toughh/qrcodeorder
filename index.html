@@ -366,6 +366,42 @@
             opacity: 0.85;
         }
 
+        /* ===== PREMIUM BILLING CARD ===== */
+
+        .billing-card {
+            background: white;
+            border-radius: 16px;
+            padding: 18px;
+            margin-top: 20px;
+            box-shadow: 0 10px 28px rgba(0, 0, 0, 0.08);
+            max-width: 520px;
+        }
+
+        .billing-title {
+            font-size: 20px;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+
+        .bill-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 6px 0;
+            font-size: 15px;
+        }
+
+        .bill-row.total {
+            font-weight: 800;
+            font-size: 18px;
+            margin-top: 10px;
+            border-top: 1px dashed #ddd;
+            padding-top: 8px;
+        }
+
+        .bill-row.tax {
+            color: #6b7280;
+        }
+
         /* ===== PREMIUM MOBILE EXPERIENCE ===== */
         @media screen and (max-width: 768px) {
 
@@ -590,10 +626,10 @@
         </div>
     </div>
 
-    Subtotal: <b><span id="subtotal">0</span> AED</b><br>
-    VAT (5%): <b><span id="vat">0</span> AED</b>
-    <hr>
-    Total Amount: <b><span id="total">0</span> AED</b>
+    <div id="billingCard" class="billing-card">
+        <div class="billing-title">💳 Order Summary</div>
+        <div id="billingContainer"></div>
+    </div>
 
     <div class="buttons">
         <button id="placeBtn" class="place" onclick="placeOrder()">Place Order</button>
@@ -622,7 +658,7 @@
         function applySettings(config) {
 
             const root = Array.isArray(config) ? config[0] : config;
-			const settings = root?.settings || {};
+            const settings = root?.settings || {};
 
             // 🔹 Use SAFE container hiding (no layout break)
 
@@ -644,18 +680,18 @@
 
             const tableContainer = document.getElementById("tableNumberContainer");
 
-			if (tableContainer) {
+            if (tableContainer) {
 
-				// 🏆 QR parameter ALWAYS wins
-				if (table) {
-					tableContainer.style.display = "none";
-				}
-				else {
-					// Otherwise follow restaurant settings
-					tableContainer.style.display =
-						settings.requireTable === false ? "none" : "block";
-				}
-			}
+                // 🏆 QR parameter ALWAYS wins
+                if (table) {
+                    tableContainer.style.display = "none";
+                }
+                else {
+                    // Otherwise follow restaurant settings
+                    tableContainer.style.display =
+                        settings.requireTable === false ? "none" : "block";
+                }
+            }
 
             // 🔹 Theme color (optional)
             if (settings.themeColor) {
@@ -668,6 +704,14 @@
             }
 
             console.log("Restaurant settings applied:", settings);
+
+            // ===== BILLING SETTINGS (NEW) =====
+
+            if (settings.billing) {
+                billingConfig = settings.billing;
+            }
+
+            updateBilling();
         }
 
         const branches = [
@@ -702,6 +746,14 @@
 
         let currentCategory = localStorage.getItem("currentCategory") || null;
         let cart = JSON.parse(localStorage.getItem("cart")) || {};
+        let billingConfig = {
+            currency: "AED",
+            showSubtotal: true,
+            showTotal: true,
+            taxes: [
+                { name: "VAT", percent: 5 }
+            ]
+        };
         let counter = 1;
         let timerInterval;
 
@@ -783,7 +835,9 @@
 
         /* CALCULATE */
         function calculate() {
+
             let subtotal = 0;
+
             Object.keys(cart).forEach(id => {
                 Object.values(menuData).forEach(cat => {
                     cat.forEach(i => {
@@ -792,12 +846,51 @@
                 });
             });
 
-            let vat = subtotal * 0.05;
-            let total = subtotal + vat;
+            updateBilling(subtotal);
+        }
 
-            document.getElementById("subtotal").innerText = subtotal.toFixed(2);
-            document.getElementById("vat").innerText = vat.toFixed(2);
-            document.getElementById("total").innerText = total.toFixed(2);
+        function updateBilling(subtotal = 0) {
+
+            const container = document.getElementById("billingContainer");
+
+            if (!container) return;
+
+            let html = "";
+            let total = subtotal;
+
+            // 🔹 Subtotal
+            if (billingConfig.showSubtotal) {
+                html += `
+            <div class="bill-row">
+                <span>Subtotal</span>
+                <span>${subtotal.toFixed(2)} ${billingConfig.currency}</span>
+            </div>`;
+            }
+
+            // 🔹 Taxes (dynamic)
+            if (billingConfig.taxes) {
+                billingConfig.taxes.forEach(tax => {
+                    const amount = subtotal * tax.percent / 100;
+                    total += amount;
+
+                    html += `
+                <div class="bill-row tax">
+                    <span>${tax.name} (${tax.percent}%)</span>
+                    <span>${amount.toFixed(2)} ${billingConfig.currency}</span>
+                </div>`;
+                });
+            }
+
+            // 🔹 Total
+            if (billingConfig.showTotal) {
+                html += `
+            <div class="bill-row total">
+                <span>Total Amount</span>
+                <span>${total.toFixed(2)} ${billingConfig.currency}</span>
+            </div>`;
+            }
+
+            container.innerHTML = html;
         }
 
         /* GLOBAL SEARCH WITH CATEGORY AUTO SELECT */
@@ -1039,9 +1132,20 @@
             }
 
             const customMes = document.getElementById("customNote").value.trim();
-            const subtotal = document.getElementById("subtotal").innerText;
-            const vat = document.getElementById("vat").innerText;
-            const total = document.getElementById("total").innerText;
+
+            let subtotal = 0;
+
+            Object.keys(cart).forEach(id => {
+                Object.values(menuData).forEach(cat => {
+                    cat.forEach(i => {
+                        if (i.id === id) subtotal += i.price * cart[id];
+                    });
+                });
+            });
+
+            const totalText = document
+                .querySelector(".bill-row.total span:last-child")
+                ?.innerText || "0";
 
             if (!navigator.geolocation) {
                 showDialog("Location not supported. Please enable GPS.");
@@ -1085,7 +1189,8 @@
                         tableNumber,
                         orderTime,
                         orderId,
-                        restaurantId
+                        restaurantId,
+                        total: totalText
                     })
                 });
 
@@ -1195,9 +1300,7 @@ Expected time: 20 mins`
 
             localStorage.removeItem("cart");
 
-            document.getElementById("subtotal").innerText = "0.00";
-            document.getElementById("vat").innerText = "0.00";
-            document.getElementById("total").innerText = "0.00";
+            updateBilling(0);
 
             document.querySelectorAll(".qty").forEach(e => {
                 e.innerText = "0";
