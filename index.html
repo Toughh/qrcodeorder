@@ -658,6 +658,10 @@
         function applySettings(config) {
 
             const root = Array.isArray(config) ? config[0] : config;
+            // ⭐ Apply restaurant currency if available
+            if (root?.restaurant?.currency) {
+                billingConfig.currency = root.restaurant.currency;
+            }
             const settings = root?.settings || {};
 
             // 🔹 Use SAFE container hiding (no layout break)
@@ -747,13 +751,18 @@
         let currentCategory = localStorage.getItem("currentCategory") || null;
         let cart = JSON.parse(localStorage.getItem("cart")) || {};
         let billingConfig = {
-            currency: "AED",
+            currency: "AED",   // default fallback
             showSubtotal: true,
             showTotal: true,
             taxes: [
                 { name: "VAT", percent: 5 }
             ]
         };
+
+        // ⭐ Currency formatter (GLOBAL)
+        function money(amount) {
+            return billingConfig.currency + " " + amount.toFixed(2);
+        }
         let counter = 1;
         let timerInterval;
 
@@ -807,7 +816,7 @@
             <div class="menu-content">
                 <b>${item.name}</b><br>
                 Fresh prepared delicious item.<br>
-                AED ${item.price}
+                ${money(item.price)}
                 <button class="qty-btn minus" onclick="updateQty('${item.id}',-1)">-</button>
                 <span class="qty" id="qty-${item.id}">${savedQty}</span>
                 <button class="qty-btn plus" onclick="updateQty('${item.id}',1)">+</button>
@@ -852,7 +861,6 @@
         function updateBilling(subtotal = 0) {
 
             const container = document.getElementById("billingContainer");
-
             if (!container) return;
 
             let html = "";
@@ -861,33 +869,34 @@
             // 🔹 Subtotal
             if (billingConfig.showSubtotal) {
                 html += `
-            <div class="bill-row">
-                <span>Subtotal</span>
-                <span>${subtotal.toFixed(2)} ${billingConfig.currency}</span>
-            </div>`;
+        <div class="bill-row">
+            <span>Subtotal</span>
+            <span>${money(subtotal)}</span>
+        </div>`;
             }
 
             // 🔹 Taxes (dynamic)
             if (billingConfig.taxes) {
                 billingConfig.taxes.forEach(tax => {
+
                     const amount = subtotal * tax.percent / 100;
                     total += amount;
 
                     html += `
-                <div class="bill-row tax">
-                    <span>${tax.name} (${tax.percent}%)</span>
-                    <span>${amount.toFixed(2)} ${billingConfig.currency}</span>
-                </div>`;
+            <div class="bill-row tax">
+                <span>${tax.name} (${tax.percent}%)</span>
+                <span>${money(amount)}</span>
+            </div>`;
                 });
             }
 
             // 🔹 Total
             if (billingConfig.showTotal) {
                 html += `
-            <div class="bill-row total">
-                <span>Total Amount</span>
-                <span>${total.toFixed(2)} ${billingConfig.currency}</span>
-            </div>`;
+        <div class="bill-row total">
+            <span>Total Amount</span>
+            <span>${money(total)}</span>
+        </div>`;
             }
 
             container.innerHTML = html;
@@ -1180,8 +1189,6 @@
                         contactNote,
                         customMes,
                         subtotal,
-                        vat,
-                        total,
                         cart,
                         branch: nearestBranch.name,
                         latitude: userLat,
@@ -1201,9 +1208,8 @@
                     `Order Placed Successfully!!!
 
 Branch: ${nearestBranch.name}
-Subtotal: ${subtotal} AED
-VAT: ${vat} AED
-Total: ${total} AED
+Subtotal: ${money(subtotal)}
+Total: ${totalText}
 
 Expected time: 20 mins`
                 );
