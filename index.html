@@ -766,18 +766,15 @@
         let currentCategory = localStorage.getItem("currentCategory") || null;
         let cart = JSON.parse(localStorage.getItem("cart")) || {};
         let billingConfig = {
-            currency: "AED",   // default fallback
-            showSubtotal: true,
-            showTotal: true,
-            taxes: [
-                { name: "VAT", percent: 5 }
-            ]
-        };
+		  currency: "AED",
+		  taxes: [],
+		  showSubtotal: true,
+		  showTotal: true
+		};
 
         // ⭐ Currency formatter (GLOBAL)
         function money(amount) {
-            //return billingConfig.currency + " " + amount.toFixed(2);
-			return amount.toFixed(2);
+            return billingConfig.currency + " " + amount.toFixed(2);
         }
         let counter = 1;
         let timerInterval;
@@ -871,52 +868,49 @@
                 });
             });
 
-            updateBilling(subtotal);
+            updateBilling();
         }
 
-        function updateBilling(subtotal = 0) {
+        function updateBilling() {
 
-            const container = document.getElementById("billingContainer");
-            if (!container) return;
+			let subtotal = 0;
 
-            let html = "";
-            let total = subtotal;
+			for (const item of Object.values(cart)) {
+				subtotal += item.price * item.qty;
+			}
 
-            // 🔹 Subtotal
-            if (billingConfig.showSubtotal) {
-                html += `
-        <div class="bill-row">	
-            <span>Subtotal</span>
-            <span>${money(subtotal)}</span>
-        </div>`;
-            }
+			const billingBox = document.getElementById("billingDetails");
+			billingBox.innerHTML = "";
 
-            // 🔹 Taxes (dynamic)
-            if (billingConfig.taxes) {
-                billingConfig.taxes.forEach(tax => {
+			// 🔹 Subtotal
+			if (billingConfig.showSubtotal) {
+				billingBox.innerHTML += `
+					<div>Subtotal: ${billingConfig.currency} ${subtotal.toFixed(2)}</div>
+				`;
+			}
 
-                    const amount = subtotal * tax.percent / 100;
-                    total += amount;
+			let total = subtotal;
 
-                    html += `
-            <div class="bill-row tax">
-                <span>${tax.name} (${tax.percent}%)</span>
-                <span>${money(amount)}</span>
-            </div>`;
-                });
-            }
+			// 🔹 Dynamic taxes
+			billingConfig.taxes.forEach(tax => {
+				const taxAmount = subtotal * (tax.rate / 100);
+				total += taxAmount;
 
-            // 🔹 Total
-            if (billingConfig.showTotal) {
-                html += `
-        <div class="bill-row total">
-            <span>Total Amount</span>
-            <span>${money(total)}</span>
-        </div>`;
-            }
+				billingBox.innerHTML += `
+					<div>${tax.name} (${tax.rate}%): 
+					${billingConfig.currency} ${taxAmount.toFixed(2)}</div>
+				`;
+			});
 
-            container.innerHTML = html;
-        }
+			// 🔹 Total
+			if (billingConfig.showTotal) {
+				billingBox.innerHTML += `
+					<div class="total">
+						Total: ${billingConfig.currency} ${total.toFixed(2)}
+					</div>
+				`;
+			}
+		}
 
         /* GLOBAL SEARCH WITH CATEGORY AUTO SELECT */
         function searchMenu() {
