@@ -655,7 +655,7 @@
                 const result = await response.json();
 
                 // n8n function node returns array of items
-                const config = Array.isArray(result) ? result[0]?.json : result;
+                const config = Array.isArray(result) ? result[0] : result;
 
                 if (!config) {
                     console.error("Restaurant config not found!");
