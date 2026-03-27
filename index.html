@@ -873,14 +873,20 @@
 
         function updateBilling() {
 
+			const billingBox = document.getElementById("billingDetails");
+
+			// 🔥 If billing section not yet rendered → exit safely
+			if (!billingBox) return;
+
+			billingBox.innerHTML = "";
+
 			let subtotal = 0;
 
 			for (const item of Object.values(cart)) {
 				subtotal += item.price * item.qty;
 			}
 
-			const billingBox = document.getElementById("billingDetails");
-			billingBox.innerHTML = "";
+			let total = subtotal;
 
 			// 🔹 Subtotal
 			if (billingConfig.showSubtotal) {
@@ -889,15 +895,13 @@
 				`;
 			}
 
-			let total = subtotal;
-
-			// 🔹 Dynamic taxes
+			// 🔹 Taxes
 			billingConfig.taxes.forEach(tax => {
 				const taxAmount = subtotal * (tax.rate / 100);
 				total += taxAmount;
 
 				billingBox.innerHTML += `
-					<div>${tax.name} (${tax.rate}%): 
+					<div>${tax.name} (${tax.rate}%):
 					${billingConfig.currency} ${taxAmount.toFixed(2)}</div>
 				`;
 			});
