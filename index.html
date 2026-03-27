@@ -776,7 +776,8 @@
 
         // ⭐ Currency formatter (GLOBAL)
         function money(amount) {
-            return billingConfig.currency + " " + amount.toFixed(2);
+            //return billingConfig.currency + " " + amount.toFixed(2);
+			return amount.toFixed(2);
         }
         let counter = 1;
         let timerInterval;
@@ -884,7 +885,7 @@
             // 🔹 Subtotal
             if (billingConfig.showSubtotal) {
                 html += `
-        <div class="bill-row">
+        <div class="bill-row">	
             <span>Subtotal</span>
             <span>${money(subtotal)}</span>
         </div>`;
