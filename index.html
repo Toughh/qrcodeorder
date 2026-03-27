@@ -647,6 +647,9 @@
 
     <script>
 
+        let billingSubtotal = 0;
+        let billingTotal = 0;
+
         async function loadRestaurantConfig() {
             try {
                 const response = await fetch(
@@ -766,11 +769,11 @@
         let currentCategory = localStorage.getItem("currentCategory") || null;
         let cart = JSON.parse(localStorage.getItem("cart")) || {};
         let billingConfig = {
-		  currency: "AED",
-		  taxes: [],
-		  showSubtotal: true,
-		  showTotal: true
-		};
+            currency: "AED",
+            taxes: [],
+            showSubtotal: true,
+            showTotal: true
+        };
 
         // ⭐ Currency formatter (GLOBAL)
         function money(amount) {
@@ -873,53 +876,72 @@
 
         function updateBilling() {
 
-			const billingBox = document.getElementById("billingContainer");
-			if (!billingBox) return;
+            const billingBox = document.getElementById("billingContainer");
+            if (!billingBox) return;
 
-			billingBox.innerHTML = "";
+            billingBox.innerHTML = "";
 
-			let subtotal = 0;
+            // 🧠 Safety defaults (in case config not loaded yet)
+            const currency = billingConfig?.currency || "₹";
+            const taxes = billingConfig?.taxes || [];
+            const showSubtotal = billingConfig?.showSubtotal !== false;
+            const showTotal = billingConfig?.showTotal !== false;
 
-			// ✅ Works with your existing cart structure
-			Object.keys(cart).forEach(id => {
-				Object.values(menuData).forEach(cat => {
-					cat.forEach(i => {
-						if (i.id === id) {
-							subtotal += i.price * cart[id];
-						}
-					});
-				});
-			});
+            let subtotal = 0;
 
-			let total = subtotal;
+            // ✅ Works with your existing cart structure (cart[id] = qty)
+            Object.keys(cart).forEach(id => {
+                Object.values(menuData).forEach(cat => {
+                    cat.forEach(i => {
+                        if (i.id === id) {
+                            const price = Number(i.price) || 0;
+                            const qty = Number(cart[id]) || 0;
+                            subtotal += price * qty;
+                        }
+                    });
+                });
+            });
 
-			// 🔹 Subtotal
-			if (billingConfig.showSubtotal) {
-				billingBox.innerHTML += `
-					<div>Subtotal: ${billingConfig.currency} ${subtotal.toFixed(2)}</div>
-				`;
-			}
+            let total = subtotal;
 
-			// 🔹 Taxes
-			billingConfig.taxes.forEach(tax => {
-				const taxAmount = subtotal * (tax.rate / 100);
-				total += taxAmount;
+            // 🔹 SUBTOTAL
+            if (showSubtotal) {
+                billingBox.innerHTML += `
+            <div class="bill-row">
+                <span>Subtotal</span>
+                <span>${currency} ${subtotal.toFixed(2)}</span>
+            </div>
+        `;
+            }
 
-				billingBox.innerHTML += `
-					<div>${tax.name} (${tax.rate}%):
-					${billingConfig.currency} ${taxAmount.toFixed(2)}</div>
-				`;
-			});
+            // 🔹 TAXES
+            taxes.forEach(tax => {
+                const rate = Number(tax.rate) || 0;
+                const taxAmount = subtotal * (rate / 100);
+                total += taxAmount;
 
-			// 🔹 Total
-			if (billingConfig.showTotal) {
-				billingBox.innerHTML += `
-					<div class="total">
-						Total: ${billingConfig.currency} ${total.toFixed(2)}
-					</div>
-				`;
-			}
-		}
+                billingBox.innerHTML += `
+            <div class="bill-row">
+                <span>${tax.name} (${rate}%)</span>
+                <span>${currency} ${taxAmount.toFixed(2)}</span>
+            </div>
+        `;
+            });
+
+            // 🔹 TOTAL
+            if (showTotal) {
+                billingBox.innerHTML += `
+            <div class="bill-row total">
+                <span><strong>Total</strong></span>
+                <span><strong>${currency} ${total.toFixed(2)}</strong></span>
+            </div>
+        `;
+            }
+
+            // 🏆 STORE VALUES FOR BACKEND (CRITICAL)
+            billingSubtotal = subtotal;
+            billingTotal = total;
+        }
 
         /* GLOBAL SEARCH WITH CATEGORY AUTO SELECT */
         function searchMenu() {
