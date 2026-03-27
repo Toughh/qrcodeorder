@@ -650,6 +650,9 @@
         let billingSubtotal = 0;
         let billingTotal = 0;
 
+        let billingTaxTotal = 0;
+        let billingTaxDetails = [];
+
         async function loadRestaurantConfig() {
             try {
                 const response = await fetch(
@@ -941,6 +944,22 @@
             // 🏆 STORE VALUES FOR BACKEND (CRITICAL)
             billingSubtotal = subtotal;
             billingTotal = total;
+
+            billingTaxTotal = 0;
+            billingTaxDetails = [];
+
+            taxes.forEach(tax => {
+                const rate = Number(tax.rate) || 0;
+                const amount = subtotal * (rate / 100);
+
+                billingTaxTotal += amount;
+
+                billingTaxDetails.push({
+                    name: tax.name,
+                    rate: rate,
+                    amount: Number(amount.toFixed(2))
+                });
+            });
         }
 
         /* GLOBAL SEARCH WITH CATEGORY AUTO SELECT */
@@ -1229,8 +1248,14 @@
                         address,
                         contactNote,
                         customMes,
+
+                        // 💰 Billing
                         subtotal: billingSubtotal,
+                        taxTotal: billingTaxTotal,        // ⭐ NEW
+                        taxDetails: billingTaxDetails,    // ⭐ NEW
                         total: billingTotal,
+
+                        // 🛒 Order data
                         cart,
                         branch: nearestBranch.name,
                         latitude: userLat,
