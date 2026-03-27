@@ -874,17 +874,22 @@
         function updateBilling() {
 
 			const billingBox = document.getElementById("billingContainer");
-
-			// 🔥 If billing section not yet rendered → exit safely
 			if (!billingBox) return;
 
 			billingBox.innerHTML = "";
 
 			let subtotal = 0;
 
-			for (const item of Object.values(cart)) {
-				subtotal += item.price * item.qty;
-			}
+			// ✅ Works with your existing cart structure
+			Object.keys(cart).forEach(id => {
+				Object.values(menuData).forEach(cat => {
+					cat.forEach(i => {
+						if (i.id === id) {
+							subtotal += i.price * cart[id];
+						}
+					});
+				});
+			});
 
 			let total = subtotal;
 
