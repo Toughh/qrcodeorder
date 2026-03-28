@@ -402,6 +402,14 @@
             color: #6b7280;
         }
 
+        .country-code {
+            border: none;
+            background: #f9f9f9;
+            padding: 10px;
+            border-right: 1px solid #ddd;
+            font-size: 14px;
+        }
+
         /* ===== PREMIUM MOBILE EXPERIENCE ===== */
         @media screen and (max-width: 768px) {
 
@@ -565,11 +573,23 @@
 
             <div class="form-group">
                 <label id="mobileLabel">Mobile Number</label>
+
                 <div class="input-row">
-                    <span class="country-code">+971</span>
-                    <input type="tel" id="mobile" placeholder="55XXXXXXX" inputmode="numeric">
+
+                    <select id="countryCode" class="country-code">
+                        <option value="+971">🇦🇪 +971</option>
+                        <option value="+91">🇮🇳 +91</option>
+                        <option value="+44">🇬🇧 +44</option>
+                        <option value="+1">🇺🇸 +1</option>
+                    </select>
+
+                    <input type="tel" id="mobile" placeholder="Enter mobile number" inputmode="numeric">
+
                 </div>
-                <div class="tooltip-text mandatory">Mandatory If WhatsApp Number Not Provided</div>
+
+                <div class="tooltip-text mandatory">
+                    Mandatory If WhatsApp Number Not Provided
+                </div>
             </div>
 
             <div class="form-group">
@@ -680,9 +700,18 @@
 
             // ✅ Handle n8n array output
             const root = Array.isArray(config) ? config[0]?.json : config;
+
             if (!root) {
                 console.error("Invalid restaurant config");
                 return;
+            }
+
+            // ⭐ Apply default country code
+            if (root?.restaurant?.defaultCountryCode) {
+                const countrySelect = document.getElementById("countryCode");
+                if (countrySelect) {
+                    countrySelect.value = root.restaurant.defaultCountryCode;
+                }
             }
 
             // ⭐ Apply restaurant currency if available
@@ -1151,7 +1180,9 @@
             }
 
             const name = document.getElementById("customerName").value.trim();
-            const mobile = document.getElementById("mobile").value.trim();
+            const code = document.getElementById("countryCode").value;
+            const mobileLocal = document.getElementById("mobile").value.trim();
+            const mobile = mobileLocal ? code + mobileLocal : "";
             const whatsapp = document.getElementById("whatsapp").value.trim();
             const address = document.getElementById("address").value.trim();
             const tableNumber = document.getElementById("tableNumber").value;
