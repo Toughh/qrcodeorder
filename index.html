@@ -658,6 +658,24 @@
     <div id="infoText" class="info-text"></div>
     </div>
 
+    <!-- ===== REVIEW ORDER MODAL ===== -->
+    <div id="reviewModal" class="dialog-overlay">
+        <div class="dialog-box" style="max-width:500px; text-align:left;">
+
+            <h3>🧾 Review Your Order</h3>
+
+            <div id="reviewItems"></div>
+
+            <div id="reviewSummary" style="margin-top:10px;"></div>
+
+            <div style="margin-top:15px; text-align:right;">
+                <button onclick="closeReview()">Cancel</button>
+                <button class="place" onclick="confirmOrder()">Confirm Order</button>
+            </div>
+
+        </div>
+    </div>
+
     <div id="dialog" class="dialog-overlay">
         <div class="dialog-box">
             <p id="dialogMsg"></p>
@@ -1171,7 +1189,7 @@
 
         const orderId = "ORD-" + now;
 
-        /* PLACE ORDER */
+
         function placeOrder() {
 
             if (Object.keys(cart).length === 0) {
@@ -1179,6 +1197,13 @@
                 return;
             }
 
+            openReviewModal();
+        }
+
+
+        /* PLACE ORDER */
+        function confirmOrder() {
+            closeReview();
             const name = document.getElementById("customerName").value.trim();
             const code = document.getElementById("countryCode").value;
             const mobileLocal = document.getElementById("mobile").value.trim();
@@ -1301,15 +1326,93 @@
                 const endTime = Date.now() + 120000;
                 localStorage.setItem("orderEndTime", endTime);
 
-                showDialog(
-                    `Order Placed Successfully!!!
+                let itemsHtml = "";
+                let subtotal = 0;
+                let taxTotal = 0;
 
-Branch: ${nearestBranch.name}
-Subtotal: ${money(subtotal)}
-Total: ${totalText}
+                // 🔹 Build item list
+                Object.keys(cart).forEach(id => {
+                    Object.values(menuData).forEach(cat => {
+                        cat.forEach(item => {
+                            if (item.id === id) {
 
-Expected time: 20 mins`
-                );
+                                const qty = cart[id];
+                                const price = parseFloat(item.price) || 0;
+                                const total = qty * price;
+
+                                subtotal += total;
+
+                                itemsHtml += `
+									<div style="display:flex; justify-content:space-between; margin:6px 0;">
+										<span>${item.name} x ${qty}</span>
+										<span>${money(total)}</span>
+									</div>
+								`;
+                            }
+                        });
+                    });
+                });
+
+                // 🔹 Taxes (dynamic from billingConfig)
+                let taxHtml = "";
+
+                if (billingConfig.taxes && billingConfig.taxes.length > 0) {
+                    billingConfig.taxes.forEach(tax => {
+
+                        const rate = parseFloat(tax.rate || tax.percent || 0);
+                        const taxAmount = subtotal * (rate / 100);
+
+                        taxTotal += taxAmount;
+
+                        taxHtml += `
+							<div style="display:flex; justify-content:space-between; font-size:13px; color:#555;">
+								<span>${tax.name} (${rate}%)</span>
+								<span>${money(taxAmount)}</span>
+							</div>
+						`;
+                    });
+                }
+
+                const finalTotal = subtotal + taxTotal;
+
+                // 🔥 PREMIUM INVOICE POPUP
+                showDialog(`
+					<div style="text-align:left;">
+
+						<h3 style="margin-bottom:5px;">✅ Order Confirmed</h3>
+
+						<div style="font-size:13px; color:#555;">
+							🆔 ${orderId}<br>
+							📍 ${nearestBranch.name}<br>
+							⏱ ${orderTime}
+						</div>
+
+						<hr>
+
+						${itemsHtml}
+
+						<hr>
+
+						<div style="display:flex; justify-content:space-between;">
+							<b>Subtotal</b>
+							<b>${money(subtotal)}</b>
+						</div>
+
+						${taxHtml}
+
+						<div style="display:flex; justify-content:space-between; margin-top:8px; font-size:18px;">
+							<b>Total</b>
+							<b>${money(finalTotal)}</b>
+						</div>
+
+						<hr>
+
+						<div style="font-size:13px; color:#555;">
+							⏳ Expected time: 20 mins
+						</div>
+
+					</div>
+				`);
 
                 startTimer();
                 resetOrder();
@@ -1426,9 +1529,60 @@ Expected time: 20 mins`
             restoreTimer();
         });
 
+        function openReviewModal() {
+
+            const container = document.getElementById("reviewItems");
+            const summary = document.getElementById("reviewSummary");
+
+            container.innerHTML = "";
+
+            let subtotal = 0;
+
+            Object.keys(cart).forEach(id => {
+                Object.values(menuData).forEach(cat => {
+                    cat.forEach(item => {
+                        if (item.id === id) {
+
+                            const qty = cart[id];
+                            const price = item.price;
+                            const total = qty * price;
+
+                            subtotal += total;
+
+                            container.innerHTML += `
+                        <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+                            <div>
+                                <b>${item.name}</b><br>
+                                ${money(price)} x ${qty}
+                            </div>
+                            <div>
+                                <button onclick="updateQty('${id}',-1)">-</button>
+                                ${qty}
+                                <button onclick="updateQty('${id}',1)">+</button>
+                            </div>
+                        </div>
+                    `;
+                        }
+                    });
+                });
+            });
+
+            // 🔹 Summary
+            summary.innerHTML = `
+        <hr>
+        <b>Subtotal:</b> ${money(subtotal)}<br>
+    `;
+
+            document.getElementById("reviewModal").style.display = "flex";
+        }
+
+        function closeReview() {
+            document.getElementById("reviewModal").style.display = "none";
+        }
+
         /* DIALOG */
-        function showDialog(msg) {
-            document.getElementById("dialogMsg").innerText = msg;
+        function showDialog(html) {
+            document.getElementById("dialogMsg").innerHTML = html;
             document.getElementById("dialog").style.display = "flex";
         }
         function closeDialog() {
