@@ -410,6 +410,54 @@
             font-size: 14px;
         }
 
+        /* 🔥 PREMIUM BUTTONS */
+
+        .cancel-btn {
+            flex: 1;
+            padding: 12px;
+            font-size: 16px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            background: #f5f5f5;
+            cursor: pointer;
+        }
+
+        .confirm-btn {
+            flex: 2;
+            padding: 12px;
+            font-size: 16px;
+            border-radius: 8px;
+            border: none;
+            background: #ff6600;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .confirm-btn:hover {
+            opacity: 0.9;
+        }
+
+        /* Qty buttons upgrade */
+        .qty-btn {
+            width: 30px;
+            height: 30px;
+            border-radius: 6px;
+            border: none;
+            background: #eee;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .qty-btn.plus {
+            background: #ff6600;
+            color: white;
+        }
+
+        .qty-btn.minus {
+            background: #ddd;
+        }
+
         /* ===== PREMIUM MOBILE EXPERIENCE ===== */
         @media screen and (max-width: 768px) {
 
@@ -660,20 +708,62 @@
 
     <!-- ===== REVIEW ORDER MODAL ===== -->
     <div id="reviewModal" class="dialog-overlay">
-        <div class="dialog-box" style="max-width:500px; text-align:left;">
+        <div class="dialog-box" style="
+        max-width:500px;
+        width:95%;
+        height:80vh;
+        display:flex;
+        flex-direction:column;
+        border-radius:12px;
+        overflow:hidden;
+    ">
 
-            <h3>🧾 Review Your Order</h3>
+            <!-- HEADER -->
+            <div style="padding:15px; border-bottom:1px solid #eee;">
+                <h3 style="margin:0;">🧾 Review Your Order</h3>
+            </div>
 
-            <div id="reviewItems"></div>
+            <!-- SCROLLABLE ITEMS -->
+            <div id="reviewItems" style="
+            flex:1;
+            overflow-y:auto;
+            padding:15px;
+        "></div>
 
-            <div id="reviewSummary" style="margin-top:10px;"></div>
+            <!-- SUMMARY -->
+            <div id="reviewSummary" style="
+            padding:10px 15px;
+            border-top:1px solid #eee;
+            background:#fafafa;
+        "></div>
 
-            <div style="margin-top:15px; text-align:right;">
-                <button onclick="closeReview()">Cancel</button>
-                <button class="place" onclick="confirmOrder()">Confirm Order</button>
+            <!-- FIXED FOOTER -->
+            <div style="
+            padding:12px;
+            display:flex;
+            gap:10px;
+            border-top:1px solid #eee;
+            background:#fff;
+        ">
+                <button class="cancel-btn" onclick="closeReview()">Cancel</button>
+                <button class="confirm-btn" onclick="confirmOrder()">Confirm Order</button>
             </div>
 
         </div>
+    </div>
+
+    <h3>🧾 Review Your Order</h3>
+
+    <div id="reviewItems"></div>
+
+    <div id="reviewSummary" style="margin-top:10px;"></div>
+
+    <div style="margin-top:15px; text-align:right;">
+        <button onclick="closeReview()">Cancel</button>
+        <button class="place" onclick="confirmOrder()">Confirm Order</button>
+    </div>
+
+    </div>
     </div>
 
     <div id="dialog" class="dialog-overlay">
@@ -1570,16 +1660,23 @@
                             subtotal += total;
 
                             container.innerHTML += `
-                        <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+							<div style="
+								display:flex;
+								justify-content:space-between;
+								align-items:center;
+								margin-bottom:12px;
+								padding-bottom:8px;
+								border-bottom:1px solid #eee;
+							">
                             <div>
                                 <b>${item.name}</b><br>
                                 ${money(price)} x ${qty}
                             </div>
                             <div style="display:flex; align-items:center; gap:8px;">
-    <button class="qty-btn minus" onclick="updateQty('${id}',-1)">-</button>
-    <span style="min-width:20px; text-align:center;">${qty}</span>
-    <button class="qty-btn plus" onclick="updateQty('${id}',1)">+</button>
-</div>
+							<button class="qty-btn minus" onclick="updateQty('${id}',-1)">-</button>
+							<span style="min-width:20px; text-align:center;">${qty}</span>
+							<button class="qty-btn plus" onclick="updateQty('${id}',1)">+</button>
+						</div>
                         </div>
                     `;
                         }
