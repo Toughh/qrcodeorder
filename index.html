@@ -895,17 +895,31 @@
 
         /* UPDATE QTY */
         function updateQty(id, change) {
-            const el = document.getElementById("qty-" + id);
-            let qty = parseInt(el.innerText) + change;
-            if (qty < 0) qty = 0;
-            el.innerText = qty;
 
+            const el = document.getElementById("qty-" + id);
+
+            let qty = (cart[id] || 0) + change;
+
+            if (qty < 0) qty = 0;
+
+            // 🔹 Update cart
             if (qty === 0) delete cart[id];
             else cart[id] = qty;
 
             localStorage.setItem("cart", JSON.stringify(cart));
+
+            // 🔹 Update main menu UI (if visible)
+            if (el) el.innerText = qty;
+
             calculate();
+
             document.getElementById("resetBtn").disabled = Object.keys(cart).length === 0;
+
+            // 🔥 IMPORTANT: If review modal is open → refresh it
+            const modal = document.getElementById("reviewModal");
+            if (modal && modal.style.display === "flex") {
+                openReviewModal(); // re-render
+            }
         }
 
         /* CALCULATE */
@@ -1531,6 +1545,12 @@
 
         function openReviewModal() {
 
+            if (Object.keys(cart).length === 0) {
+                closeReview();
+                showDialog("Cart is empty.");
+                return;
+            }
+
             const container = document.getElementById("reviewItems");
             const summary = document.getElementById("reviewSummary");
 
@@ -1555,11 +1575,11 @@
                                 <b>${item.name}</b><br>
                                 ${money(price)} x ${qty}
                             </div>
-                            <div>
-                                <button onclick="updateQty('${id}',-1)">-</button>
-                                ${qty}
-                                <button onclick="updateQty('${id}',1)">+</button>
-                            </div>
+                            <div style="display:flex; align-items:center; gap:8px;">
+    <button class="qty-btn minus" onclick="updateQty('${id}',-1)">-</button>
+    <span style="min-width:20px; text-align:center;">${qty}</span>
+    <button class="qty-btn plus" onclick="updateQty('${id}',1)">+</button>
+</div>
                         </div>
                     `;
                         }
@@ -1568,10 +1588,40 @@
             });
 
             // 🔹 Summary
+            let taxTotal = 0;
+            let taxHtml = "";
+
+            if (billingConfig.taxes && billingConfig.taxes.length > 0) {
+                billingConfig.taxes.forEach(tax => {
+                    const rate = parseFloat(tax.rate || tax.percent || 0);
+                    const amount = subtotal * (rate / 100);
+                    taxTotal += amount;
+
+                    taxHtml += `
+            <div style="display:flex; justify-content:space-between; font-size:13px;">
+                <span>${tax.name} (${rate}%)</span>
+                <span>${money(amount)}</span>
+            </div>
+        `;
+                });
+            }
+
+            const finalTotal = subtotal + taxTotal;
+
             summary.innerHTML = `
-        <hr>
-        <b>Subtotal:</b> ${money(subtotal)}<br>
-    `;
+    <hr>
+    <div style="display:flex; justify-content:space-between;">
+        <span>Subtotal</span>
+        <span>${money(subtotal)}</span>
+    </div>
+
+    ${taxHtml}
+
+    <div style="display:flex; justify-content:space-between; font-weight:bold; font-size:16px; margin-top:5px;">
+        <span>Total</span>
+        <span>${money(finalTotal)}</span>
+    </div>
+`;
 
             document.getElementById("reviewModal").style.display = "flex";
         }
