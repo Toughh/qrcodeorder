@@ -1069,33 +1069,33 @@
 
             // 🔹 TAXES
             billingTaxTotal = 0;
-			billingTaxDetails = [];
+            billingTaxDetails = [];
 
-			taxes.forEach(tax => {
-				const rate = Number(tax.rate) || 0;
+            taxes.forEach(tax => {
+                const rate = Number(tax.rate) || 0;
 
-				// ✅ FIX: Proper rounding
-				const rawTax = subtotal * (rate / 100);
-				const taxAmount = Math.round(rawTax * 100) / 100;
+                // ✅ FIX: Proper rounding
+                const rawTax = subtotal * (rate / 100);
+                const taxAmount = Math.round(rawTax * 100) / 100;
 
-				total += taxAmount;
-				billingTaxTotal += taxAmount;
+                total += taxAmount;
+                billingTaxTotal += taxAmount;
 
-				billingTaxDetails.push({
-					name: tax.name,
-					rate: rate,
-					amount: taxAmount
-				});
+                billingTaxDetails.push({
+                    name: tax.name,
+                    rate: rate,
+                    amount: taxAmount
+                });
 
-				billingBox.innerHTML += `
+                billingBox.innerHTML += `
 					<div class="bill-row">
 						<span>${tax.name} (${rate}%)</span>
 						<span>${currency} ${taxAmount.toFixed(2)}</span>
 					</div>
 				`;
-			});
-			// ✅ FIX: Final total rounding
-			total = Math.round(total * 100) / 100;
+            });
+            // ✅ FIX: Final total rounding
+            total = Math.round(total * 100) / 100;
             // 🔹 TOTAL
             if (showTotal) {
                 billingBox.innerHTML += `
@@ -1479,7 +1479,7 @@
 
                         const rate = parseFloat(tax.rate || tax.percent || 0);
                         const rawTax = subtotal * (rate / 100);
-						const taxAmount = Math.round(rawTax * 100) / 100;
+                        const taxAmount = Math.round(rawTax * 100) / 100;
 
                         taxTotal += taxAmount;
 
@@ -1707,7 +1707,7 @@
                 billingConfig.taxes.forEach(tax => {
                     const rate = parseFloat(tax.rate || tax.percent || 0);
                     const rawTax = subtotal * (rate / 100);
-					const amount = Math.round(rawTax * 100) / 100;
+                    const amount = Math.round(rawTax * 100) / 100;
                     taxTotal += amount;
 
                     taxHtml += `
