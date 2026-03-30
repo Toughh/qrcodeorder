@@ -765,8 +765,8 @@
 
             <div id="dialogContent" style="max-height:60vh; overflow-y:auto;"></div>
 
-            <div style="margin-top:15px; display:flex; gap:10px; justify-content:space-between;">
-                <button id="cancelBtn" class="cancel" onclick="closeDialog()">❌ Cancel</button>
+            <div style="margin-top:20px; text-align:center;">
+                <button id="cancelBtn" class="confirm-btn" onclick="closeDialog()">OK</button>
             </div>
 
         </div>
@@ -1068,19 +1068,34 @@
             }
 
             // 🔹 TAXES
-            taxes.forEach(tax => {
-                const rate = Number(tax.rate) || 0;
-                const taxAmount = subtotal * (rate / 100);
-                total += taxAmount;
+            billingTaxTotal = 0;
+			billingTaxDetails = [];
 
-                billingBox.innerHTML += `
-            <div class="bill-row">
-                <span>${tax.name} (${rate}%)</span>
-                <span>${currency} ${taxAmount.toFixed(2)}</span>
-            </div>
-        `;
-            });
+			taxes.forEach(tax => {
+				const rate = Number(tax.rate) || 0;
 
+				// ✅ FIX: Proper rounding
+				const rawTax = subtotal * (rate / 100);
+				const taxAmount = Math.round(rawTax * 100) / 100;
+
+				total += taxAmount;
+				billingTaxTotal += taxAmount;
+
+				billingTaxDetails.push({
+					name: tax.name,
+					rate: rate,
+					amount: taxAmount
+				});
+
+				billingBox.innerHTML += `
+					<div class="bill-row">
+						<span>${tax.name} (${rate}%)</span>
+						<span>${currency} ${taxAmount.toFixed(2)}</span>
+					</div>
+				`;
+			});
+			// ✅ FIX: Final total rounding
+			total = Math.round(total * 100) / 100;
             // 🔹 TOTAL
             if (showTotal) {
                 billingBox.innerHTML += `
@@ -1463,7 +1478,8 @@
                     billingConfig.taxes.forEach(tax => {
 
                         const rate = parseFloat(tax.rate || tax.percent || 0);
-                        const taxAmount = subtotal * (rate / 100);
+                        const rawTax = subtotal * (rate / 100);
+						const taxAmount = Math.round(rawTax * 100) / 100;
 
                         taxTotal += taxAmount;
 
@@ -1690,7 +1706,8 @@
             if (billingConfig.taxes && billingConfig.taxes.length > 0) {
                 billingConfig.taxes.forEach(tax => {
                     const rate = parseFloat(tax.rate || tax.percent || 0);
-                    const amount = subtotal * (rate / 100);
+                    const rawTax = subtotal * (rate / 100);
+					const amount = Math.round(rawTax * 100) / 100;
                     taxTotal += amount;
 
                     taxHtml += `
