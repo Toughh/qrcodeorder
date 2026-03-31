@@ -1496,21 +1496,41 @@
 
                 // 🔥 PREMIUM INVOICE POPUP
                 showDialog(`
-					<div style="text-align:left;">
+				<div style="
+					display:flex;
+					flex-direction:column;
+					height:70vh;
+					max-height:500px;
+				">
 
-						<h3 style="margin-bottom:5px;">✅ Order Confirmed</h3>
-
+					<!-- HEADER -->
+					<div style="margin-bottom:10px;">
+						<h3 style="margin:0;">✅ Order Confirmed</h3>
 						<div style="font-size:13px; color:#555;">
 							🆔 ${orderId}<br>
 							📍 ${nearestBranch.name}<br>
 							⏱ ${orderTime}
 						</div>
+					</div>
 
-						<hr>
+					<hr>
 
+					<!-- 🔥 SCROLLABLE ITEMS -->
+					<div style="
+						flex:1;
+						overflow-y:auto;
+						padding-right:5px;
+					">
 						${itemsHtml}
+					</div>
 
-						<hr>
+					<hr>
+
+					<!-- 🔥 FIXED SUMMARY -->
+					<div style="
+						padding-top:10px;
+						background:#fff;
+					">
 
 						<div style="display:flex; justify-content:space-between;">
 							<b>Subtotal</b>
@@ -1519,18 +1539,27 @@
 
 						${taxHtml}
 
-						<div style="display:flex; justify-content:space-between; margin-top:8px; font-size:18px;">
+						<div style="
+							display:flex;
+							justify-content:space-between;
+							font-size:18px;
+							margin-top:6px;
+						">
 							<b>Total</b>
 							<b>${money(finalTotal)}</b>
 						</div>
 
-						<hr>
-
-						<div style="font-size:13px; color:#555;">
+						<div style="
+							font-size:13px;
+							color:#555;
+							margin-top:8px;
+						">
 							⏳ Expected time: 20 mins
 						</div>
 
 					</div>
+
+				</div>
 				`);
 
                 startTimer();
