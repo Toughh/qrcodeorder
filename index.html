@@ -962,21 +962,34 @@
                 console.error("menuContainer not found in DOM");
                 return;
             }
+
             container.innerHTML = "";
+
             data.forEach(item => {
                 const savedQty = cart[item.id] || 0;
+
                 container.innerHTML += `
-            <div class="menu-item">
-            <img src="https://picsum.photos/300/200?random=${item.id}">
+        <div class="menu-item">
+
+            <img 
+              src="${item.imageURL || 'https://via.placeholder.com/150'}" 
+              alt="${item.name}"
+              class="menu-img"
+              loading="lazy"
+              onerror="this.src='https://via.placeholder.com/150'"
+            >
+
             <div class="menu-content">
                 <b>${item.name}</b><br>
                 Fresh prepared delicious item.<br>
                 ${money(item.price)}
+
                 <button class="qty-btn minus" onclick="updateQty('${item.id}',-1)">-</button>
                 <span class="qty" id="qty-${item.id}">${savedQty}</span>
                 <button class="qty-btn plus" onclick="updateQty('${item.id}',1)">+</button>
             </div>
-            </div>`;
+
+        </div>`;
             });
 
             calculate();
