@@ -966,6 +966,7 @@
         /* LOAD MENU */
         function loadMenu(data) {
             const container = document.getElementById("menuContainer");
+
             if (!container) {
                 console.error("menuContainer not found in DOM");
                 return;
@@ -976,15 +977,20 @@
             data.forEach(item => {
                 const savedQty = cart[item.id] || 0;
 
+                // ✅ SAFE IMAGE HANDLING (no infinite loop, no empty string issue)
+                const imgUrl = item.imageURL && item.imageURL.trim() !== ""
+                    ? item.imageURL
+                    : "fallback.png";   // 🔥 use local fallback instead of external URL
+
                 container.innerHTML += `
         <div class="menu-item">
 
             <img 
-              src="${item.imageURL || 'https://via.placeholder.com/150'}" 
-              alt="${item.name}"
-              class="menu-img"
-              loading="lazy"
-              onerror="this.src='https://via.placeholder.com/150'"
+                src="${imgUrl}" 
+                alt="${item.name}"
+                class="menu-img"
+                loading="lazy"
+                onerror="this.onerror=null; this.src='fallback.png';"
             >
 
             <div class="menu-content">
