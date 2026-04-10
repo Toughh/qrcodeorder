@@ -124,8 +124,10 @@
         /* ===== Scrollable Menu ===== */
         .menu-container {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
+            grid-template-columns: 1fr;
+            /* ✅ was 2 columns → now 1 for better mobile */
+            gap: 10px;
+            /* slightly reduced */
             max-height: 750px;
             overflow-y: auto;
             padding-right: 5px;
@@ -135,16 +137,36 @@
             background: white;
             border-radius: 10px;
             overflow: hidden;
+
+            display: flex;
+            /* ✅ NEW */
+            align-items: center;
+            /* ✅ NEW */
+            gap: 10px;
+            /* ✅ NEW */
+            padding: 8px;
+            /* ✅ NEW */
         }
 
         .menu-item img {
-            width: 100%;
-            height: 120px;
+            width: 70px;
+            /* ✅ was 100% */
+            height: 70px;
+            /* ✅ was 120px */
             object-fit: cover;
+            border-radius: 8px;
+            /* slight refinement */
+            flex-shrink: 0;
+            /* ✅ prevents shrink */
         }
 
         .menu-content {
-            padding: 10px;
+            padding: 0;
+            /* ✅ was 10px */
+            flex: 1;
+            /* ✅ NEW */
+            min-width: 0;
+            /* ✅ prevents overflow */
         }
 
         .qty-btn {
@@ -287,6 +309,34 @@
         .category-btn.active {
             background: #f59e0b;
             color: white;
+        }
+
+        .top-row {
+            display: flex;
+            justify-content: space-between;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .name {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .price {
+            margin-left: 6px;
+            flex-shrink: 0;
+        }
+
+        .desc {
+            font-size: 12px;
+            margin-top: 2px;
+            line-height: 1.3;
+        }
+
+        .qty-row {
+            margin-top: 6px;
         }
 
         /* ===== PREMIUM NO RESULTS ===== */
@@ -972,17 +1022,28 @@
                 return;
             }
 
-            container.innerHTML = "";
+            let html = ""; // ✅ better performance
 
             data.forEach(item => {
                 const savedQty = cart[item.id] || 0;
 
-                // ✅ SAFE IMAGE HANDLING (no infinite loop, no empty string issue)
-                const imgUrl = item.imageURL && item.imageURL.trim() !== ""
-                    ? item.imageURL
-                    : "fallback.png";   // 🔥 use local fallback instead of external URL
+                // ✅ Image handling (Airtable + URL + fallback)
+                let imgUrl = "fallback.png";
 
-                container.innerHTML += `
+                if (item.imageURL) {
+                    if (Array.isArray(item.imageURL) && item.imageURL.length > 0) {
+                        imgUrl = item.imageURL[0].url;
+                    } else if (typeof item.imageURL === "string" && item.imageURL.trim() !== "") {
+                        imgUrl = item.imageURL;
+                    }
+                }
+
+                // ✅ Optional description
+                const descriptionHTML = item.description && item.description.trim() !== ""
+                    ? `<div class="desc">${item.description}</div>`
+                    : "";
+
+                html += `
         <div class="menu-item">
 
             <img 
@@ -994,17 +1055,24 @@
             >
 
             <div class="menu-content">
-                <b>${item.name}</b><br>
-                Fresh prepared delicious item.<br>
-                ${money(item.price)}
+                <div class="top-row">
+                    <span class="name">${item.name}</span>
+                    <span class="price">${money(item.price)}</span>
+                </div>
 
-                <button class="qty-btn minus" onclick="updateQty('${item.id}',-1)">-</button>
-                <span class="qty" id="qty-${item.id}">${savedQty}</span>
-                <button class="qty-btn plus" onclick="updateQty('${item.id}',1)">+</button>
+                ${descriptionHTML}
+
+                <div class="qty-row">
+                    <button class="qty-btn minus" onclick="updateQty('${item.id}',-1)">−</button>
+                    <span class="qty" id="qty-${item.id}">${savedQty}</span>
+                    <button class="qty-btn plus" onclick="updateQty('${item.id}',1)">+</button>
+                </div>
             </div>
 
         </div>`;
             });
+
+            container.innerHTML = html;
 
             calculate();
         }
