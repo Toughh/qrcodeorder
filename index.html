@@ -586,7 +586,7 @@
             /* Menu list single column */
             .menu-container {
                 grid-template-columns: 1fr;
-                gap: 16px;
+                gap: 10px;
                 max-height: none;
             }
 
@@ -596,9 +596,18 @@
                 box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
             }
 
-            /* Bigger food image */
+            .menu-item {
+                flex-direction: row;
+                /* keep horizontal */
+                align-items: center;
+                padding: 8px;
+                gap: 10px;
+            }
+
             .menu-item img {
-                height: 200px;
+                width: 65px;
+                height: 65px;
+                border-radius: 10px;
             }
 
             /* Menu text */
@@ -609,6 +618,21 @@
             .menu-content {
                 font-size: 16px;
                 line-height: 1.5;
+            }
+
+            .name {
+                font-size: 15px;
+                font-weight: 600;
+            }
+
+            .price {
+                font-size: 14px;
+                font-weight: 600;
+            }
+
+            .desc {
+                font-size: 12px;
+                color: #666;
             }
 
             /* Quantity buttons */
