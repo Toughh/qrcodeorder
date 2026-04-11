@@ -1022,23 +1022,17 @@
                 return;
             }
 
-            let html = ""; // ✅ better performance
+            let html = "";
 
             data.forEach(item => {
                 const savedQty = cart[item.id] || 0;
 
-                // ✅ Image handling (Airtable + URL + fallback)
+                // ✅ FIXED IMAGE LOGIC
                 let imgUrl = "fallback.png";
-
-                if (item.imageURL) {
-                    if (Array.isArray(item.imageURL) && item.imageURL.length > 0) {
-                        imgUrl = item.imageURL[0].url;
-                    } else if (typeof item.imageURL === "string" && item.imageURL.trim() !== "") {
-                        imgUrl = item.imageURL;
-                    }
+                if (item.image && item.image.trim() !== "") {
+                    imgUrl = item.image;
                 }
 
-                // ✅ Optional description
                 const descriptionHTML = item.description && item.description.trim() !== ""
                     ? `<div class="desc">${item.description}</div>`
                     : "";
