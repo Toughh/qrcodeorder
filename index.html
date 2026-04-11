@@ -1014,7 +1014,10 @@
         }
 
         /* LOAD MENU */
+        /* LOAD MENU */
         function loadMenu(data) {
+            console.log("MENU DATA 👉", data);
+
             const container = document.getElementById("menuContainer");
 
             if (!container) {
@@ -1027,10 +1030,10 @@
             data.forEach(item => {
                 const savedQty = cart[item.id] || 0;
 
-                // ✅ FIXED IMAGE LOGIC
+                // ✅ FINAL IMAGE FIX
                 let imgUrl = "fallback.png";
-                if (item.image && item.image.trim() !== "") {
-                    imgUrl = item.image;
+                if (item.imageURL && item.imageURL.trim() !== "") {
+                    imgUrl = item.imageURL;
                 }
 
                 const descriptionHTML = item.description && item.description.trim() !== ""
