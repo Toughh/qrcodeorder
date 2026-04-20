@@ -4,6 +4,8 @@ let lastOrderCount = 0;
 
 function parseAirtableDate(str) {
 
+    if (!str || !str.includes(",")) return new Date();
+
     const months = {
         Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4, Jun: 5,
         Jul: 6, Aug: 7, Sep: 8, Oct: 9, Nov: 10, Dec: 11
@@ -17,7 +19,6 @@ function parseAirtableDate(str) {
     const month = months[mon];
 
     return new Date(`${year}-${month + 1}-${day} ${timePart}`);
-
 }
 
 
@@ -62,11 +63,23 @@ async function loadOrders() {
 
         data.forEach((order) => {
 
+            // ✅ SANITIZE HERE (ADD THIS BLOCK)
+            order = {
+                orderId: order.orderId || "",
+                status: order.status || "",
+                items: order.items || "",
+                table: order.table || "-",
+                mobile: order.mobile || "-",
+                whatsapp: order.whatsapp || "-",
+                customizationRequest: order.customizationRequest || "-",
+                orderTime: order.orderTime || ""
+            };
+
             let highlight = newOrderIds.includes(order.orderId) ? "newOrder" : "";
 
             let statusClass = "pending";
 
-            if (order.status === "Accepted") statusClass = "accepted";
+            if (order.status === "Accepted" || order.status === "Preparing") statusClass = "accepted";
             if (order.status === "Ready") statusClass = "ready";
 
             let card = `
@@ -84,7 +97,7 @@ async function loadOrders() {
         <b>Mobile:</b> ${order.mobile}<br>
 		<b>Whatsapp:</b> ${order.whatsapp}<br>
 
-        <b>Waiting:</b> ${getWaitingTime(order.orderTime)}<br><br>
+        <b>Waiting:</b> ${order.orderTime ? getWaitingTime(order.orderTime) : "-"}<br><br>
 
         <button onclick="updateOrder('${order.orderId}','Preparing')">Accept</button>
         <button onclick="updateOrder('${order.orderId}','Rejected')">Reject</button>
