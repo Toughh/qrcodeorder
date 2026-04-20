@@ -3,7 +3,7 @@
 
 <head>
 
-  <title>Kitchen Orders</title>
+  <title>Kitchen Live Orders</title>
 
   <style>
     body {
@@ -27,6 +27,12 @@
       font-size: 16px;
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
       margin-bottom: 15px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .order:hover {
+      transform: scale(1.02);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
     }
 
     .pending {
@@ -58,6 +64,27 @@
       cursor: pointer;
     }
 
+    /* Button Colors */
+    button:nth-child(1) {
+      background: #3b82f6;
+      color: white;
+    }
+
+    button:nth-child(2) {
+      background: #ef4444;
+      color: white;
+    }
+
+    button:nth-child(3) {
+      background: #22c55e;
+      color: white;
+    }
+
+    button:nth-child(4) {
+      background: #6b7280;
+      color: white;
+    }
+
     @keyframes flash {
       0% {
         box-shadow: 0 0 5px red;
@@ -76,61 +103,64 @@
       animation: flash 1s infinite;
     }
 
+    /* Layout */
     .kitchen {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 15px;
-    }
-
-    /* Tablet */
-    @media (min-width: 600px) {
-      .kitchen {
-        grid-template-columns: 1fr 1fr;
-      }
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
     }
 
     /* Desktop */
     @media (min-width: 900px) {
       .kitchen {
+        display: grid;
         grid-template-columns: 1fr 1fr 1fr;
       }
     }
 
     .kitchen>div {
-      min-height: 200px;
+      min-width: 300px;
+      height: 75vh;
+      display: flex;
+      flex-direction: column;
+      background: #1f1f1f;
+      border-radius: 10px;
+      padding: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
     }
 
-    button:nth-child(1) {
-      background: #3b82f6;
-      color: white;
+    /* Scroll inside column */
+    .kitchen>div>div {
+      overflow-y: auto;
+      flex: 1;
+      padding-right: 5px;
     }
 
-    /* Accept */
-    button:nth-child(2) {
-      background: #ef4444;
-      color: white;
+    /* Sticky headers */
+    .kitchen h2 {
+      position: sticky;
+      top: 0;
+      background: #1f1f1f;
+      padding: 5px 0;
+      z-index: 2;
     }
 
-    /* Reject */
-    button:nth-child(3) {
-      background: #22c55e;
-      color: white;
+    /* Scrollbar */
+    .kitchen>div>div::-webkit-scrollbar {
+      width: 6px;
     }
 
-    /* Ready */
-    button:nth-child(4) {
-      background: #6b7280;
-      color: white;
+    .kitchen>div>div::-webkit-scrollbar-thumb {
+      background: #444;
+      border-radius: 10px;
     }
-
-    /* Done */
   </style>
 
 </head>
 
 <body>
 
-  <h2>Live Orders</h2>
+  <h2>🍽️ Kitchen Dashboard</h2>
 
   <div class="kitchen">
 
@@ -152,9 +182,6 @@
   </div>
 
   <script>
-
-    /* Get Admin Token from URL */
-
     const params = new URLSearchParams(window.location.search);
     window.adminToken = params.get("token");
 
@@ -162,7 +189,6 @@
       document.body.innerHTML = "<h2>Invalid Admin Access</h2>";
       throw new Error("No token");
     }
-
   </script>
 
   <script src="admin.js"></script>
