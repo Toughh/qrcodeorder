@@ -37,8 +37,8 @@ async function loadOrders() {
         const ready = document.getElementById("ready");
 
         pending.innerHTML = "";
-        accepted.innerHTML = "";
-        ready.innerHTML = "";
+        accepted.innerHTML = "<p>No Cooking Orders</p>";;
+        ready.innerHTML = "<p>No Ready Orders</p>";
 
         if (!data || data.length === 0) {
             pending.innerHTML = "<p>No Live Orders</p>";

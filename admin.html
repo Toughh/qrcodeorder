@@ -12,17 +12,19 @@
       color: white;
       margin: 0;
       padding: 20px;
+      overflow-x: hidden;
     }
 
     h2 {
       text-align: center;
-      margin-bottom: 20px;
+      margin-bottom: 10px;
+      font-size: 18px;
     }
 
     .order {
-      padding: 20px;
+      padding: 14px;
       border-radius: 10px;
-      font-size: 18px;
+      font-size: 16px;
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
       margin-bottom: 15px;
     }
@@ -47,8 +49,8 @@
     }
 
     button {
-      margin-top: 10px;
-      margin-right: 10px;
+      width: 100%;
+      margin-top: 8px;
       padding: 8px 14px;
       border: none;
       border-radius: 6px;
@@ -76,9 +78,52 @@
 
     .kitchen {
       display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 20px;
+      grid-template-columns: 1fr;
+      gap: 15px;
     }
+
+    /* Tablet */
+    @media (min-width: 600px) {
+      .kitchen {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    /* Desktop */
+    @media (min-width: 900px) {
+      .kitchen {
+        grid-template-columns: 1fr 1fr 1fr;
+      }
+    }
+
+    .kitchen>div {
+      min-height: 200px;
+    }
+
+    button:nth-child(1) {
+      background: #3b82f6;
+      color: white;
+    }
+
+    /* Accept */
+    button:nth-child(2) {
+      background: #ef4444;
+      color: white;
+    }
+
+    /* Reject */
+    button:nth-child(3) {
+      background: #22c55e;
+      color: white;
+    }
+
+    /* Ready */
+    button:nth-child(4) {
+      background: #6b7280;
+      color: white;
+    }
+
+    /* Done */
   </style>
 
 </head>
@@ -115,6 +160,7 @@
 
     if (!window.adminToken) {
       document.body.innerHTML = "<h2>Invalid Admin Access</h2>";
+      throw new Error("No token");
     }
 
   </script>
