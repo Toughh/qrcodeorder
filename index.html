@@ -1068,9 +1068,9 @@
     </div>
 
     <div class="qty-row">
-        <button class="qty-btn minus" onclick="updateQty('${item.name}',-1)">−</button>
-		<span class="qty" id="qty-${item.name}">${savedQty}</span>
-		<button class="qty-btn plus" onclick="updateQty('${item.name}',1)">+</button>
+        <button class="qty-btn minus" onclick="updateQty('${item.id}',-1)">−</button>
+		<span class="qty" id="qty-${item.id}">${savedQty}</span>
+		<button class="qty-btn plus" onclick="updateQty('${item.id}',1)">+</button>
     </div>
 
 </div>
@@ -1512,49 +1512,17 @@
                     }
                 });
 
-                // ===== SEND TO n8n =====
-                fetch("https://aviaviemail01.app.n8n.cloud/webhook/restaurant-qrcode-order", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        name,
-                        mobile,
-                        whatsapp,
-                        address,
-                        contactNote,
-                        customMes,
-
-                        // 💰 Billing
-                        subtotal: billingSubtotal,
-                        taxTotal: billingTaxTotal,        // ⭐ NEW
-                        taxDetails: billingTaxDetails,    // ⭐ NEW
-                        total: billingTotal,
-
-                        // 🛒 Order data
-                        cart,
-                        branch: nearestBranch.name,
-                        latitude: userLat,
-                        longitude: userLon,
-                        tableNumber,
-                        orderTime,
-                        orderId,
-                        restaurantId
-                    })
-                });
-
-                const endTime = Date.now() + 120000;
-                localStorage.setItem("orderEndTime", endTime);
-
                 let itemsHtml = "";
                 let subtotal = 0;
                 let taxTotal = 0;
+                const cartWithNames = {};
 
-                // 🔹 Build item list
+                // 🔹 Build item list FIRST
                 Object.keys(cart).forEach(id => {
                     Object.values(menuData).forEach(cat => {
                         cat.forEach(item => {
                             if (item.id === id) {
-
+                                cartWithNames[item.name] = cart[id];
                                 const qty = cart[id];
                                 const price = parseFloat(item.price) || 0;
                                 const total = qty * price;
@@ -1571,6 +1539,39 @@
                         });
                     });
                 });
+
+                // ===== SEND TO n8n =====
+                fetch("https://aviaviemail01.app.n8n.cloud/webhook/restaurant-qrcode-order", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        name,
+                        mobile,
+                        whatsapp,
+                        address,
+                        contactNote,
+                        customMes,
+
+                        // 💰 Billing
+                        subtotal: billingSubtotal,
+                        taxTotal: billingTaxTotal,
+                        taxDetails: billingTaxDetails,
+                        total: billingTotal,
+
+                        // 🛒 Order data
+                        cart: cartWithNames,
+                        branch: nearestBranch.name,
+                        latitude: userLat,
+                        longitude: userLon,
+                        tableNumber,
+                        orderTime,
+                        orderId,
+                        restaurantId
+                    })
+                });
+
+                const endTime = Date.now() + 120000;
+                localStorage.setItem("orderEndTime", endTime);
 
                 // 🔹 Taxes (dynamic from billingConfig)
                 let taxHtml = "";
