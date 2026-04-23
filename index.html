@@ -1918,7 +1918,7 @@
                     if (cat && cat.name && Array.isArray(cat.items)) {
                         menuData[cat.name] = cat.items.map(item => ({
                             id: item.id || `item-${Math.random()}`,
-                            name: item.name || "Unnamed Item",
+                            name: item.itemName || item.name || item.ItemName || "Unnamed Item",
                             price: Number(item.price) || 0,
 
                             // ✅ ADD THESE 2 LINES
