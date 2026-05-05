@@ -846,7 +846,7 @@
         async function loadRestaurantConfig() {
             try {
                 const response = await fetch(
-                    `https://aviaviemail01.app.n8n.cloud/webhook/getRestaurantConfig?rid=${restaurantId}&bid=${finalBranchId}`
+                    `https://avibiswa.app.n8n.cloud/webhook/getRestaurantConfig?rid=${restaurantId}&bid=${finalBranchId}`
                 );
                 const result = await response.json();
 
@@ -1541,7 +1541,7 @@
                 });
 
                 // ===== SEND TO n8n =====
-                fetch("https://aviaviemail01.app.n8n.cloud/webhook/restaurant-qrcode-order", {
+                fetch("https://avibiswa.app.n8n.cloud/webhook/restaurant-qrcode-order", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
@@ -1894,7 +1894,7 @@
         async function fetchMenuFromAPI() {
             try {
                 const response = await fetch(
-                    `https://aviaviemail01.app.n8n.cloud/webhook/get-menu?rid=${restaurantId}&bid=${finalBranchId}`
+                    `https://avibiswa.app.n8n.cloud/webhook/get-menu?rid=${restaurantId}&bid=${finalBranchId}`
                 );
                 const result = await response.json();
                 console.log("Menu API response:", result);
