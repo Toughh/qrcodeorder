@@ -524,6 +524,20 @@
             flex-shrink: 0;
         }
 
+        @keyframes pulse {
+            0% {
+                opacity: 0.6;
+            }
+
+            50% {
+                opacity: 1;
+            }
+
+            100% {
+                opacity: 0.6;
+            }
+        }
+
         /* ===== PREMIUM MOBILE EXPERIENCE ===== */
         @media screen and (max-width: 768px) {
 
@@ -967,6 +981,7 @@
 
         let menuData = {};
         let allItems = [];
+        let menuIndex = {};
 
         let currentCategory = localStorage.getItem("currentCategory") || null;
         let cart = JSON.parse(localStorage.getItem("cart")) || {};
@@ -1019,68 +1034,49 @@
         }
 
         /* LOAD MENU */
-        /* LOAD MENU */
         function loadMenu(data) {
-            console.log("MENU DATA 👉", data);
-
             const container = document.getElementById("menuContainer");
+            container.innerHTML = "";
 
-            if (!container) {
-                console.error("menuContainer not found in DOM");
-                return;
-            }
-
-            let html = "";
+            const fragment = document.createDocumentFragment();
 
             data.forEach(item => {
                 const savedQty = cart[item.id] || 0;
 
-                // ✅ FINAL IMAGE FIX
+                const div = document.createElement("div");
+                div.className = "menu-item";
+
                 let imgUrl =
                     (Array.isArray(item.imageURL)
                         ? item.imageURL[0]?.url
                         : item.imageURL
                     )?.trim() || "fallback.png";
 
-                const descriptionHTML = item.description && item.description.trim() !== ""
-                    ? `<div class="desc">${item.description}</div>`
-                    : "";
-
-                html += `
-        <div class="menu-item">
-
-            <img 
-                src="${imgUrl}" 
-                alt="${item.name}"
-                class="menu-img"
-                loading="lazy"
-                onerror="this.onerror=null; this.src='fallback.png';"
-            >
+                div.innerHTML = `
+            <img src="${imgUrl}" class="menu-img" loading="lazy"
+                onerror="this.src='fallback.png'">
 
             <div class="menu-content">
+                <div class="top-row">
+                    <div class="name-block">
+                        <span class="name">${item.name}</span>
+                        ${item.description ? `<div class="desc">${item.description}</div>` : ""}
+                    </div>
+                    <span class="price">${money(item.price)}</span>
+                </div>
 
-    <div class="top-row">
-        <div class="name-block">
-            <span class="name">${item.name}</span>
-            ${descriptionHTML}
-        </div>
+                <div class="qty-row">
+                    <button class="qty-btn minus" onclick="updateQty('${item.id}',-1)">−</button>
+                    <span class="qty" id="qty-${item.id}">${savedQty}</span>
+                    <button class="qty-btn plus" onclick="updateQty('${item.id}',1)">+</button>
+                </div>
+            </div>
+        `;
 
-        <span class="price">${money(item.price)}</span>
-    </div>
-
-    <div class="qty-row">
-        <button class="qty-btn minus" onclick="updateQty('${item.id}',-1)">−</button>
-		<span class="qty" id="qty-${item.id}">${savedQty}</span>
-		<button class="qty-btn plus" onclick="updateQty('${item.id}',1)">+</button>
-    </div>
-
-</div>
-
-        </div>`;
+                fragment.appendChild(div);
             });
 
-            container.innerHTML = html;
-
+            container.appendChild(fragment);
             calculate();
         }
 
@@ -1119,11 +1115,8 @@
             let subtotal = 0;
 
             Object.keys(cart).forEach(id => {
-                Object.values(menuData).forEach(cat => {
-                    cat.forEach(i => {
-                        if (i.id === id) subtotal += i.price * cart[id];
-                    });
-                });
+                const item = menuIndex[id];
+                if (item) subtotal += item.price * cart[id];
             });
 
             updateBilling();
@@ -1144,17 +1137,15 @@
 
             let subtotal = 0;
 
-            // ✅ Works with your existing cart structure (cart[id] = qty)
+            // ✅ fast lookup (menuIndex is prebuilt once)
             Object.keys(cart).forEach(id => {
-                Object.values(menuData).forEach(cat => {
-                    cat.forEach(i => {
-                        if (i.id === id) {
-                            const price = Number(i.price) || 0;
-                            const qty = Number(cart[id]) || 0;
-                            subtotal += price * qty;
-                        }
-                    });
-                });
+                const item = menuIndex[id];
+
+                if (item) {
+                    const price = Number(item.price) || 0;
+                    const qty = Number(cart[id]) || 0;
+                    subtotal += price * qty;
+                }
             });
 
             let total = subtotal;
@@ -1520,25 +1511,23 @@
 
                 // 🔹 Build item list FIRST
                 Object.keys(cart).forEach(id => {
-                    Object.values(menuData).forEach(cat => {
-                        cat.forEach(item => {
-                            if (item.id === id) {
-                                cartWithNames[item.name] = cart[id];
-                                const qty = cart[id];
-                                const price = parseFloat(item.price) || 0;
-                                const total = qty * price;
+                    const item = menuIndex[id];
 
-                                subtotal += total;
+                    if (!item) return;
 
-                                itemsHtml += `
-									<div style="display:flex; justify-content:space-between; margin:6px 0;">
-										<span>${item.name} x ${qty}</span>
-										<span>${money(total)}</span>
-									</div>
-								`;
-                            }
-                        });
-                    });
+                    const qty = cart[id];
+                    const price = Number(item.price) || 0;
+                    const total = qty * price;
+
+                    cartWithNames[item.name] = qty;
+                    subtotal += total;
+
+                    itemsHtml += `
+        <div style="display:flex; justify-content:space-between;">
+            <span>${item.name} x ${qty}</span>
+            <span>${money(total)}</span>
+        </div>
+    `;
                 });
 
                 // ===== SEND TO n8n =====
@@ -1800,32 +1789,26 @@
                     cat.forEach(item => {
                         if (item.id === id) {
 
-                            const qty = cart[id];
-                            const price = item.price;
-                            const total = qty * price;
+                            Object.keys(cart).forEach(id => {
+                                const item = menuIndex[id];
 
-                            subtotal += total;
+                                if (!item) return;
 
-                            container.innerHTML += `
-							<div style="
-								display:flex;
-								justify-content:space-between;
-								align-items:center;
-								margin-bottom:12px;
-								padding-bottom:8px;
-								border-bottom:1px solid #eee;
-							">
-                            <div>
-                                <b>${item.name}</b><br>
-                                ${money(price)} x ${qty}
-                            </div>
-                            <div style="display:flex; align-items:center; gap:8px;">
-							<button class="qty-btn minus" onclick="updateQty('${id}',-1)">-</button>
-							<span style="min-width:20px; text-align:center;">${qty}</span>
-							<button class="qty-btn plus" onclick="updateQty('${id}',1)">+</button>
-						</div>
-                        </div>
-                    `;
+                                const qty = cart[id];
+                                const price = item.price;
+                                const total = qty * price;
+
+                                subtotal += total;
+
+                                container.innerHTML += `
+        <div style="display:flex; justify-content:space-between;">
+            <div>
+                <b>${item.name}</b><br>
+                ${money(price)} x ${qty}
+            </div>
+        </div>
+    `;
+                            });
                         }
                     });
                 });
@@ -1897,6 +1880,21 @@
                 const response = await fetch(
                     `https://sahilavi.app.n8n.cloud/webhook/get-menu?rid=${restaurantId}&bid=${finalBranchId}`
                 );
+
+                document.getElementById("menuContainer").innerHTML = `
+<div style="padding:10px;">
+    ${Array(6).fill(`
+        <div style="
+            height:70px;
+            margin-bottom:10px;
+            border-radius:10px;
+            background:linear-gradient(90deg,#eee,#f5f5f5,#eee);
+            animation:pulse 1.2s infinite;
+        "></div>
+    `).join("")}
+</div>
+`;
+
                 const result = await response.json();
                 console.log("Menu API response:", result);
 
@@ -1928,6 +1926,15 @@
                             description: item.description || ""
                         }));
                     }
+                });
+
+                // 🚀 BUILD FAST LOOKUP INDEX (IMPORTANT)
+                menuIndex = {};
+
+                Object.values(menuData).forEach(cat => {
+                    cat.forEach(item => {
+                        menuIndex[item.id] = item;
+                    });
                 });
 
                 // Set current category
@@ -1996,8 +2003,11 @@
         /* INITIAL LOAD */
         window.onload = async function () {
             try {
-                await loadRestaurantConfig();
-                await fetchMenuFromAPI();
+                const [_, __] = await Promise.all([
+                    loadRestaurantConfig(),
+                    fetchMenuFromAPI()
+                ]);
+
                 restoreTimer();
             } catch (err) {
                 console.error("Initialization failed:", err);
