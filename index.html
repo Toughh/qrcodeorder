@@ -1784,72 +1784,72 @@
 
             let subtotal = 0;
 
+            // ✅ SINGLE SOURCE OF TRUTH: menuIndex (fast lookup)
             Object.keys(cart).forEach(id => {
-                Object.values(menuData).forEach(cat => {
-                    cat.forEach(item => {
-                        if (item.id === id) {
 
-                            Object.keys(cart).forEach(id => {
-                                const item = menuIndex[id];
+                const item = menuIndex[id];
+                const qty = cart[id];
 
-                                if (!item) return;
+                if (!item || !qty) return;
 
-                                const qty = cart[id];
-                                const price = item.price;
-                                const total = qty * price;
+                const price = Number(item.price) || 0;
+                const total = price * qty;
 
-                                subtotal += total;
+                subtotal += total;
 
-                                container.innerHTML += `
-        <div style="display:flex; justify-content:space-between;">
-            <div>
-                <b>${item.name}</b><br>
-                ${money(price)} x ${qty}
+                container.innerHTML += `
+            <div style="display:flex; justify-content:space-between; padding:6px 0;">
+                <div>
+                    <b>${item.name}</b><br>
+                    ${money(price)} x ${qty}
+                </div>
+
+                <!-- ⭐ ADD + / - HERE (FIX) -->
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <button onclick="updateQty('${id}', -1)" class="qty-btn minus">−</button>
+                    <span>${qty}</span>
+                    <button onclick="updateQty('${id}', 1)" class="qty-btn plus">+</button>
+                </div>
             </div>
-        </div>
-    `;
-                            });
-                        }
-                    });
-                });
+        `;
             });
 
-            // 🔹 Summary
+            // TAX
             let taxTotal = 0;
             let taxHtml = "";
 
-            if (billingConfig.taxes && billingConfig.taxes.length > 0) {
+            if (billingConfig.taxes?.length) {
                 billingConfig.taxes.forEach(tax => {
-                    const rate = parseFloat(tax.rate || tax.percent || 0);
-                    const rawTax = subtotal * (rate / 100);
-                    const amount = Math.round(rawTax * 100) / 100;
+                    const rate = Number(tax.rate || 0);
+                    const amount = Math.round((subtotal * rate / 100) * 100) / 100;
+
                     taxTotal += amount;
 
                     taxHtml += `
-            <div style="display:flex; justify-content:space-between; font-size:13px;">
-                <span>${tax.name} (${rate}%)</span>
-                <span>${money(amount)}</span>
-            </div>
-        `;
+                <div style="display:flex; justify-content:space-between; font-size:13px;">
+                    <span>${tax.name} (${rate}%)</span>
+                    <span>${money(amount)}</span>
+                </div>
+            `;
                 });
             }
 
             const finalTotal = subtotal + taxTotal;
 
             summary.innerHTML = `
-    <hr>
-    <div style="display:flex; justify-content:space-between;">
-        <span>Subtotal</span>
-        <span>${money(subtotal)}</span>
-    </div>
+        <hr>
+        <div style="display:flex; justify-content:space-between;">
+            <span>Subtotal</span>
+            <span>${money(subtotal)}</span>
+        </div>
 
-    ${taxHtml}
+        ${taxHtml}
 
-    <div style="display:flex; justify-content:space-between; font-weight:bold; font-size:16px; margin-top:5px;">
-        <span>Total</span>
-        <span>${money(finalTotal)}</span>
-    </div>
-`;
+        <div style="display:flex; justify-content:space-between; font-weight:bold; font-size:16px; margin-top:5px;">
+            <span>Total</span>
+            <span>${money(finalTotal)}</span>
+        </div>
+    `;
 
             document.getElementById("reviewModal").style.display = "flex";
         }
