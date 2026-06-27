@@ -1036,10 +1036,7 @@
                 const savedQty = cart[item.id] || 0;
 
                 // ✅ FINAL IMAGE FIX
-                let imgUrl = "fallback.png";
-                if (item.imageURL && item.imageURL.trim() !== "") {
-                    imgUrl = item.imageURL;
-                }
+                let imgUrl = item.image && item.image.trim() !== "" ? item.image : "fallback.png";
 
                 const descriptionHTML = item.description && item.description.trim() !== ""
                     ? `<div class="desc">${item.description}</div>`
