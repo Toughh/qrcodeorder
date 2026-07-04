@@ -58,48 +58,45 @@ async function loadOrders() {
         /* Render Orders */
         data.forEach(order => {
 
-            // ✅ MAP API FIELDS → UI FIELDS
             const mapped = {
-                orderId: order.OrderId || "",
-                status: order.Status || "Pending",
-                items: order.OrderedItems || "",
-                table: order.TableNumber || "-",
-                mobile: order.MobileNumber || "-",
-                whatsapp: order.WhatsappNumber || "-",
+                orderId: order.OrderId,
+                status: order.Status,
+                items: order.OrderedItems || "No items",
+                table: order.TableNumber || order.BranchOutlet || "-",
+                mobile: order.MobileNumber,
+                whatsapp: order.WhatsappNumber,
                 customizationRequest: order.CustomizedRequest || "-",
-                orderTime: order.OrderDate || ""
+                total: order.Total
             };
-
-            let highlight = newOrderIds.includes(mapped.orderId) ? "newOrder" : "";
 
             let statusClass = "pending";
             if (mapped.status === "Accepted" || mapped.status === "Preparing") statusClass = "accepted";
             if (mapped.status === "Ready") statusClass = "ready";
 
             let card = `
-                <div class="order ${statusClass} ${highlight}">
+        <div class="order ${statusClass}">
 
-                    <h3>Table ${mapped.table}</h3>
+            <h3>${mapped.table}</h3>
 
-                    <b>Status:</b> ${mapped.status}<br><br>
+            <b>Status:</b> ${mapped.status}<br><br>
 
-                    <b>Items:</b>
-                    <pre>${mapped.items}</pre>
+            <b>Items:</b>
+            <pre>${mapped.items}</pre>
 
-                    <b>Customized Request:</b> ${mapped.customizationRequest}<br>
+            <b>Customer:</b> ${order.CustomerName || "-"}<br>
 
-                    <b>Mobile:</b> ${mapped.mobile}<br>
-                    <b>Whatsapp:</b> ${mapped.whatsapp}<br>
+            <b>Mobile:</b> ${mapped.mobile}<br>
+            <b>Whatsapp:</b> ${mapped.whatsapp}<br>
 
-                    <b>Waiting:</b> ${mapped.orderTime ? getWaitingTime(mapped.orderTime) : "-"}<br><br>
+            <b>Total:</b> ${mapped.total}<br><br>
 
-                    <button onclick="updateOrder('${mapped.orderId}','Preparing')">Accept</button>
-                    <button onclick="updateOrder('${mapped.orderId}','Rejected')">Reject</button>
-                    <button onclick="updateOrder('${mapped.orderId}','Ready')">Ready</button>
-                    <button onclick="updateOrder('${mapped.orderId}','Completed')">Done</button>
+            <button onclick="updateOrder('${mapped.orderId}','Preparing')">Accept</button>
+            <button onclick="updateOrder('${mapped.orderId}','Rejected')">Reject</button>
+            <button onclick="updateOrder('${mapped.orderId}','Ready')">Ready</button>
+            <button onclick="updateOrder('${mapped.orderId}','Completed')">Done</button>
 
-                </div>
-            `;
+        </div>
+    `;
 
             if (mapped.status === "Pending") {
                 pending.innerHTML += card;
