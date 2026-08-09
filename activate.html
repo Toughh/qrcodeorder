@@ -1,0 +1,213 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Activate Your Account | QR Restaurant SaaS</title>
+
+    <link rel="stylesheet" href="activate.css">
+
+</head>
+
+
+<body>
+
+    <div class="activation-page">
+
+        <div class="activation-card">
+
+            <!-- ============================= -->
+            <!-- LOGO / BRAND -->
+            <!-- ============================= -->
+
+            <div class="brand">
+
+                <div class="brand-icon">
+                    🍽️
+                </div>
+
+                <h1>
+                    QR Restaurant SaaS
+                </h1>
+
+            </div>
+
+
+            <!-- ============================= -->
+            <!-- HEADER -->
+            <!-- ============================= -->
+
+            <div class="activation-header">
+
+                <h2>
+                    Activate Your Account
+                </h2>
+
+                <p>
+                    Welcome! Create your password to activate
+                    your restaurant owner account.
+                </p>
+
+            </div>
+
+
+            <!-- ============================= -->
+            <!-- FORM -->
+            <!-- ============================= -->
+
+            <form id="activationForm">
+
+
+                <!-- PASSWORD -->
+
+                <div class="form-group">
+
+                    <label for="password">
+                        Create Password
+                    </label>
+
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        placeholder="Enter your password"
+                        autocomplete="new-password"
+                        required
+                    >
+
+                    <div class="password-hint">
+                        Minimum 8 characters
+                    </div>
+
+                </div>
+
+
+                <!-- CONFIRM PASSWORD -->
+
+                <div class="form-group">
+
+                    <label for="confirmPassword">
+                        Confirm Password
+                    </label>
+
+                    <input
+                        type="password"
+                        id="confirmPassword"
+                        name="confirmPassword"
+                        placeholder="Re-enter your password"
+                        autocomplete="new-password"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- PASSWORD REQUIREMENTS -->
+
+                <div class="requirements">
+
+                    <strong>
+                        Password requirements
+                    </strong>
+
+                    <ul>
+
+                        <li id="lengthCheck">
+                            At least 8 characters
+                        </li>
+
+                        <li id="uppercaseCheck">
+                            At least one uppercase letter
+                        </li>
+
+                        <li id="numberCheck">
+                            At least one number
+                        </li>
+
+                    </ul>
+
+                </div>
+
+
+                <!-- TERMS -->
+
+                <div class="terms-row">
+
+                    <input
+                        type="checkbox"
+                        id="terms"
+                        required
+                    >
+
+                    <label for="terms">
+
+                        I agree to the
+                        <a href="#" target="_blank">
+                            Terms & Conditions
+                        </a>
+
+                    </label>
+
+                </div>
+
+
+                <!-- SUBMIT -->
+
+                <button
+                    type="submit"
+                    id="activateButton"
+                >
+
+                    🔐 Activate My Account
+
+                </button>
+
+
+            </form>
+
+
+            <!-- ============================= -->
+            <!-- MESSAGE -->
+            <!-- ============================= -->
+
+            <div
+                id="message"
+                class="message"
+            ></div>
+
+
+            <!-- ============================= -->
+            <!-- FOOTER -->
+            <!-- ============================= -->
+
+            <div class="activation-footer">
+
+                <p>
+                    Already activated?
+                </p>
+
+                <a href="login.html">
+                    Go to Login
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <script src="activate.js"></script>
+
+</body>
+
+</html>
+```
