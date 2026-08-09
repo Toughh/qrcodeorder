@@ -1,315 +1,470 @@
 // ==========================================
-// QR ORDER SAAS REGISTRATION
-// Frontend Registration Handler
+// QR RESTAURANT SAAS
+// OWNER ACCOUNT ACTIVATION
 // ==========================================
 
-
-// ==========================================
-// n8n REGISTRATION WEBHOOK
-// ==========================================
-
-const N8N_REGISTRATION_WEBHOOK =
-"https://maatapita.app.n8n.cloud/webhook/restaurant-registration";
+const ACTIVATION_WEBHOOK =
+    "https://maatapita.app.n8n.cloud/webhook-test/owner-activate";
 
 
 // ==========================================
-// FORM SUBMIT EVENT
+// ELEMENTS
 // ==========================================
 
-document
-.getElementById("registrationForm")
-.addEventListener("submit", async function(event) {
+const activationForm =
+    document.getElementById("activationForm");
 
-    event.preventDefault();
+const passwordInput =
+    document.getElementById("password");
 
-    const button = document.querySelector(".register-btn");
-    const messageBox = document.getElementById("message");
+const confirmPasswordInput =
+    document.getElementById("confirmPassword");
 
-    // Clear previous message
-    messageBox.innerHTML = "";
+const activateButton =
+    document.getElementById("activateButton");
 
-    // Disable button
-    button.disabled = true;
-    button.innerHTML = "⏳ Creating Account...";
-
-
-    try {
-
-        // ===============================
-        // COLLECT FORM DATA
-        // ===============================
-
-        const formData = {
-
-            restaurantName:
-            document.getElementById("restaurantName").value.trim(),
-
-            ownerName:
-            document.getElementById("ownerName").value.trim(),
-
-            email:
-            document.getElementById("email").value.trim(),
-
-            mobile:
-            document.getElementById("mobile").value.trim(),
-
-            country:
-            document.getElementById("country").value,
-
-            city:
-            document.getElementById("city").value.trim(),
-
-            businessType:
-            document.getElementById("businessType").value,
-
-            branches:
-            Number(
-                document.getElementById("branches").value
-            ),
-
-            plan:
-            document.getElementById("plan").value,
-
-            website:
-            document.getElementById("website").value.trim(),
-
-            notes:
-            document.getElementById("notes").value.trim(),
-
-            createdAt:
-            new Date().toISOString()
-        };
+const messageBox =
+    document.getElementById("message");
 
 
-        // ===============================
-        // FRONTEND VALIDATION
-        // ===============================
+// ==========================================
+// GET TOKEN
+// ==========================================
 
-        if (!formData.restaurantName) {
+const urlParams =
+    new URLSearchParams(
+        window.location.search
+    );
 
-            throw new Error(
-                "Restaurant name is required"
-            );
-
-        }
-
-
-        if (!formData.ownerName) {
-
-            throw new Error(
-                "Owner name is required"
-            );
-
-        }
+const activationToken =
+    urlParams.get("token");
 
 
-        if (!formData.email) {
-
-            throw new Error(
-                "Email is required"
-            );
-
-        }
+console.log(
+    "Activation token:",
+    activationToken
+);
 
 
-        const emailRegex =
-        /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+// ==========================================
+// CHECK TOKEN
+// ==========================================
+
+if (!activationToken) {
+
+    messageBox.innerHTML = `
+
+        <div class="error-message">
+
+            ❌ <strong>Invalid activation link.</strong>
+
+            <br><br>
+
+            Activation token is missing.
+
+        </div>
+
+    `;
+
+    activateButton.disabled = true;
+
+}
 
 
-        if (!emailRegex.test(formData.email)) {
+// ==========================================
+// PASSWORD VALIDATION
+// ==========================================
 
-            throw new Error(
-                "Please enter a valid email"
-            );
+function validatePassword(password) {
 
-        }
+    const lengthValid =
+        password.length >= 8;
 
+    const uppercaseValid =
+        /[A-Z]/.test(password);
 
-        if (!formData.mobile) {
-
-            throw new Error(
-                "Mobile number is required"
-            );
-
-        }
+    const numberValid =
+        /[0-9]/.test(password);
 
 
-        if (!formData.country) {
+    document
+        .getElementById("lengthCheck")
+        .classList
+        .toggle(
+            "valid",
+            lengthValid
+        );
 
-            throw new Error(
-                "Please select country"
-            );
 
-        }
+    document
+        .getElementById("uppercaseCheck")
+        .classList
+        .toggle(
+            "valid",
+            uppercaseValid
+        );
 
 
-        if (!document.getElementById("terms").checked) {
+    document
+        .getElementById("numberCheck")
+        .classList
+        .toggle(
+            "valid",
+            numberValid
+        );
 
-            throw new Error(
-                "Please accept Terms & Conditions"
-            );
 
-        }
+    return (
+        lengthValid &&
+        uppercaseValid &&
+        numberValid
+    );
+}
+
+
+// ==========================================
+// PASSWORD LIVE CHECK
+// ==========================================
+
+passwordInput.addEventListener(
+    "input",
+    function () {
+
+        validatePassword(
+            passwordInput.value
+        );
+
+    }
+);
+
+
+// ==========================================
+// FORM SUBMIT
+// ==========================================
+
+activationForm.addEventListener(
+    "submit",
+    async function (event) {
+
+        // VERY IMPORTANT
+        event.preventDefault();
+        event.stopPropagation();
 
 
         console.log(
-            "Registration Data:",
-            formData
+            "Activation form submitted"
         );
 
 
-        // ===============================
-        // SEND TO n8n
-        // ===============================
+        // ==================================
+        // TOKEN
+        // ==================================
 
-        const response = await fetch(
-            N8N_REGISTRATION_WEBHOOK,
-            {
-                method: "POST",
-
-                headers: {
-                    "Content-Type": "application/json"
-                },
-
-                body: JSON.stringify(formData)
-            }
-        );
-
-
-        // ===============================
-        // HTTP ERROR
-        // ===============================
-
-        if (!response.ok) {
-
-            throw new Error(
-                "Server error. Please try again."
-            );
-
-        }
-
-
-        // ===============================
-        // READ n8n RESPONSE
-        // ===============================
-
-        const result =
-        await response.json();
-
-
-        console.log(
-            "n8n Response:",
-            result
-        );
-
-
-        // ===============================
-        // BUSINESS SUCCESS
-        // ===============================
-
-        if (result.success === true) {
+        if (!activationToken) {
 
             messageBox.innerHTML = `
 
-                <div style="
-                background:#dcfce7;
-                color:#166534;
-                padding:15px;
-                border-radius:12px;
-                margin-top:20px;
-                ">
+                <div class="error-message">
 
-                    🎉 <strong>Registration successful!</strong>
-
-                    <br><br>
-
-                    ${result.message ||
-                    "Your restaurant has been successfully registered."}
-
-                    <br><br>
-
-                    ${
-                        result.data?.email
-                        ? `📧 Registration details have been sent to <strong>${result.data.email}</strong>.`
-                        : ""
-                    }
+                    ❌ Invalid activation link.
 
                 </div>
 
             `;
 
-
-            // Reset form only after SUCCESS
-            document
-            .getElementById("registrationForm")
-            .reset();
+            return;
 
         }
 
 
-        // ===============================
-        // EXISTING CLIENT
-        // ===============================
+        // ==================================
+        // PASSWORD
+        // ==================================
 
-        else if (
-            result.code === "CLIENT_ALREADY_EXISTS"
+        const password =
+            passwordInput.value;
+
+        const confirmPassword =
+            confirmPasswordInput.value;
+
+
+        // ==================================
+        // PASSWORD VALIDATION
+        // ==================================
+
+        if (!validatePassword(password)) {
+
+            messageBox.innerHTML = `
+
+                <div class="error-message">
+
+                    ❌ Password does not meet
+                    the required criteria.
+
+                </div>
+
+            `;
+
+            return;
+
+        }
+
+
+        // ==================================
+        // CONFIRM PASSWORD
+        // ==================================
+
+        if (
+            password !==
+            confirmPassword
         ) {
 
             messageBox.innerHTML = `
 
-                <div style="
-                background:#fef3c7;
-                color:#92400e;
-                padding:15px;
-                border-radius:12px;
-                margin-top:20px;
-                ">
+                <div class="error-message">
 
-                    ⚠️ <strong>Account already exists</strong>
-
-                    <br><br>
-
-                    An account with this email already exists.
-
-                    <br><br>
-
-                    Please use a different email or contact support
-                    if you believe this is an error.
+                    ❌ Passwords do not match.
 
                 </div>
 
             `;
 
-            // IMPORTANT:
-            // Do NOT reset the form here.
-            // The user may want to correct the email.
+            return;
 
         }
 
 
-        // ===============================
-        // OTHER BUSINESS ERROR
-        // ===============================
+        // ==================================
+        // TERMS
+        // ==================================
 
-        else {
+        const terms =
+            document.getElementById("terms");
+
+        if (!terms.checked) {
 
             messageBox.innerHTML = `
 
-                <div style="
-                background:#fee2e2;
-                color:#991b1b;
-                padding:15px;
-                border-radius:12px;
-                margin-top:20px;
-                ">
+                <div class="error-message">
 
-                    ❌ <strong>Registration could not be completed.</strong>
+                    ❌ Please accept the
+                    Terms & Conditions.
+
+                </div>
+
+            `;
+
+            return;
+
+        }
+
+
+        // ==================================
+        // DISABLE BUTTON
+        // ==================================
+
+        activateButton.disabled = true;
+
+        activateButton.innerHTML =
+            "⏳ Activating Account...";
+
+
+        try {
+
+            console.log(
+                "Sending activation request..."
+            );
+
+
+            console.log(
+                "Token being sent:",
+                activationToken
+            );
+
+
+            // ==================================
+            // CALL n8n
+            // ==================================
+
+            const response =
+                await fetch(
+                    ACTIVATION_WEBHOOK,
+                    {
+
+                        method: "POST",
+
+                        headers: {
+
+                            "Content-Type":
+                                "application/json"
+
+                        },
+
+                        body: JSON.stringify({
+
+                            token:
+                                activationToken,
+
+                            password:
+                                password
+
+                        })
+
+                    }
+                );
+
+
+            console.log(
+                "HTTP Status:",
+                response.status
+            );
+
+
+            // ==================================
+            // READ RESPONSE
+            // ==================================
+
+            const result =
+                await response.json();
+
+
+            console.log(
+                "n8n Response:",
+                result
+            );
+
+
+            // ==================================
+            // SUCCESS
+            // ==================================
+
+            if (
+                result.success === true
+            ) {
+
+                messageBox.innerHTML = `
+
+                    <div class="success-message">
+
+                        🎉 <strong>
+                        Account activated successfully!
+                        </strong>
+
+                        <br><br>
+
+                        ${
+                            result.message ||
+                            "Your account is now active."
+                        }
+
+                        <br><br>
+
+                        You can now login.
+
+                        <br><br>
+
+                        <a href="login.html">
+
+                            🔐 Go to Login
+
+                        </a>
+
+                    </div>
+
+                `;
+
+
+                activationForm.style.display =
+                    "none";
+
+                return;
+
+            }
+
+
+            // ==================================
+            // TOKEN EXPIRED
+            // ==================================
+
+            if (
+                result.code ===
+                "ACTIVATION_TOKEN_EXPIRED"
+            ) {
+
+                messageBox.innerHTML = `
+
+                    <div class="warning-message">
+
+                        ⚠️ <strong>
+                        Activation link expired.
+                        </strong>
+
+                        <br><br>
+
+                        ${
+                            result.message ||
+                            "Please request a new activation email."
+                        }
+
+                    </div>
+
+                `;
+
+                return;
+
+            }
+
+
+            // ==================================
+            // INVALID TOKEN
+            // ==================================
+
+            if (
+                result.code ===
+                "INVALID_ACTIVATION_TOKEN"
+            ) {
+
+                messageBox.innerHTML = `
+
+                    <div class="error-message">
+
+                        ❌ <strong>
+                        Invalid activation link.
+                        </strong>
+
+                        <br><br>
+
+                        ${
+                            result.message ||
+                            "This activation link is no longer valid."
+                        }
+
+                    </div>
+
+                `;
+
+                return;
+
+            }
+
+
+            // ==================================
+            // GENERIC ERROR
+            // ==================================
+
+            messageBox.innerHTML = `
+
+                <div class="error-message">
+
+                    ❌ <strong>
+                    Activation failed.
+                    </strong>
 
                     <br><br>
 
                     ${
                         result.message ||
-                        "Please check your information and try again."
+                        "Unable to activate your account."
                     }
 
                 </div>
@@ -318,43 +473,42 @@ document
 
         }
 
+        catch (error) {
+
+            console.error(
+                "Activation Error:",
+                error
+            );
+
+
+            messageBox.innerHTML = `
+
+                <div class="error-message">
+
+                    ❌ ${error.message}
+
+                </div>
+
+            `;
+
+        }
+
+        finally {
+
+            if (
+                activationForm.style.display
+                !== "none"
+            ) {
+
+                activateButton.disabled =
+                    false;
+
+                activateButton.innerHTML =
+                    "🔐 Activate My Account";
+
+            }
+
+        }
+
     }
-
-
-    catch(error) {
-
-        console.error(
-            "Registration Error:",
-            error
-        );
-
-
-        messageBox.innerHTML = `
-
-            <div style="
-            background:#fee2e2;
-            color:#991b1b;
-            padding:15px;
-            border-radius:12px;
-            margin-top:20px;
-            ">
-
-                ❌ ${error.message}
-
-            </div>
-
-        `;
-
-    }
-
-
-    finally {
-
-        button.disabled = false;
-
-        button.innerHTML =
-        "🚀 Register Restaurant";
-
-    }
-
-});
+);
