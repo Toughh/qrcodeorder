@@ -1,4 +1,3 @@
-```javascript
 // ==========================================
 // QR RESTAURANT SAAS
 // PREMIUM OWNER LOGIN
@@ -673,4 +672,3 @@ catch (error) {
     );
 
 }
-```
