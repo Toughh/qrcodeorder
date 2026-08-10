@@ -1,0 +1,349 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="description"
+        content="Secure login for QR Restaurant SaaS"
+    >
+
+    <title>Sign In | QR Restaurant SaaS</title>
+
+    <link
+        rel="stylesheet"
+        href="login.css"
+    >
+
+</head>
+
+
+<body>
+
+    <!-- ==========================================
+         PAGE BACKGROUND
+         ========================================== -->
+
+    <div class="page-background">
+
+        <div class="background-orb orb-one"></div>
+
+        <div class="background-orb orb-two"></div>
+
+        <div class="background-grid"></div>
+
+    </div>
+
+
+    <!-- ==========================================
+         MAIN CONTAINER
+         ========================================== -->
+
+    <main class="login-page">
+
+        <section class="login-card">
+
+
+            <!-- ======================================
+                 BRAND
+                 ====================================== -->
+
+            <div class="brand">
+
+                <div class="brand-icon">
+
+                    <span>QR</span>
+
+                </div>
+
+
+                <div class="brand-text">
+
+                    <div class="brand-name">
+                        QR Restaurant
+                    </div>
+
+                    <div class="brand-product">
+                        SaaS
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ======================================
+                 HEADER
+                 ====================================== -->
+
+            <div class="login-header">
+
+                <div class="welcome-badge">
+
+                    <span class="status-dot"></span>
+
+                    Secure Portal
+
+                </div>
+
+
+                <h1>
+                    Welcome back
+                </h1>
+
+
+                <p>
+                    Sign in to manage your restaurant,
+                    orders, branches and team.
+                </p>
+
+            </div>
+
+
+            <!-- ======================================
+                 MESSAGE
+                 ====================================== -->
+
+            <div
+                id="message"
+                class="message"
+                role="alert"
+                aria-live="polite"
+            ></div>
+
+
+            <!-- ======================================
+                 LOGIN FORM
+                 ====================================== -->
+
+            <form
+                id="loginForm"
+                class="login-form"
+                method="POST"
+                action="javascript:void(0);"
+                novalidate
+            >
+
+
+                <!-- EMAIL -->
+
+                <div class="form-group">
+
+                    <label for="email">
+                        Email address
+                    </label>
+
+
+                    <div class="input-wrapper">
+
+                        <span class="input-icon">
+                            ✉
+                        </span>
+
+
+                        <input
+                            type="email"
+                            id="email"
+                            name="email"
+                            placeholder="you@example.com"
+                            autocomplete="email"
+                            required
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- PASSWORD -->
+
+                <div class="form-group">
+
+                    <div class="label-row">
+
+                        <label for="password">
+                            Password
+                        </label>
+
+
+                        <a
+                            href="forgot-password.html"
+                            class="forgot-link"
+                        >
+                            Forgot password?
+                        </a>
+
+                    </div>
+
+
+                    <div class="input-wrapper">
+
+                        <span class="input-icon">
+                            🔒
+                        </span>
+
+
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            placeholder="Enter your password"
+                            autocomplete="current-password"
+                            required
+                        >
+
+
+                        <button
+                            type="button"
+                            id="togglePassword"
+                            class="password-toggle"
+                            aria-label="Show password"
+                        >
+                            Show
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <!-- REMEMBER ME -->
+
+                <div class="login-options">
+
+                    <label class="remember-me">
+
+                        <input
+                            type="checkbox"
+                            id="rememberMe"
+                        >
+
+                        <span class="custom-checkbox"></span>
+
+                        <span>
+                            Remember me
+                        </span>
+
+                    </label>
+
+                </div>
+
+
+                <!-- LOGIN BUTTON -->
+
+                <button
+                    type="submit"
+                    id="loginButton"
+                    class="login-button"
+                >
+
+                    <span class="button-icon">
+                        →
+                    </span>
+
+                    <span class="button-text">
+                        Sign In
+                    </span>
+
+                </button>
+
+
+            </form>
+
+
+            <!-- ======================================
+                 SECURITY NOTE
+                 ====================================== -->
+
+            <div class="security-note">
+
+                <span class="security-icon">
+                    🛡
+                </span>
+
+                <div>
+
+                    <strong>
+                        Secure access
+                    </strong>
+
+                    <span>
+                        Your account credentials are protected.
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <!-- ======================================
+                 REGISTER
+                 ====================================== -->
+
+            <div class="register-section">
+
+                <span>
+                    Don't have an account?
+                </span>
+
+
+                <a href="register.html">
+                    Register your restaurant
+                    <span>→</span>
+                </a>
+
+            </div>
+
+
+            <!-- ======================================
+                 FOOTER
+                 ====================================== -->
+
+            <div class="login-footer">
+
+                <span>
+                    © 2026 QR Restaurant SaaS
+                </span>
+
+                <span class="footer-divider">
+                    •
+                </span>
+
+                <a href="#">
+                    Privacy
+                </a>
+
+                <span class="footer-divider">
+                    •
+                </span>
+
+                <a href="#">
+                    Terms
+                </a>
+
+            </div>
+
+
+        </section>
+
+    </main>
+
+
+    <!-- ==========================================
+         JAVASCRIPT
+         ========================================== -->
+
+    <script src="login.js"></script>
+
+</body>
+
+</html>
+```
