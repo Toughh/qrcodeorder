@@ -321,15 +321,30 @@ activationForm.addEventListener(
 
 
             // ==================================
-            // READ RESPONSE
+            // READ n8n RESPONSE
+            // ==================================
+
+            const rawResult =
+                await response.json();
+
+            console.log(
+                "Raw n8n Response:",
+                rawResult
+            );
+
+
+            // ==================================
+            // NORMALIZE RESPONSE
             // ==================================
 
             const result =
-                await response.json();
+                Array.isArray(rawResult)
+                    ? rawResult[0]
+                    : rawResult;
 
 
             console.log(
-                "n8n Response:",
+                "Normalized n8n Response:",
                 result
             );
 
@@ -339,46 +354,48 @@ activationForm.addEventListener(
             // ==================================
 
             if (
+                result &&
                 result.success === true
             ) {
 
                 messageBox.innerHTML = `
 
-                    <div class="success-message">
+        <div class="success-message">
 
-                        🎉 <strong>
-                        Account activated successfully!
-                        </strong>
+            🎉 <strong>
+            Account activated successfully!
+            </strong>
 
-                        <br><br>
+            <br><br>
 
-                        ${
-                            result.message ||
-                            "Your account is now active."
-                        }
+            ${result.message ||
+                    "Your account is now active."
+                    }
 
-                        <br><br>
+            <br><br>
 
-                        You can now login.
+            <strong>
+            You can now log in to your account.
+            </strong>
 
-                        <br><br>
+            <br><br>
 
-                        <a href="login.html">
+            <a href="login.html">
 
-                            🔐 Go to Login
+                🔐 Go to Login
 
-                        </a>
+            </a>
 
-                    </div>
+        </div>
 
-                `;
+    `;
 
 
                 activationForm.style.display =
                     "none";
 
-                return;
 
+                return;
             }
 
 
@@ -387,31 +404,30 @@ activationForm.addEventListener(
             // ==================================
 
             if (
+                result &&
                 result.code ===
                 "ACTIVATION_TOKEN_EXPIRED"
             ) {
 
                 messageBox.innerHTML = `
 
-                    <div class="warning-message">
+        <div class="warning-message">
 
-                        ⚠️ <strong>
-                        Activation link expired.
-                        </strong>
+            ⚠️ <strong>
+            Activation link expired.
+            </strong>
 
-                        <br><br>
+            <br><br>
 
-                        ${
-                            result.message ||
-                            "Please request a new activation email."
-                        }
+            ${result.message ||
+                    "Please request a new activation email."
+                    }
 
-                    </div>
+        </div>
 
-                `;
+    `;
 
                 return;
-
             }
 
 
@@ -420,31 +436,30 @@ activationForm.addEventListener(
             // ==================================
 
             if (
+                result &&
                 result.code ===
                 "INVALID_ACTIVATION_TOKEN"
             ) {
 
                 messageBox.innerHTML = `
 
-                    <div class="error-message">
+        <div class="error-message">
 
-                        ❌ <strong>
-                        Invalid activation link.
-                        </strong>
+            ❌ <strong>
+            Invalid activation link.
+            </strong>
 
-                        <br><br>
+            <br><br>
 
-                        ${
-                            result.message ||
-                            "This activation link is no longer valid."
-                        }
+            ${result.message ||
+                    "This activation link is no longer valid."
+                    }
 
-                    </div>
+        </div>
 
-                `;
+    `;
 
                 return;
-
             }
 
 
@@ -454,22 +469,21 @@ activationForm.addEventListener(
 
             messageBox.innerHTML = `
 
-                <div class="error-message">
+    <div class="error-message">
 
-                    ❌ <strong>
-                    Activation failed.
-                    </strong>
+        ❌ <strong>
+        Activation failed.
+        </strong>
 
-                    <br><br>
+        <br><br>
 
-                    ${
-                        result.message ||
-                        "Unable to activate your account."
-                    }
+        ${result?.message ||
+                "Unable to activate your account."
+                }
 
-                </div>
+    </div>
 
-            `;
+`;
 
         }
 
