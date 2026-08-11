@@ -3,32 +3,44 @@
 // OWNER DASHBOARD
 // ==========================================
 
-
 document.addEventListener(
     "DOMContentLoaded",
     async function () {
 
         console.log(
-            "DASHBOARD: Page loaded."
+            "=================================="
+        );
+
+        console.log(
+            "DASHBOARD: Page loaded"
+        );
+
+        console.log(
+            "=================================="
         );
 
 
         // ==================================
-        // AUTHENTICATION CHECK
+        // CHECK CURRENT SESSION
         // ==================================
+
+        console.log(
+            "DASHBOARD: Checking authentication..."
+        );
+
 
         const session =
             await requireAuthentication();
 
 
         // ==================================
-        // STOP IF NOT AUTHENTICATED
+        // AUTHENTICATION FAILED
         // ==================================
 
         if (!session) {
 
             console.warn(
-                "DASHBOARD: No valid session."
+                "DASHBOARD: Authentication failed."
             );
 
             return;
@@ -36,8 +48,17 @@ document.addEventListener(
         }
 
 
+        // ==================================
+        // AUTHENTICATION SUCCESSFUL
+        // ==================================
+
         console.log(
-            "DASHBOARD: Valid session:",
+            "DASHBOARD: Authentication successful."
+        );
+
+
+        console.log(
+            "DASHBOARD SESSION:",
             session
         );
 
@@ -154,7 +175,7 @@ document.addEventListener(
                 function () {
 
                     console.log(
-                        "DASHBOARD: Logging out..."
+                        "DASHBOARD: Logging out."
                     );
 
 
