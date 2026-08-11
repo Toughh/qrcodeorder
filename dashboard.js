@@ -1,5 +1,5 @@
 // ==========================================
-// QR ORDER SAAS
+// QR RESTAURANT SAAS
 // OWNER DASHBOARD
 // ==========================================
 
@@ -8,20 +8,28 @@ document.addEventListener(
     "DOMContentLoaded",
     async function () {
 
+        console.log(
+            "DASHBOARD: Page loaded."
+        );
+
 
         // ==================================
-        // AUTHENTICATE USER
+        // AUTHENTICATION CHECK
         // ==================================
 
         const session =
             await requireAuthentication();
 
 
-        // If authentication failed,
-        // requireAuthentication() redirects
-        // to login.html.
+        // ==================================
+        // STOP IF NOT AUTHENTICATED
+        // ==================================
 
         if (!session) {
+
+            console.warn(
+                "DASHBOARD: No valid session."
+            );
 
             return;
 
@@ -29,13 +37,13 @@ document.addEventListener(
 
 
         console.log(
-            "Authenticated session:",
+            "DASHBOARD: Valid session:",
             session
         );
 
 
         // ==================================
-        // DISPLAY USER
+        // USER NAME
         // ==================================
 
         const userName =
@@ -43,119 +51,88 @@ document.addEventListener(
                 "userName"
             );
 
-        const userRole =
+
+        if (userName) {
+
+            userName.textContent =
+                session.name ||
+                "Owner";
+
+        }
+
+
+        // ==================================
+        // USER EMAIL
+        // ==================================
+
+        const userEmail =
             document.getElementById(
-                "userRole"
+                "userEmail"
             );
 
-        const welcomeMessage =
-            document.getElementById(
-                "welcomeMessage"
-            );
 
-        const userId =
-            document.getElementById(
-                "userId"
-            );
+        if (userEmail) {
 
-        const email =
-            document.getElementById(
-                "email"
-            );
+            userEmail.textContent =
+                session.email ||
+                "";
+
+        }
+
+
+        // ==================================
+        // RESTAURANT ID
+        // ==================================
 
         const restaurantId =
             document.getElementById(
                 "restaurantId"
             );
 
-        const tenantRestaurantId =
-            document.getElementById(
-                "tenantRestaurantId"
-            );
+
+        if (restaurantId) {
+
+            restaurantId.textContent =
+                session.restaurantId ||
+                "-";
+
+        }
+
+
+        // ==================================
+        // CLIENT ID
+        // ==================================
 
         const clientId =
             document.getElementById(
                 "clientId"
             );
 
-        const role =
-            document.getElementById(
-                "role"
-            );
 
+        if (clientId) {
 
-        // ==================================
-        // POPULATE UI
-        // ==================================
-
-        if (userName) {
-
-            userName.textContent =
-                session.name || "User";
+            clientId.textContent =
+                session.clientId ||
+                "-";
 
         }
+
+
+        // ==================================
+        // ROLE
+        // ==================================
+
+        const userRole =
+            document.getElementById(
+                "userRole"
+            );
 
 
         if (userRole) {
 
             userRole.textContent =
-                session.role || "User";
-
-        }
-
-
-        if (welcomeMessage) {
-
-            welcomeMessage.textContent =
-                `Welcome back, ${session.name || "User"}!`;
-
-        }
-
-
-        if (userId) {
-
-            userId.textContent =
-                session.userId || "—";
-
-        }
-
-
-        if (email) {
-
-            email.textContent =
-                session.email || "—";
-
-        }
-
-
-        if (restaurantId) {
-
-            restaurantId.textContent =
-                session.restaurantId || "—";
-
-        }
-
-
-        if (tenantRestaurantId) {
-
-            tenantRestaurantId.textContent =
-                session.restaurantId || "—";
-
-        }
-
-
-        if (clientId) {
-
-            clientId.textContent =
-                session.clientId || "—";
-
-        }
-
-
-        if (role) {
-
-            role.textContent =
-                session.role || "—";
+                session.role ||
+                "Owner";
 
         }
 
@@ -164,19 +141,25 @@ document.addEventListener(
         // LOGOUT
         // ==================================
 
-        const logoutBtn =
+        const logoutButton =
             document.getElementById(
-                "logoutBtn"
+                "logoutButton"
             );
 
 
-        if (logoutBtn) {
+        if (logoutButton) {
 
-            logoutBtn.addEventListener(
+            logoutButton.addEventListener(
                 "click",
                 function () {
 
+                    console.log(
+                        "DASHBOARD: Logging out..."
+                    );
+
+
                     clearSession();
+
 
                     window.location.href =
                         "login.html";
