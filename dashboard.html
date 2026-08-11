@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>QR Order SaaS — Owner Dashboard</title>
+
+    <link rel="stylesheet" href="dashboard.css">
+
+</head>
+
+
+<body>
+
+    <div class="app">
+
+        <!-- ==================================
+             SIDEBAR
+        =================================== -->
+
+        <aside class="sidebar">
+
+            <div class="brand">
+
+                <div class="brand-logo">
+                    QR
+                </div>
+
+                <div>
+
+                    <div class="brand-name">
+                        QR Order
+                    </div>
+
+                    <div class="brand-subtitle">
+                        SaaS
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <nav class="navigation">
+
+                <a href="#" class="nav-item active">
+                    <span>📊</span>
+                    Dashboard
+                </a>
+
+
+                <a href="#" class="nav-item">
+                    <span>🏪</span>
+                    Restaurants
+                </a>
+
+
+                <a href="#" class="nav-item">
+                    <span>🏢</span>
+                    Branches
+                </a>
+
+
+                <a href="#" class="nav-item">
+                    <span>🍽️</span>
+                    Menu
+                </a>
+
+
+                <a href="#" class="nav-item">
+                    <span>👥</span>
+                    Users
+                </a>
+
+
+                <a href="#" class="nav-item">
+                    <span>📦</span>
+                    Orders
+                </a>
+
+
+                <a href="#" class="nav-item">
+                    <span>📈</span>
+                    Reports
+                </a>
+
+
+                <a href="#" class="nav-item">
+                    <span>⚙️</span>
+                    Settings
+                </a>
+
+            </nav>
+
+
+            <div class="sidebar-footer">
+
+                <button id="logoutBtn" class="logout-btn">
+                    🚪 Logout
+                </button>
+
+            </div>
+
+        </aside>
+
+
+        <!-- ==================================
+             MAIN
+        =================================== -->
+
+        <main class="main">
+
+            <header class="topbar">
+
+                <div>
+
+                    <div class="page-label">
+                        OWNER PORTAL
+                    </div>
+
+                    <h1>
+                        Dashboard
+                    </h1>
+
+                </div>
+
+
+                <div class="user-area">
+
+                    <div class="user-avatar">
+                        A
+                    </div>
+
+                    <div class="user-info">
+
+                        <strong id="userName">
+                            Loading...
+                        </strong>
+
+                        <span id="userRole">
+                            Owner
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </header>
+
+
+            <!-- ==================================
+                 DASHBOARD CONTENT
+            =================================== -->
+
+            <section class="welcome-card">
+
+                <div>
+
+                    <span class="eyebrow">
+                        WELCOME BACK
+                    </span>
+
+                    <h2 id="welcomeMessage">
+                        Welcome!
+                    </h2>
+
+                    <p>
+                        Your restaurant SaaS command center
+                        is ready.
+                    </p>
+
+                </div>
+
+            </section>
+
+
+            <section class="stats-grid">
+
+                <div class="stat-card">
+
+                    <span>
+                        🏪
+                    </span>
+
+                    <div>
+
+                        <small>
+                            Restaurant
+                        </small>
+
+                        <strong id="restaurantId">
+                            —
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <span>
+                        🏢
+                    </span>
+
+                    <div>
+
+                        <small>
+                            Client
+                        </small>
+
+                        <strong id="clientId">
+                            —
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <span>
+                        👤
+                    </span>
+
+                    <div>
+
+                        <small>
+                            Role
+                        </small>
+
+                        <strong id="role">
+                            —
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <span>
+                        🔐
+                    </span>
+
+                    <div>
+
+                        <small>
+                            Session
+                        </small>
+
+                        <strong>
+                            Active
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <section class="content-card">
+
+                <div class="section-header">
+
+                    <div>
+
+                        <span class="eyebrow">
+                            SECURE SESSION
+                        </span>
+
+                        <h2>
+                            Authentication Verified
+                        </h2>
+
+                    </div>
+
+                    <div class="status-pill">
+                        ● Secure
+                    </div>
+
+                </div>
+
+
+                <p class="secure-message">
+
+                    Your identity has been verified and
+                    your restaurant tenant context has been
+                    loaded successfully.
+
+                </p>
+
+
+                <div class="tenant-details">
+
+                    <div>
+                        <span>User ID</span>
+                        <strong id="userId">—</strong>
+                    </div>
+
+                    <div>
+                        <span>Email</span>
+                        <strong id="email">—</strong>
+                    </div>
+
+                    <div>
+                        <span>Restaurant ID</span>
+                        <strong id="tenantRestaurantId">—</strong>
+                    </div>
+
+                </div>
+
+            </section>
+
+        </main>
+
+    </div>
+
+
+    <script src="auth.js"></script>
+
+    <script src="dashboard.js"></script>
+
+</body>
+
+</html>

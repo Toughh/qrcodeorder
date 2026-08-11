@@ -5,22 +5,13 @@
 
     <meta charset="UTF-8">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <meta
-        name="description"
-        content="Secure login for QR Restaurant SaaS"
-    >
+    <meta name="description" content="Secure login for QR Restaurant SaaS">
 
     <title>Sign In | QR Restaurant SaaS</title>
 
-    <link
-        rel="stylesheet"
-        href="login.css"
-    >
+    <link rel="stylesheet" href="login.css">
 
 </head>
 
@@ -111,25 +102,14 @@
                  MESSAGE
                  ====================================== -->
 
-            <div
-                id="message"
-                class="message"
-                role="alert"
-                aria-live="polite"
-            ></div>
+            <div id="message" class="message" role="alert" aria-live="polite"></div>
 
 
             <!-- ======================================
                  LOGIN FORM
                  ====================================== -->
 
-            <form
-                id="loginForm"
-                class="login-form"
-                method="POST"
-                action="javascript:void(0);"
-                novalidate
-            >
+            <form id="loginForm" class="login-form" method="POST" action="javascript:void(0);" novalidate>
 
 
                 <!-- EMAIL -->
@@ -148,14 +128,8 @@
                         </span>
 
 
-                        <input
-                            type="email"
-                            id="email"
-                            name="email"
-                            placeholder="you@example.com"
-                            autocomplete="email"
-                            required
-                        >
+                        <input type="email" id="email" name="email" placeholder="you@example.com" autocomplete="email"
+                            required>
 
                     </div>
 
@@ -173,10 +147,7 @@
                         </label>
 
 
-                        <a
-                            href="forgot-password.html"
-                            class="forgot-link"
-                        >
+                        <a href="forgot-password.html" class="forgot-link">
                             Forgot password?
                         </a>
 
@@ -190,22 +161,11 @@
                         </span>
 
 
-                        <input
-                            type="password"
-                            id="password"
-                            name="password"
-                            placeholder="Enter your password"
-                            autocomplete="current-password"
-                            required
-                        >
+                        <input type="password" id="password" name="password" placeholder="Enter your password"
+                            autocomplete="current-password" required>
 
 
-                        <button
-                            type="button"
-                            id="togglePassword"
-                            class="password-toggle"
-                            aria-label="Show password"
-                        >
+                        <button type="button" id="togglePassword" class="password-toggle" aria-label="Show password">
                             Show
                         </button>
 
@@ -220,10 +180,7 @@
 
                     <label class="remember-me">
 
-                        <input
-                            type="checkbox"
-                            id="rememberMe"
-                        >
+                        <input type="checkbox" id="rememberMe">
 
                         <span class="custom-checkbox"></span>
 
@@ -238,11 +195,7 @@
 
                 <!-- LOGIN BUTTON -->
 
-                <button
-                    type="submit"
-                    id="loginButton"
-                    class="login-button"
-                >
+                <button type="submit" id="loginButton" class="login-button">
 
                     <span class="button-icon">
                         →
@@ -340,6 +293,7 @@
          JAVASCRIPT
          ========================================== -->
 
+    <script src="auth.js"></script>
     <script src="login.js"></script>
 
 </body>

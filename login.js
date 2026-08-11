@@ -9,6 +9,7 @@
 // ==========================================
 
 // TEST URL FOR NOW
+
 const N8N_LOGIN_WEBHOOK =
     "https://maatapita.app.n8n.cloud/webhook-test/owner-login";
 
@@ -45,38 +46,55 @@ const messageBox =
 
 
 // ==========================================
+// SAFETY CHECK
+// ==========================================
+
+if (!loginForm) {
+
+    console.error(
+        "Login form not found."
+    );
+
+}
+
+
+// ==========================================
 // SHOW / HIDE PASSWORD
 // ==========================================
 
-togglePassword.addEventListener(
-    "click",
-    function () {
+if (togglePassword) {
 
-        const isPassword =
-            passwordInput.type === "password";
+    togglePassword.addEventListener(
+        "click",
+        function () {
 
-
-        passwordInput.type =
-            isPassword
-                ? "text"
-                : "password";
+            const isPassword =
+                passwordInput.type === "password";
 
 
-        togglePassword.textContent =
-            isPassword
-                ? "Hide"
-                : "Show";
+            passwordInput.type =
+                isPassword
+                    ? "text"
+                    : "password";
 
 
-        togglePassword.setAttribute(
-            "aria-label",
-            isPassword
-                ? "Hide password"
-                : "Show password"
-        );
+            togglePassword.textContent =
+                isPassword
+                    ? "Hide"
+                    : "Show";
 
-    }
-);
+
+            togglePassword.setAttribute(
+                "aria-label",
+                isPassword
+                    ? "Hide password"
+                    : "Show password"
+            );
+
+        }
+    );
+
+}
 
 
 // ==========================================
@@ -140,6 +158,7 @@ function clearMessage() {
     messageBox.className =
         "message";
 
+
     messageBox.innerHTML =
         "";
 
@@ -154,7 +173,10 @@ loginForm.addEventListener(
     "submit",
     async function (event) {
 
-        // Prevent browser from changing URL
+        // ==================================
+        // PREVENT DEFAULT
+        // ==================================
+
         event.preventDefault();
 
         event.stopPropagation();
@@ -252,6 +274,10 @@ loginForm.addEventListener(
         `;
 
 
+        // ==================================
+        // TRY
+        // ==================================
+
         try {
 
             console.log(
@@ -316,8 +342,9 @@ loginForm.addEventListener(
             );
 
 
-            // n8n can return an array
-            // depending on Respond to Webhook
+            // n8n may return an array
+            // depending on Respond to Webhook.
+
             const result =
                 Array.isArray(rawResult)
                     ? rawResult[0]
@@ -331,14 +358,58 @@ loginForm.addEventListener(
 
 
             // ==================================
-            // SUCCESS
+            // LOGIN SUCCESS
             // ==================================
 
             if (
                 response.ok &&
                 result &&
-                result.success === true
+                result.success === true &&
+                result.code === "LOGIN_SUCCESS" &&
+                result.data &&
+                result.data.sessionToken
             ) {
+
+                console.log(
+                    "Login successful:",
+                    result.data
+                );
+
+
+                // ==================================
+                // SAVE SESSION
+                // ==================================
+
+                saveSession(
+                    result.data
+                );
+
+
+                // ==================================
+                // REMEMBER ME
+                // ==================================
+
+                if (remember) {
+
+                    localStorage.setItem(
+                        "qro_remember_email",
+                        email
+                    );
+
+                }
+
+                else {
+
+                    localStorage.removeItem(
+                        "qro_remember_email"
+                    );
+
+                }
+
+
+                // ==================================
+                // SUCCESS MESSAGE
+                // ==================================
 
                 showMessage(
                     "success",
@@ -349,61 +420,14 @@ loginForm.addEventListener(
 
                     <br><br>
 
-                    Welcome back.
+                    Welcome back,
+                    ${result.data.name || "User"}.
+
+                    <br><br>
+
                     Redirecting to your dashboard...
                     `
                 );
-
-
-                // ==================================
-                // STORE SESSION
-                // ==================================
-
-                if (result.data) {
-
-                    const sessionData = {
-
-                        userId:
-                            result.data.userId,
-
-                        clientId:
-                            result.data.clientId,
-
-                        restaurantId:
-                            result.data.restaurantId,
-
-                        role:
-                            result.data.role,
-
-                        email:
-                            result.data.email,
-
-                        name:
-                            result.data.name || "",
-
-                        sessionToken:
-                            result.data.sessionToken || "",
-
-                        loggedInAt:
-                            new Date().toISOString()
-
-                    };
-
-
-                    const storage =
-                        remember
-                            ? localStorage
-                            : sessionStorage;
-
-
-                    storage.setItem(
-                        "qrRestaurantSession",
-                        JSON.stringify(
-                            sessionData
-                        )
-                    );
-
-                }
 
 
                 // ==================================
@@ -417,7 +441,7 @@ loginForm.addEventListener(
                             "dashboard.html";
 
                     },
-                    1200
+                    800
                 );
 
 
@@ -561,6 +585,10 @@ loginForm.addEventListener(
         }
 
 
+        // ==================================
+        // CATCH
+        // ==================================
+
         catch (error) {
 
             console.error(
@@ -585,6 +613,10 @@ loginForm.addEventListener(
 
         }
 
+
+        // ==================================
+        // FINALLY
+        // ==================================
 
         finally {
 
@@ -636,29 +668,20 @@ emailInput.addEventListener(
 
 try {
 
-    const savedSession =
+    const savedEmail =
         localStorage.getItem(
-            "qrRestaurantSession"
+            "qro_remember_email"
         );
 
 
-    if (savedSession) {
+    if (savedEmail) {
 
-        const session =
-            JSON.parse(
-                savedSession
-            );
+        emailInput.value =
+            savedEmail;
 
 
-        if (session.email) {
-
-            emailInput.value =
-                session.email;
-
-            rememberMe.checked =
-                true;
-
-        }
+        rememberMe.checked =
+            true;
 
     }
 
@@ -667,7 +690,7 @@ try {
 catch (error) {
 
     console.warn(
-        "Unable to load saved session:",
+        "Unable to load remembered email:",
         error
     );
 
