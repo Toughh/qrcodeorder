@@ -21,7 +21,7 @@ document.addEventListener(
 
 
         // ==================================
-        // AUTHENTICATION
+        // CHECK AUTHENTICATION
         // ==================================
 
         console.log(
@@ -64,34 +64,84 @@ document.addEventListener(
 
 
         // ==================================
-        // CLIENT DATA
+        // GET SESSION SECTIONS
         // ==================================
 
         const client =
-            session.client ||
-            {};
-
-
-        // ==================================
-        // RESTAURANT DATA
-        // ==================================
+            session.client || {};
 
         const restaurant =
-            session.restaurant ||
-            {};
-
-
-        // ==================================
-        // PLAN DATA
-        // ==================================
+            session.restaurant || {};
 
         const plan =
-            session.plan ||
-            {};
+            session.plan || {};
 
 
         // ==================================
         // OWNER NAME
+        // ==================================
+
+        const ownerName =
+            client.ownerName ||
+            "Owner";
+
+
+        // ==================================
+        // OWNER EMAIL
+        // ==================================
+
+        const ownerEmail =
+            client.email ||
+            "";
+
+
+        // ==================================
+        // USER ID
+        // ==================================
+
+        const userId =
+            session.userId ||
+            "-";
+
+
+        // ==================================
+        // CLIENT ID
+        // ==================================
+
+        const clientId =
+            session.clientId ||
+            "-";
+
+
+        // ==================================
+        // RESTAURANT ID
+        // ==================================
+
+        const restaurantId =
+            session.restaurantId ||
+            "-";
+
+
+        // ==================================
+        // ROLE
+        // ==================================
+
+        const role =
+            session.role ||
+            "Owner";
+
+
+        // ==================================
+        // RESTAURANT STATUS
+        // ==================================
+
+        const restaurantStatus =
+            restaurant.status ||
+            "Active";
+
+
+        // ==================================
+        // UPDATE TOP USER NAME
         // ==================================
 
         const userName =
@@ -103,90 +153,13 @@ document.addEventListener(
         if (userName) {
 
             userName.textContent =
-                client.ownerName ||
-                "Owner";
+                ownerName;
 
         }
 
 
         // ==================================
-        // OWNER EMAIL
-        // ==================================
-
-        const userEmail =
-            document.getElementById(
-                "userEmail"
-            );
-
-
-        if (userEmail) {
-
-            userEmail.textContent =
-                client.email ||
-                "";
-
-        }
-
-
-        // ==================================
-        // MOBILE
-        // ==================================
-
-        const userMobile =
-            document.getElementById(
-                "userMobile"
-            );
-
-
-        if (userMobile) {
-
-            userMobile.textContent =
-                client.mobile ||
-                "";
-
-        }
-
-
-        // ==================================
-        // RESTAURANT ID
-        // ==================================
-
-        const restaurantId =
-            document.getElementById(
-                "restaurantId"
-            );
-
-
-        if (restaurantId) {
-
-            restaurantId.textContent =
-                session.restaurantId ||
-                "-";
-
-        }
-
-
-        // ==================================
-        // CLIENT ID
-        // ==================================
-
-        const clientId =
-            document.getElementById(
-                "clientId"
-            );
-
-
-        if (clientId) {
-
-            clientId.textContent =
-                session.clientId ||
-                "-";
-
-        }
-
-
-        // ==================================
-        // ROLE
+        // UPDATE TOP USER ROLE
         // ==================================
 
         const userRole =
@@ -198,27 +171,171 @@ document.addEventListener(
         if (userRole) {
 
             userRole.textContent =
-                session.role ||
-                "Owner";
+                role;
 
         }
 
 
         // ==================================
-        // RESTAURANT STATUS
+        // UPDATE WELCOME MESSAGE
         // ==================================
 
-        const restaurantStatus =
+        const welcomeMessage =
+            document.getElementById(
+                "welcomeMessage"
+            );
+
+
+        if (welcomeMessage) {
+
+            welcomeMessage.textContent =
+                `Welcome back, ${ownerName}!`;
+
+        }
+
+
+        // ==================================
+        // UPDATE RESTAURANT ID
+        // ==================================
+
+        const restaurantIdElement =
+            document.getElementById(
+                "restaurantId"
+            );
+
+
+        if (restaurantIdElement) {
+
+            restaurantIdElement.textContent =
+                restaurantId;
+
+        }
+
+
+        // ==================================
+        // UPDATE CLIENT ID
+        // ==================================
+
+        const clientIdElement =
+            document.getElementById(
+                "clientId"
+            );
+
+
+        if (clientIdElement) {
+
+            clientIdElement.textContent =
+                clientId;
+
+        }
+
+
+        // ==================================
+        // UPDATE ROLE CARD
+        // ==================================
+
+        const roleElement =
+            document.getElementById(
+                "role"
+            );
+
+
+        if (roleElement) {
+
+            roleElement.textContent =
+                role;
+
+        }
+
+
+        // ==================================
+        // UPDATE USER ID
+        // ==================================
+
+        const userIdElement =
+            document.getElementById(
+                "userId"
+            );
+
+
+        if (userIdElement) {
+
+            userIdElement.textContent =
+                userId;
+
+        }
+
+
+        // ==================================
+        // UPDATE EMAIL
+        // ==================================
+
+        const emailElement =
+            document.getElementById(
+                "email"
+            );
+
+
+        if (emailElement) {
+
+            emailElement.textContent =
+                ownerEmail;
+
+        }
+
+
+        // ==================================
+        // UPDATE TENANT RESTAURANT ID
+        // ==================================
+
+        const tenantRestaurantIdElement =
+            document.getElementById(
+                "tenantRestaurantId"
+            );
+
+
+        if (tenantRestaurantIdElement) {
+
+            tenantRestaurantIdElement.textContent =
+                restaurantId;
+
+        }
+
+
+        // ==================================
+        // UPDATE AVATAR
+        // ==================================
+
+        const avatar =
+            document.querySelector(
+                ".user-avatar"
+            );
+
+
+        if (avatar) {
+
+            avatar.textContent =
+                ownerName
+                    .charAt(0)
+                    .toUpperCase();
+
+        }
+
+
+        // ==================================
+        // UPDATE RESTAURANT STATUS
+        // ==================================
+
+        const restaurantStatusElement =
             document.getElementById(
                 "restaurantStatus"
             );
 
 
-        if (restaurantStatus) {
+        if (restaurantStatusElement) {
 
-            restaurantStatus.textContent =
-                restaurant.status ||
-                "Active";
+            restaurantStatusElement.textContent =
+                restaurantStatus;
 
         }
 
@@ -227,15 +344,15 @@ document.addEventListener(
         // PLAN NAME
         // ==================================
 
-        const planName =
+        const planNameElement =
             document.getElementById(
                 "planName"
             );
 
 
-        if (planName) {
+        if (planNameElement) {
 
-            planName.textContent =
+            planNameElement.textContent =
                 plan.planName ||
                 "Starter";
 
@@ -246,15 +363,15 @@ document.addEventListener(
         // PLAN PRICE
         // ==================================
 
-        const planPrice =
+        const planPriceElement =
             document.getElementById(
                 "planPrice"
             );
 
 
-        if (planPrice) {
+        if (planPriceElement) {
 
-            planPrice.textContent =
+            planPriceElement.textContent =
                 `${restaurant.currency || "AED"} ${plan.price ?? 0}`;
 
         }
@@ -264,15 +381,15 @@ document.addEventListener(
         // MAX ORDERS
         // ==================================
 
-        const maxOrders =
+        const maxOrdersElement =
             document.getElementById(
                 "maxOrders"
             );
 
 
-        if (maxOrders) {
+        if (maxOrdersElement) {
 
-            maxOrders.textContent =
+            maxOrdersElement.textContent =
                 plan.maxOrders ??
                 "-";
 
@@ -283,141 +400,17 @@ document.addEventListener(
         // MAX BRANCHES
         // ==================================
 
-        const maxBranches =
+        const maxBranchesElement =
             document.getElementById(
                 "maxBranches"
             );
 
 
-        if (maxBranches) {
+        if (maxBranchesElement) {
 
-            maxBranches.textContent =
+            maxBranchesElement.textContent =
                 plan.maxBranches ??
                 "-";
-
-        }
-
-
-        // ==================================
-        // CURRENCY
-        // ==================================
-
-        const currency =
-            document.getElementById(
-                "currency"
-            );
-
-
-        if (currency) {
-
-            currency.textContent =
-                restaurant.currency ||
-                "AED";
-
-        }
-
-
-        // ==================================
-        // VAT
-        // ==================================
-
-        const vat =
-            document.getElementById(
-                "vat"
-            );
-
-
-        if (vat) {
-
-            vat.textContent =
-                `${restaurant.vat ?? 0}%`;
-
-        }
-
-
-        // ==================================
-        // TIMEZONE
-        // ==================================
-
-        const timezone =
-            document.getElementById(
-                "timezone"
-            );
-
-
-        if (timezone) {
-
-            timezone.textContent =
-                restaurant.timezone ||
-                "Asia/Dubai";
-
-        }
-
-
-        // ==================================
-        // FEATURES
-        // ==================================
-
-        const pickupEnabled =
-            document.getElementById(
-                "pickupEnabled"
-            );
-
-
-        if (pickupEnabled) {
-
-            pickupEnabled.textContent =
-                restaurant.pickupEnabled
-                    ? "Enabled"
-                    : "Disabled";
-
-        }
-
-
-        const deliveryEnabled =
-            document.getElementById(
-                "deliveryEnabled"
-            );
-
-
-        if (deliveryEnabled) {
-
-            deliveryEnabled.textContent =
-                restaurant.deliveryEnabled
-                    ? "Enabled"
-                    : "Disabled";
-
-        }
-
-
-        const kitchenEnabled =
-            document.getElementById(
-                "kitchenEnabled"
-            );
-
-
-        if (kitchenEnabled) {
-
-            kitchenEnabled.textContent =
-                restaurant.kitchenEnabled
-                    ? "Enabled"
-                    : "Disabled";
-
-        }
-
-
-        const whatsappEnabled =
-            document.getElementById(
-                "whatsappEnabled"
-            );
-
-
-        if (whatsappEnabled) {
-
-            whatsappEnabled.textContent =
-                restaurant.whatsappEnabled
-                    ? "Enabled"
-                    : "Disabled";
 
         }
 
@@ -428,7 +421,7 @@ document.addEventListener(
 
         const logoutButton =
             document.getElementById(
-                "logoutButton"
+                "logoutBtn"
             );
 
 
@@ -453,6 +446,50 @@ document.addEventListener(
             );
 
         }
+
+
+        // ==================================
+        // FINAL DEBUG
+        // ==================================
+
+        console.log(
+            "DASHBOARD: UI populated successfully."
+        );
+
+        console.log(
+            "Owner:",
+            ownerName
+        );
+
+        console.log(
+            "Email:",
+            ownerEmail
+        );
+
+        console.log(
+            "User ID:",
+            userId
+        );
+
+        console.log(
+            "Client ID:",
+            clientId
+        );
+
+        console.log(
+            "Restaurant ID:",
+            restaurantId
+        );
+
+        console.log(
+            "Role:",
+            role
+        );
+
+        console.log(
+            "Plan:",
+            plan.planName
+        );
 
     }
 );
