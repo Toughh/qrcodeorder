@@ -1,6 +1,10 @@
 // ==========================================
 // QR ORDER SAAS
-// FRONTEND AUTHENTICATION GUARD
+// FRONTEND AUTHENTICATION
+// ==========================================
+
+// ==========================================
+// n8n VALIDATE SESSION WEBHOOK
 // ==========================================
 
 const N8N_VALIDATE_SESSION_WEBHOOK =
@@ -13,32 +17,40 @@ const N8N_VALIDATE_SESSION_WEBHOOK =
 
 function getSessionToken() {
 
-    return localStorage.getItem("qro_session_token");
+    return localStorage.getItem(
+        "qro_session_token"
+    );
 
 }
 
 
 // ==========================================
-// GET CURRENT SESSION
+// GET CURRENT STORED SESSION
 // ==========================================
 
 function getCurrentSession() {
 
     const sessionData =
-        localStorage.getItem("qro_session_data");
+        localStorage.getItem(
+            "qro_session_data"
+        );
 
     if (!sessionData) {
+
         return null;
+
     }
 
     try {
 
-        return JSON.parse(sessionData);
+        return JSON.parse(
+            sessionData
+        );
 
     } catch (error) {
 
         console.error(
-            "Unable to parse session data:",
+            "Unable to parse stored session:",
             error
         );
 
@@ -50,12 +62,15 @@ function getCurrentSession() {
 
 
 // ==========================================
-// SAVE SESSION
+// SAVE LOGIN SESSION
 // ==========================================
 
 function saveSession(data) {
 
-    if (!data || !data.sessionToken) {
+    if (
+        !data ||
+        !data.sessionToken
+    ) {
 
         throw new Error(
             "Invalid session response."
@@ -64,11 +79,19 @@ function saveSession(data) {
     }
 
 
+    // ==================================
+    // SESSION TOKEN
+    // ==================================
+
     localStorage.setItem(
         "qro_session_token",
         data.sessionToken
     );
 
+
+    // ==================================
+    // BASIC SESSION DATA
+    // ==================================
 
     localStorage.setItem(
         "qro_session_data",
@@ -102,6 +125,133 @@ function saveSession(data) {
 
 
 // ==========================================
+// SAVE VALIDATED SESSION
+// ==========================================
+
+function saveValidatedSession(data) {
+
+    if (!data) {
+
+        return;
+
+    }
+
+
+    // Keep the session token separately.
+    // We DO NOT overwrite it with anything
+    // from SESSION_VALID.
+
+    const existingToken =
+        getSessionToken();
+
+
+    // ==================================
+    // STORE COMPLETE SAFE SESSION DATA
+    // ==================================
+
+    localStorage.setItem(
+        "qro_validated_session",
+        JSON.stringify(data)
+    );
+
+
+    // ==================================
+    // UPDATE BASIC SESSION DATA
+    // ==================================
+
+    localStorage.setItem(
+        "qro_session_data",
+        JSON.stringify({
+
+            userId:
+                data.userId,
+
+            clientId:
+                data.clientId,
+
+            restaurantId:
+                data.restaurantId,
+
+            name:
+                data.name,
+
+            email:
+                data.email,
+
+            mobile:
+                data.mobile,
+
+            role:
+                data.role,
+
+            status:
+                data.status,
+
+            emailVerified:
+                data.emailVerified,
+
+            sessionId:
+                data.sessionId,
+
+            sessionExpiresAt:
+                data.sessionExpiresAt,
+
+            restaurant:
+                data.restaurant,
+
+            plan:
+                data.plan
+
+        })
+    );
+
+
+    console.log(
+        "Validated session saved:",
+        data
+    );
+
+}
+
+
+// ==========================================
+// GET VALIDATED SESSION
+// ==========================================
+
+function getValidatedSession() {
+
+    const data =
+        localStorage.getItem(
+            "qro_validated_session"
+        );
+
+    if (!data) {
+
+        return null;
+
+    }
+
+    try {
+
+        return JSON.parse(
+            data
+        );
+
+    } catch (error) {
+
+        console.error(
+            "Unable to parse validated session:",
+            error
+        );
+
+        return null;
+
+    }
+
+}
+
+
+// ==========================================
 // CLEAR SESSION
 // ==========================================
 
@@ -115,6 +265,10 @@ function clearSession() {
         "qro_session_data"
     );
 
+    localStorage.removeItem(
+        "qro_validated_session"
+    );
+
 }
 
 
@@ -124,17 +278,31 @@ function clearSession() {
 
 async function validateSession() {
 
+    console.log(
+        "AUTH: Starting session validation..."
+    );
+
+
     const sessionToken =
         getSessionToken();
 
 
+    // ==================================
+    // NO TOKEN
+    // ==================================
+
     if (!sessionToken) {
+
+        console.warn(
+            "AUTH: No session token found."
+        );
 
         return {
 
             valid: false,
 
-            code: "NO_SESSION"
+            code:
+                "NO_SESSION"
 
         };
 
@@ -142,6 +310,10 @@ async function validateSession() {
 
 
     try {
+
+        // ==================================
+        // CALL n8n
+        // ==================================
 
         const response =
             await fetch(
@@ -157,21 +329,32 @@ async function validateSession() {
 
                     },
 
-                    body: JSON.stringify({
+                    body:
+                        JSON.stringify({
 
-                        sessionToken:
-                            sessionToken
+                            sessionToken:
+                                sessionToken
 
-                    })
+                        })
 
                 }
             );
 
 
+        console.log(
+            "AUTH: Validation HTTP status:",
+            response.status
+        );
+
+
+        // ==================================
+        // HTTP ERROR
+        // ==================================
+
         if (!response.ok) {
 
             console.error(
-                "Session validation HTTP error:",
+                "AUTH: Session validation HTTP error:",
                 response.status
             );
 
@@ -179,31 +362,75 @@ async function validateSession() {
 
                 valid: false,
 
-                code: "VALIDATION_ERROR"
+                code:
+                    "VALIDATION_ERROR"
 
             };
 
         }
 
 
-        const result =
+        // ==================================
+        // READ RESPONSE
+        // ==================================
+
+        const rawResult =
             await response.json();
 
 
         console.log(
-            "Session validation response:",
+            "AUTH: Raw validation response:",
+            rawResult
+        );
+
+
+        // ==================================
+        // NORMALIZE n8n RESPONSE
+        // ==================================
+
+        const result =
+            Array.isArray(rawResult)
+                ? rawResult[0]
+                : rawResult;
+
+
+        console.log(
+            "AUTH: Normalized validation response:",
             result
         );
 
 
+        // ==================================
+        // SESSION VALID
+        // ==================================
+
         if (
+            result &&
             result.success === true &&
-            result.code === "SESSION_VALID"
+            result.code === "SESSION_VALID" &&
+            result.data
         ) {
+
+            // ==================================
+            // SAVE COMPLETE VALIDATED SESSION
+            // ==================================
+
+            saveValidatedSession(
+                result.data
+            );
+
+
+            console.log(
+                "AUTH: Session is valid."
+            );
+
 
             return {
 
                 valid: true,
+
+                code:
+                    "SESSION_VALID",
 
                 data:
                     result.data
@@ -213,13 +440,27 @@ async function validateSession() {
         }
 
 
+        // ==================================
+        // SESSION INVALID
+        // ==================================
+
+        console.warn(
+            "AUTH: Session is invalid.",
+            result
+        );
+
+
         return {
 
             valid: false,
 
             code:
-                result.code ||
-                "INVALID_SESSION"
+                result?.code ||
+                "INVALID_SESSION",
+
+            message:
+                result?.message ||
+                "Session is invalid."
 
         };
 
@@ -227,7 +468,7 @@ async function validateSession() {
     } catch (error) {
 
         console.error(
-            "Session validation failed:",
+            "AUTH: Session validation failed:",
             error
         );
 
@@ -236,7 +477,11 @@ async function validateSession() {
 
             valid: false,
 
-            code: "NETWORK_ERROR"
+            code:
+                "NETWORK_ERROR",
+
+            message:
+                "Unable to validate login session."
 
         };
 
@@ -251,11 +496,26 @@ async function validateSession() {
 
 async function requireAuthentication() {
 
+    console.log(
+        "AUTH: requireAuthentication()"
+    );
+
+
     const result =
         await validateSession();
 
 
+    // ==================================
+    // INVALID
+    // ==================================
+
     if (!result.valid) {
+
+        console.warn(
+            "AUTH: Authentication failed:",
+            result.code
+        );
+
 
         clearSession();
 
@@ -263,9 +523,19 @@ async function requireAuthentication() {
         window.location.href =
             "login.html";
 
+
         return null;
 
     }
+
+
+    // ==================================
+    // VALID
+    // ==================================
+
+    console.log(
+        "AUTH: Authentication successful."
+    );
 
 
     return result.data;

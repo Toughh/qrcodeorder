@@ -21,7 +21,7 @@ document.addEventListener(
 
 
         // ==================================
-        // CHECK CURRENT SESSION
+        // AUTHENTICATION
         // ==================================
 
         console.log(
@@ -64,7 +64,7 @@ document.addEventListener(
 
 
         // ==================================
-        // USER NAME
+        // USER
         // ==================================
 
         const userName =
@@ -82,10 +82,6 @@ document.addEventListener(
         }
 
 
-        // ==================================
-        // USER EMAIL
-        // ==================================
-
         const userEmail =
             document.getElementById(
                 "userEmail"
@@ -101,8 +97,23 @@ document.addEventListener(
         }
 
 
+        const userRole =
+            document.getElementById(
+                "userRole"
+            );
+
+
+        if (userRole) {
+
+            userRole.textContent =
+                session.role ||
+                "Owner";
+
+        }
+
+
         // ==================================
-        // RESTAURANT ID
+        // RESTAURANT
         // ==================================
 
         const restaurantId =
@@ -120,10 +131,6 @@ document.addEventListener(
         }
 
 
-        // ==================================
-        // CLIENT ID
-        // ==================================
-
         const clientId =
             document.getElementById(
                 "clientId"
@@ -140,20 +147,107 @@ document.addEventListener(
 
 
         // ==================================
-        // ROLE
+        // RESTAURANT SETTINGS
         // ==================================
 
-        const userRole =
+        const restaurant =
+            session.restaurant ||
+            {};
+
+
+        console.log(
+            "DASHBOARD RESTAURANT:",
+            restaurant
+        );
+
+
+        // ==================================
+        // PLAN
+        // ==================================
+
+        const plan =
+            session.plan ||
+            {};
+
+
+        console.log(
+            "DASHBOARD PLAN:",
+            plan
+        );
+
+
+        // ==================================
+        // PLAN NAME
+        // ==================================
+
+        const planName =
             document.getElementById(
-                "userRole"
+                "planName"
             );
 
 
-        if (userRole) {
+        if (planName) {
 
-            userRole.textContent =
-                session.role ||
-                "Owner";
+            planName.textContent =
+                plan.planName ||
+                "Starter";
+
+        }
+
+
+        // ==================================
+        // MAX BRANCHES
+        // ==================================
+
+        const maxBranches =
+            document.getElementById(
+                "maxBranches"
+            );
+
+
+        if (maxBranches) {
+
+            maxBranches.textContent =
+                plan.maxBranches ??
+                "-";
+
+        }
+
+
+        // ==================================
+        // MAX ORDERS
+        // ==================================
+
+        const maxOrders =
+            document.getElementById(
+                "maxOrders"
+            );
+
+
+        if (maxOrders) {
+
+            maxOrders.textContent =
+                plan.maxOrders ??
+                "-";
+
+        }
+
+
+        // ==================================
+        // CURRENCY
+        // ==================================
+
+        const currency =
+            document.getElementById(
+                "currency"
+            );
+
+
+        if (currency) {
+
+            currency.textContent =
+                restaurant.currency ||
+                "AED";
 
         }
 
