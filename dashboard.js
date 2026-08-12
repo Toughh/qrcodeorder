@@ -1,6 +1,6 @@
 // ==========================================
 // QR RESTAURANT SAAS
-// OWNER DASHBOARD
+// PREMIUM OWNER DASHBOARD
 // ==========================================
 
 document.addEventListener(
@@ -64,7 +64,34 @@ document.addEventListener(
 
 
         // ==================================
-        // USER
+        // CLIENT DATA
+        // ==================================
+
+        const client =
+            session.client ||
+            {};
+
+
+        // ==================================
+        // RESTAURANT DATA
+        // ==================================
+
+        const restaurant =
+            session.restaurant ||
+            {};
+
+
+        // ==================================
+        // PLAN DATA
+        // ==================================
+
+        const plan =
+            session.plan ||
+            {};
+
+
+        // ==================================
+        // OWNER NAME
         // ==================================
 
         const userName =
@@ -76,11 +103,15 @@ document.addEventListener(
         if (userName) {
 
             userName.textContent =
-                session.name ||
+                client.ownerName ||
                 "Owner";
 
         }
 
+
+        // ==================================
+        // OWNER EMAIL
+        // ==================================
 
         const userEmail =
             document.getElementById(
@@ -91,29 +122,33 @@ document.addEventListener(
         if (userEmail) {
 
             userEmail.textContent =
-                session.email ||
+                client.email ||
                 "";
 
         }
 
 
-        const userRole =
+        // ==================================
+        // MOBILE
+        // ==================================
+
+        const userMobile =
             document.getElementById(
-                "userRole"
+                "userMobile"
             );
 
 
-        if (userRole) {
+        if (userMobile) {
 
-            userRole.textContent =
-                session.role ||
-                "Owner";
+            userMobile.textContent =
+                client.mobile ||
+                "";
 
         }
 
 
         // ==================================
-        // RESTAURANT
+        // RESTAURANT ID
         // ==================================
 
         const restaurantId =
@@ -131,6 +166,10 @@ document.addEventListener(
         }
 
 
+        // ==================================
+        // CLIENT ID
+        // ==================================
+
         const clientId =
             document.getElementById(
                 "clientId"
@@ -147,33 +186,41 @@ document.addEventListener(
 
 
         // ==================================
-        // RESTAURANT SETTINGS
+        // ROLE
         // ==================================
 
-        const restaurant =
-            session.restaurant ||
-            {};
+        const userRole =
+            document.getElementById(
+                "userRole"
+            );
 
 
-        console.log(
-            "DASHBOARD RESTAURANT:",
-            restaurant
-        );
+        if (userRole) {
+
+            userRole.textContent =
+                session.role ||
+                "Owner";
+
+        }
 
 
         // ==================================
-        // PLAN
+        // RESTAURANT STATUS
         // ==================================
 
-        const plan =
-            session.plan ||
-            {};
+        const restaurantStatus =
+            document.getElementById(
+                "restaurantStatus"
+            );
 
 
-        console.log(
-            "DASHBOARD PLAN:",
-            plan
-        );
+        if (restaurantStatus) {
+
+            restaurantStatus.textContent =
+                restaurant.status ||
+                "Active";
+
+        }
 
 
         // ==================================
@@ -196,20 +243,19 @@ document.addEventListener(
 
 
         // ==================================
-        // MAX BRANCHES
+        // PLAN PRICE
         // ==================================
 
-        const maxBranches =
+        const planPrice =
             document.getElementById(
-                "maxBranches"
+                "planPrice"
             );
 
 
-        if (maxBranches) {
+        if (planPrice) {
 
-            maxBranches.textContent =
-                plan.maxBranches ??
-                "-";
+            planPrice.textContent =
+                `${restaurant.currency || "AED"} ${plan.price ?? 0}`;
 
         }
 
@@ -234,6 +280,25 @@ document.addEventListener(
 
 
         // ==================================
+        // MAX BRANCHES
+        // ==================================
+
+        const maxBranches =
+            document.getElementById(
+                "maxBranches"
+            );
+
+
+        if (maxBranches) {
+
+            maxBranches.textContent =
+                plan.maxBranches ??
+                "-";
+
+        }
+
+
+        // ==================================
         // CURRENCY
         // ==================================
 
@@ -248,6 +313,111 @@ document.addEventListener(
             currency.textContent =
                 restaurant.currency ||
                 "AED";
+
+        }
+
+
+        // ==================================
+        // VAT
+        // ==================================
+
+        const vat =
+            document.getElementById(
+                "vat"
+            );
+
+
+        if (vat) {
+
+            vat.textContent =
+                `${restaurant.vat ?? 0}%`;
+
+        }
+
+
+        // ==================================
+        // TIMEZONE
+        // ==================================
+
+        const timezone =
+            document.getElementById(
+                "timezone"
+            );
+
+
+        if (timezone) {
+
+            timezone.textContent =
+                restaurant.timezone ||
+                "Asia/Dubai";
+
+        }
+
+
+        // ==================================
+        // FEATURES
+        // ==================================
+
+        const pickupEnabled =
+            document.getElementById(
+                "pickupEnabled"
+            );
+
+
+        if (pickupEnabled) {
+
+            pickupEnabled.textContent =
+                restaurant.pickupEnabled
+                    ? "Enabled"
+                    : "Disabled";
+
+        }
+
+
+        const deliveryEnabled =
+            document.getElementById(
+                "deliveryEnabled"
+            );
+
+
+        if (deliveryEnabled) {
+
+            deliveryEnabled.textContent =
+                restaurant.deliveryEnabled
+                    ? "Enabled"
+                    : "Disabled";
+
+        }
+
+
+        const kitchenEnabled =
+            document.getElementById(
+                "kitchenEnabled"
+            );
+
+
+        if (kitchenEnabled) {
+
+            kitchenEnabled.textContent =
+                restaurant.kitchenEnabled
+                    ? "Enabled"
+                    : "Disabled";
+
+        }
+
+
+        const whatsappEnabled =
+            document.getElementById(
+                "whatsappEnabled"
+            );
+
+
+        if (whatsappEnabled) {
+
+            whatsappEnabled.textContent =
+                restaurant.whatsappEnabled
+                    ? "Enabled"
+                    : "Disabled";
 
         }
 
