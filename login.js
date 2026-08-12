@@ -11,7 +11,7 @@
 // TEST URL FOR NOW
 
 const N8N_LOGIN_WEBHOOK =
-    "https://maatapita.app.n8n.cloud/webhook-test/owner-login";
+    "https://maatapita.app.n8n.cloud/webhook/owner-login";
 
 // After the n8n workflow is activated,
 // change to:
