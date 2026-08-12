@@ -1,160 +1,18 @@
 // ==========================================
 // QR RESTAURANT SAAS
-// DASHBOARD - DIAGNOSTIC VERSION
+// OWNER DASHBOARD
 // ==========================================
 
 document.addEventListener(
     "DOMContentLoaded",
     async function () {
 
-        console.log("==================================");
-        console.log("DASHBOARD LOADED");
-        console.log("==================================");
-
-
-        // ==================================
-        // CHECK LOCAL STORAGE
-        // ==================================
-
-        const token =
-            localStorage.getItem(
-                "qro_session_token"
-            );
-
-        const sessionData =
-            localStorage.getItem(
-                "qro_session_data"
-            );
-
-
-        console.log(
-            "DASHBOARD: qro_session_token =",
-            token
-        );
-
-
-        console.log(
-            "DASHBOARD: qro_session_data =",
-            sessionData
-        );
-
-
-        // ==================================
-        // STOP IF TOKEN DOES NOT EXIST
-        // ==================================
-
-        if (!token) {
-
-            console.error(
-                "DASHBOARD ERROR: No session token found."
-            );
-
-            document.body.innerHTML = `
-                <div style="
-                    font-family: Arial;
-                    padding: 40px;
-                    text-align: center;
-                ">
-
-                    <h1>Session Not Found</h1>
-
-                    <p>
-                        No login session was found
-                        in this browser.
-                    </p>
-
-                    <button
-                        onclick="location.href='login.html'"
-                    >
-                        Back to Login
-                    </button>
-
-                </div>
-            `;
-
-            return;
-
-        }
-
-
-        // ==================================
-        // SESSION EXISTS
-        // ==================================
-
-        console.log(
-            "DASHBOARD: Session token exists."
-        );
-
-
-        console.log(
-            "DASHBOARD: Calling validateSession()..."
-        );
-
-
-        // ==================================
-        // VALIDATE SESSION
-        // ==================================
-
-        let result;
-
-
-        try {
-
-            result =
-                await validateSession();
-
-        }
-
-        catch (error) {
-
-            console.error(
-                "DASHBOARD: validateSession() THREW ERROR:",
-                error
-            );
-
-            document.body.innerHTML = `
-                <div style="
-                    font-family: Arial;
-                    padding: 40px;
-                    text-align: center;
-                ">
-
-                    <h1>Session Validation Error</h1>
-
-                    <p>
-                        Check the browser console.
-                    </p>
-
-                    <pre style="
-                        text-align:left;
-                        background:#f3f4f6;
-                        padding:20px;
-                        border-radius:10px;
-                        overflow:auto;
-                    ">${error.message}</pre>
-
-                </div>
-            `;
-
-            return;
-
-        }
-
-
-        // ==================================
-        // SHOW VALIDATION RESULT
-        // ==================================
-
         console.log(
             "=================================="
         );
 
         console.log(
-            "VALIDATE SESSION RESULT:"
-        );
-
-        console.log(
-            result
+            "DASHBOARD: Page loaded"
         );
 
         console.log(
@@ -163,66 +21,40 @@ document.addEventListener(
 
 
         // ==================================
-        // INVALID SESSION
-        // ==================================
-
-        if (
-            !result ||
-            result.valid !== true
-        ) {
-
-            console.error(
-                "DASHBOARD: SESSION INVALID",
-                result
-            );
-
-
-            document.body.innerHTML = `
-                <div style="
-                    font-family: Arial;
-                    padding: 40px;
-                    text-align: center;
-                ">
-
-                    <h1>Session Validation Failed</h1>
-
-                    <p>
-                        The login session exists,
-                        but validation failed.
-                    </p>
-
-                    <p>
-                        Error Code:
-                        <strong>
-                            ${result?.code || "UNKNOWN"}
-                        </strong>
-                    </p>
-
-                    <button
-                        onclick="location.href='login.html'"
-                    >
-                        Back to Login
-                    </button>
-
-                </div>
-            `;
-
-            return;
-
-        }
-
-
-        // ==================================
-        // VALID SESSION
+        // CHECK CURRENT SESSION
         // ==================================
 
         console.log(
-            "DASHBOARD: SESSION VALID!"
+            "DASHBOARD: Checking authentication..."
         );
 
 
         const session =
-            result.data;
+            await requireAuthentication();
+
+
+        // ==================================
+        // AUTHENTICATION FAILED
+        // ==================================
+
+        if (!session) {
+
+            console.warn(
+                "DASHBOARD: Authentication failed."
+            );
+
+            return;
+
+        }
+
+
+        // ==================================
+        // AUTHENTICATION SUCCESSFUL
+        // ==================================
+
+        console.log(
+            "DASHBOARD: Authentication successful."
+        );
 
 
         console.log(
@@ -244,7 +76,7 @@ document.addEventListener(
         if (userName) {
 
             userName.textContent =
-                session?.name ||
+                session.name ||
                 "Owner";
 
         }
@@ -263,7 +95,7 @@ document.addEventListener(
         if (userEmail) {
 
             userEmail.textContent =
-                session?.email ||
+                session.email ||
                 "";
 
         }
@@ -282,7 +114,7 @@ document.addEventListener(
         if (restaurantId) {
 
             restaurantId.textContent =
-                session?.restaurantId ||
+                session.restaurantId ||
                 "-";
 
         }
@@ -301,7 +133,7 @@ document.addEventListener(
         if (clientId) {
 
             clientId.textContent =
-                session?.clientId ||
+                session.clientId ||
                 "-";
 
         }
@@ -320,7 +152,7 @@ document.addEventListener(
         if (userRole) {
 
             userRole.textContent =
-                session?.role ||
+                session.role ||
                 "Owner";
 
         }
@@ -342,7 +174,13 @@ document.addEventListener(
                 "click",
                 function () {
 
+                    console.log(
+                        "DASHBOARD: Logging out."
+                    );
+
+
                     clearSession();
+
 
                     window.location.href =
                         "login.html";
@@ -351,11 +189,6 @@ document.addEventListener(
             );
 
         }
-
-
-        console.log(
-            "DASHBOARD: Finished loading."
-        );
 
     }
 );
