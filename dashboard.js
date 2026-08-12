@@ -3,6 +3,20 @@
 // PREMIUM OWNER DASHBOARD
 // ==========================================
 
+
+// ==========================================
+// n8n OWNER DASHBOARD WEBHOOK
+// ==========================================
+
+// PRODUCTION URL
+const N8N_DASHBOARD_WEBHOOK =
+    "https://maatapita.app.n8n.cloud/webhook/owner-dashboard";
+
+
+// ==========================================
+// PAGE LOAD
+// ==========================================
+
 document.addEventListener(
     "DOMContentLoaded",
     async function () {
@@ -70,8 +84,10 @@ document.addEventListener(
         const client =
             session.client || {};
 
+
         const restaurant =
             session.restaurant || {};
+
 
         const plan =
             session.plan || {};
@@ -415,9 +431,23 @@ document.addEventListener(
         }
 
 
-        // ==================================
+        // ==========================================
+        // LOAD BUSINESS DASHBOARD DATA
+        // ==========================================
+
+        const dashboardData =
+            await loadDashboardData();
+
+
+        console.log(
+            "DASHBOARD BUSINESS DATA:",
+            dashboardData
+        );
+
+
+        // ==========================================
         // LOGOUT
-        // ==================================
+        // ==========================================
 
         const logoutButton =
             document.getElementById(
@@ -456,35 +486,42 @@ document.addEventListener(
             "DASHBOARD: UI populated successfully."
         );
 
+
         console.log(
             "Owner:",
             ownerName
         );
+
 
         console.log(
             "Email:",
             ownerEmail
         );
 
+
         console.log(
             "User ID:",
             userId
         );
+
 
         console.log(
             "Client ID:",
             clientId
         );
 
+
         console.log(
             "Restaurant ID:",
             restaurantId
         );
 
+
         console.log(
             "Role:",
             role
         );
+
 
         console.log(
             "Plan:",
@@ -493,3 +530,184 @@ document.addEventListener(
 
     }
 );
+
+
+// ==========================================
+// LOAD DASHBOARD BUSINESS DATA
+// ==========================================
+
+async function loadDashboardData() {
+
+    try {
+
+        console.log(
+            "=================================="
+        );
+
+        console.log(
+            "DASHBOARD: Calling Owner Dashboard API..."
+        );
+
+        console.log(
+            "=================================="
+        );
+
+
+        // ==================================
+        // GET SESSION TOKEN
+        // ==================================
+
+        const sessionToken =
+            getSessionToken();
+
+
+        if (!sessionToken) {
+
+            console.error(
+                "DASHBOARD: No session token found."
+            );
+
+            return null;
+
+        }
+
+
+        console.log(
+            "DASHBOARD: Session token found."
+        );
+
+
+        // ==================================
+        // CALL n8n OWNER DASHBOARD WEBHOOK
+        // ==================================
+
+        const response =
+            await fetch(
+                N8N_DASHBOARD_WEBHOOK,
+                {
+
+                    method: "POST",
+
+                    headers: {
+
+                        "Content-Type":
+                            "application/json"
+
+                    },
+
+                    body:
+                        JSON.stringify({
+
+                            sessionToken:
+                                sessionToken
+
+                        })
+
+                }
+            );
+
+
+        // ==================================
+        // HTTP STATUS
+        // ==================================
+
+        console.log(
+            "DASHBOARD API HTTP STATUS:",
+            response.status
+        );
+
+
+        // ==================================
+        // READ RESPONSE
+        // ==================================
+
+        const rawResult =
+            await response.json();
+
+
+        console.log(
+            "DASHBOARD API RAW RESPONSE:",
+            rawResult
+        );
+
+
+        // ==================================
+        // NORMALIZE n8n RESPONSE
+        // ==================================
+
+        const result =
+            Array.isArray(rawResult)
+                ? rawResult[0]
+                : rawResult;
+
+
+        console.log(
+            "DASHBOARD API NORMALIZED RESPONSE:",
+            result
+        );
+
+
+        // ==================================
+        // SUCCESS
+        // ==================================
+
+        if (
+            response.ok &&
+            result &&
+            result.success === true
+        ) {
+
+            console.log(
+                "=================================="
+            );
+
+            console.log(
+                "DASHBOARD: Business data loaded successfully."
+            );
+
+            console.log(
+                "=================================="
+            );
+
+
+            return result.data || {};
+
+        }
+
+
+        // ==================================
+        // API ERROR
+        // ==================================
+
+        console.error(
+            "DASHBOARD API ERROR:",
+            result
+        );
+
+
+        return null;
+
+    }
+
+
+    catch (error) {
+
+        console.error(
+            "=================================="
+        );
+
+        console.error(
+            "DASHBOARD API CONNECTION ERROR:",
+            error
+        );
+
+        console.error(
+            "=================================="
+        );
+
+
+        return null;
+
+    }
+
+}
