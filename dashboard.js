@@ -303,6 +303,22 @@ document.addEventListener(
 
         }
 
+        // ==================================
+        // UPDATE TENANT RESTAURANT ID
+        // ==================================
+
+        const tenantRestaurantIdElement =
+            document.getElementById(
+                "tenantRestaurantId"
+            );
+
+        if (tenantRestaurantIdElement) {
+
+            tenantRestaurantIdElement.textContent =
+                restaurantId;
+
+        }
+
 
         // ==========================================
         // UPDATE CLIENT ID
