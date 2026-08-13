@@ -85,6 +85,154 @@ document.addEventListener(
             dashboardData
         );
 
+        // ==========================================
+        // POPULATE DASHBOARD BUSINESS CONTEXT
+        // ==========================================
+
+        if (dashboardData) {
+
+            console.log(
+                "DASHBOARD: Populating verified tenant information..."
+            );
+
+
+            // ==================================
+            // USER ID
+            // ==================================
+
+            const dashboardUserId =
+                dashboardData.userId ||
+                userId ||
+                "-";
+
+
+            const dashboardUserIdElement =
+                document.getElementById(
+                    "userId"
+                );
+
+
+            if (dashboardUserIdElement) {
+
+                dashboardUserIdElement.textContent =
+                    dashboardUserId;
+
+            }
+
+
+            // ==================================
+            // EMAIL
+            // ==================================
+
+            const dashboardEmail =
+                dashboardData.client &&
+                    dashboardData.client.email
+                    ? dashboardData.client.email
+                    : ownerEmail || "";
+
+
+            const dashboardEmailElement =
+                document.getElementById(
+                    "email"
+                );
+
+
+            if (dashboardEmailElement) {
+
+                dashboardEmailElement.textContent =
+                    dashboardEmail;
+
+            }
+
+
+            // ==================================
+            // RESTAURANT ID
+            // ==================================
+
+            const dashboardRestaurantId =
+                dashboardData.restaurantId ||
+                restaurantId ||
+                "-";
+
+
+            const dashboardRestaurantIdElement =
+                document.getElementById(
+                    "tenantRestaurantId"
+                );
+
+
+            if (dashboardRestaurantIdElement) {
+
+                dashboardRestaurantIdElement.textContent =
+                    dashboardRestaurantId;
+
+            }
+
+
+            // ==================================
+            // OWNER NAME
+            // ==================================
+
+            const dashboardOwnerName =
+                dashboardData.client &&
+                    dashboardData.client.ownerName
+                    ? dashboardData.client.ownerName
+                    : ownerName;
+
+
+            // Update top-right owner name
+            const dashboardUserNameElement =
+                document.getElementById(
+                    "userName"
+                );
+
+
+            if (dashboardUserNameElement) {
+
+                dashboardUserNameElement.textContent =
+                    dashboardOwnerName;
+
+            }
+
+
+            // Update welcome message
+            const dashboardWelcomeElement =
+                document.getElementById(
+                    "welcomeMessage"
+                );
+
+
+            if (dashboardWelcomeElement) {
+
+                dashboardWelcomeElement.textContent =
+                    `Welcome back, ${dashboardOwnerName}!`;
+
+            }
+
+
+            // Update avatar
+            const dashboardAvatar =
+                document.querySelector(
+                    ".user-avatar"
+                );
+
+
+            if (dashboardAvatar) {
+
+                dashboardAvatar.textContent =
+                    dashboardOwnerName
+                        .charAt(0)
+                        .toUpperCase();
+
+            }
+
+
+            console.log(
+                "DASHBOARD: Verified tenant information populated."
+            );
+
+        }
+
 
         // ==========================================
         // DASHBOARD API FAILED
