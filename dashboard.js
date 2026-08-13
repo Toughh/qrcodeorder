@@ -3,6 +3,7 @@
 // PREMIUM OWNER DASHBOARD
 // ==========================================
 
+
 // ==========================================
 // n8n OWNER DASHBOARD WEBHOOK
 // ==========================================
@@ -70,25 +71,102 @@ document.addEventListener(
 
 
         console.log(
-            "DASHBOARD SESSION:",
+            "DASHBOARD AUTH SESSION:",
             session
         );
 
 
+        // ==========================================
+        // LOAD COMPLETE DASHBOARD DATA
+        // ==========================================
+
+        const dashboardData =
+            await loadDashboardData();
+
+
+        // ==========================================
+        // DASHBOARD API FAILED
+        // ==========================================
+
+        if (!dashboardData) {
+
+            console.error(
+                "DASHBOARD: Unable to load dashboard data."
+            );
+
+            return;
+
+        }
+
+
+        console.log(
+            "=================================="
+        );
+
+        console.log(
+            "DASHBOARD DATA RECEIVED:"
+        );
+
+        console.log(
+            dashboardData
+        );
+
+        console.log(
+            "=================================="
+        );
+
+
+        // ==========================================
+        // IMPORTANT
+        //
+        // The Owner Dashboard API is now the
+        // authoritative source for dashboard data.
+        //
+        // Structure:
+        //
+        // dashboardData
+        //   ├── sessionId
+        //   ├── userId
+        //   ├── clientId
+        //   ├── restaurantId
+        //   ├── role
+        //   ├── client
+        //   ├── restaurant
+        //   ├── plan
+        //   └── metrics
+        // ==========================================
+
+
         // ==================================
-        // GET SESSION SECTIONS
+        // GET CLIENT
         // ==================================
 
         const client =
-            session.client || {};
+            dashboardData.client || {};
 
+
+        // ==================================
+        // GET RESTAURANT
+        // ==================================
 
         const restaurant =
-            session.restaurant || {};
+            dashboardData.restaurant || {};
 
+
+        // ==================================
+        // GET PLAN
+        // ==================================
 
         const plan =
-            session.plan || {};
+            dashboardData.plan || {};
+
+
+        // ==================================
+        // GET METRICS
+        // ==================================
+
+        const metrics =
+            dashboardData.metrics || {};
 
 
         // ==================================
@@ -114,7 +192,7 @@ document.addEventListener(
         // ==================================
 
         const userId =
-            session.userId ||
+            dashboardData.userId ||
             "-";
 
 
@@ -123,7 +201,7 @@ document.addEventListener(
         // ==================================
 
         const clientId =
-            session.clientId ||
+            dashboardData.clientId ||
             "-";
 
 
@@ -132,7 +210,7 @@ document.addEventListener(
         // ==================================
 
         const restaurantId =
-            session.restaurantId ||
+            dashboardData.restaurantId ||
             "-";
 
 
@@ -141,7 +219,7 @@ document.addEventListener(
         // ==================================
 
         const role =
-            session.role ||
+            dashboardData.role ||
             "Owner";
 
 
@@ -154,9 +232,9 @@ document.addEventListener(
             "Active";
 
 
-        // ==================================
+        // ==========================================
         // UPDATE TOP USER NAME
-        // ==================================
+        // ==========================================
 
         const userName =
             document.getElementById(
@@ -172,9 +250,9 @@ document.addEventListener(
         }
 
 
-        // ==================================
+        // ==========================================
         // UPDATE TOP USER ROLE
-        // ==================================
+        // ==========================================
 
         const userRole =
             document.getElementById(
@@ -190,9 +268,9 @@ document.addEventListener(
         }
 
 
-        // ==================================
+        // ==========================================
         // UPDATE WELCOME MESSAGE
-        // ==================================
+        // ==========================================
 
         const welcomeMessage =
             document.getElementById(
@@ -208,9 +286,9 @@ document.addEventListener(
         }
 
 
-        // ==================================
-        // UPDATE RESTAURANT ID CARD
-        // ==================================
+        // ==========================================
+        // UPDATE RESTAURANT ID
+        // ==========================================
 
         const restaurantIdElement =
             document.getElementById(
@@ -226,9 +304,9 @@ document.addEventListener(
         }
 
 
-        // ==================================
-        // UPDATE CLIENT ID CARD
-        // ==================================
+        // ==========================================
+        // UPDATE CLIENT ID
+        // ==========================================
 
         const clientIdElement =
             document.getElementById(
@@ -244,9 +322,9 @@ document.addEventListener(
         }
 
 
-        // ==================================
+        // ==========================================
         // UPDATE ROLE CARD
-        // ==================================
+        // ==========================================
 
         const roleElement =
             document.getElementById(
@@ -262,9 +340,9 @@ document.addEventListener(
         }
 
 
-        // ==================================
+        // ==========================================
         // UPDATE USER ID
-        // ==================================
+        // ==========================================
 
         const userIdElement =
             document.getElementById(
@@ -280,9 +358,9 @@ document.addEventListener(
         }
 
 
-        // ==================================
+        // ==========================================
         // UPDATE EMAIL
-        // ==================================
+        // ==========================================
 
         const emailElement =
             document.getElementById(
@@ -298,27 +376,87 @@ document.addEventListener(
         }
 
 
+        // ==========================================
+        // UPDATE SECURE SESSION DETAILS
+        // ==========================================
+
         // ==================================
-        // UPDATE TENANT RESTAURANT ID
+        // USER ID
         // ==================================
 
-        const tenantRestaurantIdElement =
+        const secureUserIdElement =
             document.getElementById(
-                "tenantRestaurantId"
+                "userId"
             );
 
+        if (secureUserIdElement) {
 
-        if (tenantRestaurantIdElement) {
-
-            tenantRestaurantIdElement.textContent =
-                restaurantId;
+            secureUserIdElement.textContent =
+                dashboardData.userId ||
+                "-";
 
         }
 
 
         // ==================================
-        // UPDATE AVATAR
+        // EMAIL
         // ==================================
+
+        const secureEmailElement =
+            document.getElementById(
+                "email"
+            );
+
+        if (secureEmailElement) {
+
+            secureEmailElement.textContent =
+                client.email ||
+                "-";
+
+        }
+
+
+        // ==================================
+        // RESTAURANT ID
+        // ==================================
+
+        const secureRestaurantIdElement =
+            document.getElementById(
+                "tenantRestaurantId"
+            );
+
+        if (secureRestaurantIdElement) {
+
+            secureRestaurantIdElement.textContent =
+                dashboardData.restaurantId ||
+                "-";
+
+        }
+
+
+        // ==================================
+        // DEBUG SECURE SESSION
+        // ==================================
+
+        console.log(
+            "SECURE SESSION USER ID:",
+            dashboardData.userId
+        );
+
+        console.log(
+            "SECURE SESSION EMAIL:",
+            client.email
+        );
+
+        console.log(
+            "SECURE SESSION RESTAURANT ID:",
+            dashboardData.restaurantId
+        );
+
+
+        // ==========================================
+        // UPDATE AVATAR
+        // ==========================================
 
         const avatar =
             document.querySelector(
@@ -336,9 +474,9 @@ document.addEventListener(
         }
 
 
-        // ==================================
+        // ==========================================
         // UPDATE RESTAURANT STATUS
-        // ==================================
+        // ==========================================
 
         const restaurantStatusElement =
             document.getElementById(
@@ -354,9 +492,9 @@ document.addEventListener(
         }
 
 
-        // ==================================
-        // PLAN NAME
-        // ==================================
+        // ==========================================
+        // UPDATE PLAN NAME
+        // ==========================================
 
         const planNameElement =
             document.getElementById(
@@ -373,9 +511,9 @@ document.addEventListener(
         }
 
 
-        // ==================================
-        // PLAN PRICE
-        // ==================================
+        // ==========================================
+        // UPDATE PLAN PRICE
+        // ==========================================
 
         const planPriceElement =
             document.getElementById(
@@ -391,9 +529,9 @@ document.addEventListener(
         }
 
 
-        // ==================================
-        // MAX ORDERS
-        // ==================================
+        // ==========================================
+        // UPDATE MAX ORDERS
+        // ==========================================
 
         const maxOrdersElement =
             document.getElementById(
@@ -410,9 +548,9 @@ document.addEventListener(
         }
 
 
-        // ==================================
-        // MAX BRANCHES
-        // ==================================
+        // ==========================================
+        // UPDATE MAX BRANCHES
+        // ==========================================
 
         const maxBranchesElement =
             document.getElementById(
@@ -430,167 +568,18 @@ document.addEventListener(
 
 
         // ==========================================
-        // LOAD BUSINESS DASHBOARD DATA
+        // UPDATE DASHBOARD METRICS
         // ==========================================
 
-        const dashboardData =
-            await loadDashboardData();
-
-
-        console.log(
-            "DASHBOARD BUSINESS DATA:",
-            dashboardData
+        updateDashboardMetrics(
+            metrics,
+            restaurant
         );
 
 
         // ==========================================
-        // IMPORTANT:
-        // DO NOT MODIFY METRICS HERE.
-        //
-        // Metrics are already returned by n8n.
-        // We only use dashboardData to ensure
-        // authentication details are displayed.
-        // ==========================================
-
-
-        if (dashboardData) {
-
-            console.log(
-                "DASHBOARD: API data received."
-            );
-
-
-            // ==================================
-            // USER ID
-            // ==================================
-
-            const verifiedUserId =
-                dashboardData.userId ||
-                userId;
-
-
-            const verifiedUserIdElement =
-                document.getElementById(
-                    "userId"
-                );
-
-
-            if (verifiedUserIdElement) {
-
-                verifiedUserIdElement.textContent =
-                    verifiedUserId;
-
-            }
-
-
-            // ==================================
-            // EMAIL
-            // ==================================
-
-            const verifiedEmail =
-                dashboardData.client &&
-                dashboardData.client.email
-                    ? dashboardData.client.email
-                    : ownerEmail;
-
-
-            const verifiedEmailElement =
-                document.getElementById(
-                    "email"
-                );
-
-
-            if (verifiedEmailElement) {
-
-                verifiedEmailElement.textContent =
-                    verifiedEmail;
-
-            }
-
-
-            // ==================================
-            // RESTAURANT ID
-            // ==================================
-
-            const verifiedRestaurantId =
-                dashboardData.restaurantId ||
-                restaurantId;
-
-
-            const verifiedRestaurantIdElement =
-                document.getElementById(
-                    "tenantRestaurantId"
-                );
-
-
-            if (verifiedRestaurantIdElement) {
-
-                verifiedRestaurantIdElement.textContent =
-                    verifiedRestaurantId;
-
-            }
-
-
-            // ==================================
-            // OWNER NAME
-            // ==================================
-
-            const apiOwnerName =
-                dashboardData.client &&
-                dashboardData.client.ownerName
-                    ? dashboardData.client.ownerName
-                    : ownerName;
-
-
-            const dashboardUserName =
-                document.getElementById(
-                    "userName"
-                );
-
-
-            if (dashboardUserName) {
-
-                dashboardUserName.textContent =
-                    apiOwnerName;
-
-            }
-
-
-            const dashboardWelcome =
-                document.getElementById(
-                    "welcomeMessage"
-                );
-
-
-            if (dashboardWelcome) {
-
-                dashboardWelcome.textContent =
-                    `Welcome back, ${apiOwnerName}!`;
-
-            }
-
-
-            const dashboardAvatar =
-                document.querySelector(
-                    ".user-avatar"
-                );
-
-
-            if (dashboardAvatar) {
-
-                dashboardAvatar.textContent =
-                    apiOwnerName
-                        .charAt(0)
-                        .toUpperCase();
-
-            }
-
-        }
-
-
-        // ==================================
         // LOGOUT
-        // ==================================
+        // ==========================================
 
         const logoutButton =
             document.getElementById(
@@ -621,12 +610,20 @@ document.addEventListener(
         }
 
 
-        // ==================================
+        // ==========================================
         // FINAL DEBUG
-        // ==================================
+        // ==========================================
+
+        console.log(
+            "=================================="
+        );
 
         console.log(
             "DASHBOARD: UI populated successfully."
+        );
+
+        console.log(
+            "=================================="
         );
 
 
@@ -667,12 +664,23 @@ document.addEventListener(
 
 
         console.log(
+            "Restaurant:",
+            restaurant
+        );
+
+
+        console.log(
             "Plan:",
             plan.planName
         );
 
-    }
 
+        console.log(
+            "Metrics:",
+            metrics
+        );
+
+    }
 );
 
 
@@ -814,18 +822,9 @@ async function loadDashboardData() {
             );
 
 
-            // IMPORTANT:
-            // Return the COMPLETE data object.
-            //
-            // This includes:
-            // client
-            // restaurant
-            // plan
-            // metrics
-            // userId
-            // clientId
-            // restaurantId
-            // role
+            // ==================================
+            // RETURN DATA OBJECT
+            // ==================================
 
             return result.data || {};
 
@@ -866,5 +865,194 @@ async function loadDashboardData() {
         return null;
 
     }
+
+}
+
+
+// ==========================================
+// UPDATE DASHBOARD METRICS
+// ==========================================
+
+function updateDashboardMetrics(
+    metrics,
+    restaurant
+) {
+
+    // ==================================
+    // TOTAL ORDERS
+    // ==================================
+
+    const totalOrdersElement =
+        document.getElementById(
+            "totalOrders"
+        );
+
+
+    if (totalOrdersElement) {
+
+        totalOrdersElement.textContent =
+            metrics.totalOrders ?? 0;
+
+    }
+
+
+    // ==================================
+    // TOTAL REVENUE
+    // ==================================
+
+    const totalRevenueElement =
+        document.getElementById(
+            "totalRevenue"
+        );
+
+
+    if (totalRevenueElement) {
+
+        totalRevenueElement.textContent =
+            `${restaurant.currency || "AED"} ${metrics.totalRevenue ?? 0}`;
+
+    }
+
+
+    // ==================================
+    // PENDING ORDERS
+    // ==================================
+
+    const pendingOrdersElement =
+        document.getElementById(
+            "pendingOrders"
+        );
+
+
+    if (pendingOrdersElement) {
+
+        pendingOrdersElement.textContent =
+            metrics.pendingOrders ?? 0;
+
+    }
+
+
+    // ==================================
+    // PREPARING ORDERS
+    // ==================================
+
+    const preparingOrdersElement =
+        document.getElementById(
+            "preparingOrders"
+        );
+
+
+    if (preparingOrdersElement) {
+
+        preparingOrdersElement.textContent =
+            metrics.preparingOrders ?? 0;
+
+    }
+
+
+    // ==================================
+    // READY ORDERS
+    // ==================================
+
+    const readyOrdersElement =
+        document.getElementById(
+            "readyOrders"
+        );
+
+
+    if (readyOrdersElement) {
+
+        readyOrdersElement.textContent =
+            metrics.readyOrders ?? 0;
+
+    }
+
+
+    // ==================================
+    // COMPLETED ORDERS
+    // ==================================
+
+    const completedOrdersElement =
+        document.getElementById(
+            "completedOrders"
+        );
+
+
+    if (completedOrdersElement) {
+
+        completedOrdersElement.textContent =
+            metrics.completedOrders ?? 0;
+
+    }
+
+
+    // ==================================
+    // REJECTED ORDERS
+    // ==================================
+
+    const rejectedOrdersElement =
+        document.getElementById(
+            "rejectedOrders"
+        );
+
+
+    if (rejectedOrdersElement) {
+
+        rejectedOrdersElement.textContent =
+            metrics.rejectedOrders ?? 0;
+
+    }
+
+
+    // ==================================
+    // AVERAGE ORDER VALUE
+    // ==================================
+
+    const averageOrderValueElement =
+        document.getElementById(
+            "averageOrderValue"
+        );
+
+
+    if (averageOrderValueElement) {
+
+        averageOrderValueElement.textContent =
+            `${restaurant.currency || "AED"} ${metrics.averageOrderValue ?? 0}`;
+
+    }
+
+    console.log("========== SECURE SESSION UI DEBUG ==========");
+
+    console.log(
+        "userId value:",
+        userId
+    );
+
+    console.log(
+        "email value:",
+        ownerEmail
+    );
+
+    console.log(
+        "restaurantId value:",
+        restaurantId
+    );
+
+    console.log(
+        "userId element:",
+        document.getElementById("userId")
+    );
+
+    console.log(
+        "email element:",
+        document.getElementById("email")
+    );
+
+    console.log(
+        "tenantRestaurantId element:",
+        document.getElementById("tenantRestaurantId")
+    );
+
+    console.log("============================================");
 
 }
