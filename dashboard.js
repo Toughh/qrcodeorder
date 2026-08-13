@@ -10,6 +10,7 @@
 const N8N_DASHBOARD_WEBHOOK =
     "https://maatapita.app.n8n.cloud/webhook/owner-dashboard";
 
+
 // ==========================================
 // PAGE LOAD
 // ==========================================
@@ -38,6 +39,7 @@ document.addEventListener(
         console.log(
             "DASHBOARD: Checking authentication..."
         );
+
 
         const session =
             await requireAuthentication();
@@ -72,303 +74,279 @@ document.addEventListener(
         );
 
 
-        // ==========================================
+        // ==================================
+        // INITIAL SESSION DATA
+        // ==================================
+
+        const sessionClient =
+            session.client || {};
+
+        const sessionRestaurant =
+            session.restaurant || {};
+
+        const sessionPlan =
+            session.plan || {};
+
+
+        // ==================================
+        // INITIAL VALUES
+        // ==================================
+
+        let ownerName =
+            sessionClient.ownerName ||
+            "Owner";
+
+        let ownerEmail =
+            sessionClient.email ||
+            "";
+
+        let userId =
+            session.userId ||
+            "-";
+
+        let clientId =
+            session.clientId ||
+            "-";
+
+        let restaurantId =
+            session.restaurantId ||
+            "-";
+
+        let role =
+            session.role ||
+            "Owner";
+
+
+        // ==================================
         // LOAD BUSINESS DASHBOARD DATA
-        // ==========================================
+        // ==================================
 
         const dashboardData =
             await loadDashboardData();
 
 
         console.log(
-            "DASHBOARD BUSINESS DATA:",
+            "=================================="
+        );
+
+        console.log(
+            "DASHBOARD BUSINESS DATA:"
+        );
+
+        console.log(
             dashboardData
         );
 
-        // ==========================================
-        // POPULATE DASHBOARD BUSINESS CONTEXT
-        // ==========================================
+        console.log(
+            "=================================="
+        );
+
+
+        // ==================================
+        // UPDATE FROM DASHBOARD API
+        // ==================================
 
         if (dashboardData) {
 
             console.log(
-                "DASHBOARD: Populating verified tenant information..."
+                "DASHBOARD: Applying API dashboard data..."
             );
 
 
-            // ==================================
+            // ----------------------------------
             // USER ID
-            // ==================================
+            // ----------------------------------
 
-            const dashboardUserId =
-                dashboardData.userId ||
-                userId ||
-                "-";
+            if (
+                dashboardData.userId !== undefined &&
+                dashboardData.userId !== null
+            ) {
 
-
-            const dashboardUserIdElement =
-                document.getElementById(
-                    "userId"
-                );
-
-
-            if (dashboardUserIdElement) {
-
-                dashboardUserIdElement.textContent =
-                    dashboardUserId;
+                userId =
+                    dashboardData.userId;
 
             }
 
 
-            // ==================================
-            // EMAIL
-            // ==================================
+            // ----------------------------------
+            // CLIENT ID
+            // ----------------------------------
 
-            const dashboardEmail =
-                dashboardData.client &&
-                    dashboardData.client.email
-                    ? dashboardData.client.email
-                    : ownerEmail || "";
+            if (
+                dashboardData.clientId !== undefined &&
+                dashboardData.clientId !== null
+            ) {
 
-
-            const dashboardEmailElement =
-                document.getElementById(
-                    "email"
-                );
-
-
-            if (dashboardEmailElement) {
-
-                dashboardEmailElement.textContent =
-                    dashboardEmail;
+                clientId =
+                    dashboardData.clientId;
 
             }
 
 
-            // ==================================
+            // ----------------------------------
             // RESTAURANT ID
-            // ==================================
+            // ----------------------------------
 
-            const dashboardRestaurantId =
-                dashboardData.restaurantId ||
-                restaurantId ||
-                "-";
+            if (
+                dashboardData.restaurantId !== undefined &&
+                dashboardData.restaurantId !== null
+            ) {
 
-
-            const dashboardRestaurantIdElement =
-                document.getElementById(
-                    "tenantRestaurantId"
-                );
-
-
-            if (dashboardRestaurantIdElement) {
-
-                dashboardRestaurantIdElement.textContent =
-                    dashboardRestaurantId;
+                restaurantId =
+                    dashboardData.restaurantId;
 
             }
 
 
-            // ==================================
-            // OWNER NAME
-            // ==================================
+            // ----------------------------------
+            // ROLE
+            // ----------------------------------
 
-            const dashboardOwnerName =
-                dashboardData.client &&
-                    dashboardData.client.ownerName
-                    ? dashboardData.client.ownerName
-                    : ownerName;
+            if (
+                dashboardData.role !== undefined &&
+                dashboardData.role !== null
+            ) {
 
-
-            // Update top-right owner name
-            const dashboardUserNameElement =
-                document.getElementById(
-                    "userName"
-                );
-
-
-            if (dashboardUserNameElement) {
-
-                dashboardUserNameElement.textContent =
-                    dashboardOwnerName;
+                role =
+                    dashboardData.role;
 
             }
 
 
-            // Update welcome message
-            const dashboardWelcomeElement =
-                document.getElementById(
-                    "welcomeMessage"
-                );
+            // ----------------------------------
+            // CLIENT
+            // ----------------------------------
+
+            const apiClient =
+                dashboardData.client || {};
 
 
-            if (dashboardWelcomeElement) {
+            // Owner Name
+            if (
+                apiClient.ownerName !== undefined &&
+                apiClient.ownerName !== null &&
+                apiClient.ownerName !== ""
+            ) {
 
-                dashboardWelcomeElement.textContent =
-                    `Welcome back, ${dashboardOwnerName}!`;
-
-            }
-
-
-            // Update avatar
-            const dashboardAvatar =
-                document.querySelector(
-                    ".user-avatar"
-                );
-
-
-            if (dashboardAvatar) {
-
-                dashboardAvatar.textContent =
-                    dashboardOwnerName
-                        .charAt(0)
-                        .toUpperCase();
+                ownerName =
+                    apiClient.ownerName;
 
             }
 
 
-            console.log(
-                "DASHBOARD: Verified tenant information populated."
-            );
+            // Email
+            if (
+                apiClient.email !== undefined &&
+                apiClient.email !== null &&
+                apiClient.email !== ""
+            ) {
+
+                ownerEmail =
+                    apiClient.email;
+
+            }
 
         }
 
 
         // ==========================================
-        // DASHBOARD API FAILED
+        // FINAL DEBUG
         // ==========================================
 
-        if (!dashboardData) {
+        console.log(
+            "=================================="
+        );
 
-            console.error(
-                "DASHBOARD: Business dashboard data could not be loaded."
-            );
+        console.log(
+            "FINAL DASHBOARD VALUES"
+        );
 
-            return;
+        console.log(
+            "Owner Name:",
+            ownerName
+        );
 
-        }
+        console.log(
+            "Email:",
+            ownerEmail
+        );
+
+        console.log(
+            "User ID:",
+            userId
+        );
+
+        console.log(
+            "Client ID:",
+            clientId
+        );
+
+        console.log(
+            "Restaurant ID:",
+            restaurantId
+        );
+
+        console.log(
+            "Role:",
+            role
+        );
+
+        console.log(
+            "=================================="
+        );
 
 
         // ==========================================
-        // GET DASHBOARD DATA
+        // RESTAURANT / PLAN
         // ==========================================
-
-        const client =
-            dashboardData.client || {};
 
         const restaurant =
-            dashboardData.restaurant || {};
+            dashboardData?.restaurant ||
+            sessionRestaurant ||
+            {};
 
         const plan =
-            dashboardData.plan || {};
-
-        const metrics =
-            dashboardData.metrics || {};
+            dashboardData?.plan ||
+            sessionPlan ||
+            {};
 
 
         // ==========================================
         // OWNER NAME
         // ==========================================
 
-        const ownerName =
-            client.ownerName ||
-            "Owner";
-
-
-        // ==========================================
-        // OWNER EMAIL
-        // ==========================================
-
-        const ownerEmail =
-            client.email ||
-            "";
-
-
-        // ==========================================
-        // USER ID
-        // ==========================================
-
-        const userId =
-            dashboardData.userId ||
-            session.userId ||
-            "-";
-
-
-        // ==========================================
-        // CLIENT ID
-        // ==========================================
-
-        const clientId =
-            dashboardData.clientId ||
-            session.clientId ||
-            "-";
-
-
-        // ==========================================
-        // RESTAURANT ID
-        // ==========================================
-
-        const restaurantId =
-            dashboardData.restaurantId ||
-            session.restaurantId ||
-            "-";
-
-
-        // ==========================================
-        // ROLE
-        // ==========================================
-
-        const role =
-            dashboardData.role ||
-            session.role ||
-            "Owner";
-
-
-        // ==========================================
-        // RESTAURANT STATUS
-        // ==========================================
-
-        const restaurantStatus =
-            restaurant.status ||
-            "Active";
-
-
-        // ==========================================
-        // UPDATE TOP USER NAME
-        // ==========================================
-
-        const userName =
+        const userNameElement =
             document.getElementById(
                 "userName"
             );
 
-        if (userName) {
+        if (userNameElement) {
 
-            userName.textContent =
+            userNameElement.textContent =
                 ownerName;
 
         }
 
 
         // ==========================================
-        // UPDATE TOP USER ROLE
+        // OWNER ROLE
         // ==========================================
 
-        const userRole =
+        const userRoleElement =
             document.getElementById(
                 "userRole"
             );
 
-        if (userRole) {
+        if (userRoleElement) {
 
-            userRole.textContent =
+            userRoleElement.textContent =
                 role;
 
         }
 
 
         // ==========================================
-        // UPDATE WELCOME MESSAGE
+        // WELCOME MESSAGE
         // ==========================================
 
         const welcomeMessage =
@@ -385,109 +363,7 @@ document.addEventListener(
 
 
         // ==========================================
-        // UPDATE RESTAURANT ID
-        // ==========================================
-
-        const restaurantIdElement =
-            document.getElementById(
-                "restaurantId"
-            );
-
-        if (restaurantIdElement) {
-
-            restaurantIdElement.textContent =
-                restaurantId;
-
-        }
-
-
-        // ==========================================
-        // UPDATE CLIENT ID
-        // ==========================================
-
-        const clientIdElement =
-            document.getElementById(
-                "clientId"
-            );
-
-        if (clientIdElement) {
-
-            clientIdElement.textContent =
-                clientId;
-
-        }
-
-
-        // ==========================================
-        // UPDATE ROLE
-        // ==========================================
-
-        const roleElement =
-            document.getElementById(
-                "role"
-            );
-
-        if (roleElement) {
-
-            roleElement.textContent =
-                role;
-
-        }
-
-
-        // ==========================================
-        // UPDATE USER ID
-        // ==========================================
-
-        const userIdElement =
-            document.getElementById(
-                "userId"
-            );
-
-        if (userIdElement) {
-
-            userIdElement.textContent =
-                userId;
-
-        }
-
-
-        // ==========================================
-        // UPDATE EMAIL
-        // ==========================================
-
-        const emailElement =
-            document.getElementById(
-                "email"
-            );
-
-        if (emailElement) {
-
-            emailElement.textContent =
-                ownerEmail;
-
-        }
-
-
-        // ==========================================
-        // UPDATE TENANT RESTAURANT ID
-        // ==========================================
-
-        const tenantRestaurantIdElement =
-            document.getElementById(
-                "tenantRestaurantId"
-            );
-
-        if (tenantRestaurantIdElement) {
-
-            tenantRestaurantIdElement.textContent =
-                restaurantId;
-
-        }
-
-
-        // ==========================================
-        // UPDATE AVATAR
+        // AVATAR
         // ==========================================
 
         const avatar =
@@ -506,7 +382,109 @@ document.addEventListener(
 
 
         // ==========================================
-        // UPDATE RESTAURANT STATUS
+        // RESTAURANT ID CARD
+        // ==========================================
+
+        const restaurantIdElement =
+            document.getElementById(
+                "restaurantId"
+            );
+
+        if (restaurantIdElement) {
+
+            restaurantIdElement.textContent =
+                restaurantId;
+
+        }
+
+
+        // ==========================================
+        // CLIENT ID CARD
+        // ==========================================
+
+        const clientIdElement =
+            document.getElementById(
+                "clientId"
+            );
+
+        if (clientIdElement) {
+
+            clientIdElement.textContent =
+                clientId;
+
+        }
+
+
+        // ==========================================
+        // ROLE CARD
+        // ==========================================
+
+        const roleElement =
+            document.getElementById(
+                "role"
+            );
+
+        if (roleElement) {
+
+            roleElement.textContent =
+                role;
+
+        }
+
+
+        // ==========================================
+        // AUTHENTICATION VERIFIED
+        // ==========================================
+
+        const verifiedUserIdElement =
+            document.getElementById(
+                "userId"
+            );
+
+        if (verifiedUserIdElement) {
+
+            verifiedUserIdElement.textContent =
+                userId;
+
+        }
+
+
+        // ==========================================
+        // VERIFIED EMAIL
+        // ==========================================
+
+        const verifiedEmailElement =
+            document.getElementById(
+                "email"
+            );
+
+        if (verifiedEmailElement) {
+
+            verifiedEmailElement.textContent =
+                ownerEmail;
+
+        }
+
+
+        // ==========================================
+        // VERIFIED RESTAURANT ID
+        // ==========================================
+
+        const verifiedRestaurantIdElement =
+            document.getElementById(
+                "tenantRestaurantId"
+            );
+
+        if (verifiedRestaurantIdElement) {
+
+            verifiedRestaurantIdElement.textContent =
+                restaurantId;
+
+        }
+
+
+        // ==========================================
+        // RESTAURANT STATUS
         // ==========================================
 
         const restaurantStatusElement =
@@ -517,7 +495,8 @@ document.addEventListener(
         if (restaurantStatusElement) {
 
             restaurantStatusElement.textContent =
-                restaurantStatus;
+                restaurant.status ||
+                "Active";
 
         }
 
@@ -594,51 +573,6 @@ document.addEventListener(
 
 
         // ==========================================
-        // DASHBOARD METRICS
-        // ==========================================
-
-        setElementText(
-            "totalOrders",
-            metrics.totalOrders ?? 0
-        );
-
-        setElementText(
-            "totalRevenue",
-            `${restaurant.currency || "AED"} ${metrics.totalRevenue ?? 0}`
-        );
-
-        setElementText(
-            "pendingOrders",
-            metrics.pendingOrders ?? 0
-        );
-
-        setElementText(
-            "preparingOrders",
-            metrics.preparingOrders ?? 0
-        );
-
-        setElementText(
-            "readyOrders",
-            metrics.readyOrders ?? 0
-        );
-
-        setElementText(
-            "completedOrders",
-            metrics.completedOrders ?? 0
-        );
-
-        setElementText(
-            "rejectedOrders",
-            metrics.rejectedOrders ?? 0
-        );
-
-        setElementText(
-            "averageOrderValue",
-            `${restaurant.currency || "AED"} ${metrics.averageOrderValue ?? 0}`
-        );
-
-
-        // ==========================================
         // LOGOUT
         // ==========================================
 
@@ -669,79 +603,16 @@ document.addEventListener(
 
 
         // ==========================================
-        // FINAL DEBUG
+        // FINAL UI DEBUG
         // ==========================================
 
         console.log(
             "DASHBOARD: UI populated successfully."
         );
 
-        console.log(
-            "Owner:",
-            ownerName
-        );
-
-        console.log(
-            "Email:",
-            ownerEmail
-        );
-
-        console.log(
-            "User ID:",
-            userId
-        );
-
-        console.log(
-            "Client ID:",
-            clientId
-        );
-
-        console.log(
-            "Restaurant ID:",
-            restaurantId
-        );
-
-        console.log(
-            "Role:",
-            role
-        );
-
-        console.log(
-            "Plan:",
-            plan.planName
-        );
-
-        console.log(
-            "Metrics:",
-            metrics
-        );
-
     }
+
 );
-
-
-// ==========================================
-// HELPER — SET ELEMENT TEXT
-// ==========================================
-
-function setElementText(
-    elementId,
-    value
-) {
-
-    const element =
-        document.getElementById(
-            elementId
-        );
-
-    if (element) {
-
-        element.textContent =
-            value;
-
-    }
-
-}
 
 
 // ==========================================
@@ -790,7 +661,7 @@ async function loadDashboardData() {
 
 
         // ==================================
-        // CALL n8n OWNER DASHBOARD WEBHOOK
+        // CALL n8n
         // ==================================
 
         const response =
@@ -844,10 +715,10 @@ async function loadDashboardData() {
 
 
         // ==================================
-        // NORMALIZE n8n RESPONSE
+        // NORMALIZE RESPONSE
         // ==================================
 
-        const result =
+        let result =
             Array.isArray(rawResult)
                 ? rawResult[0]
                 : rawResult;
@@ -870,15 +741,13 @@ async function loadDashboardData() {
         ) {
 
             console.log(
-                "=================================="
+                "DASHBOARD: API SUCCESS"
             );
 
-            console.log(
-                "DASHBOARD: Business data loaded successfully."
-            );
 
             console.log(
-                "=================================="
+                "DASHBOARD DATA OBJECT:",
+                result.data
             );
 
 
@@ -896,9 +765,11 @@ async function loadDashboardData() {
             result
         );
 
+
         return null;
 
     }
+
 
     catch (error) {
 
@@ -914,6 +785,7 @@ async function loadDashboardData() {
         console.error(
             "=================================="
         );
+
 
         return null;
 
