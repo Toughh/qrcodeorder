@@ -3,15 +3,12 @@
 // PREMIUM OWNER DASHBOARD
 // ==========================================
 
-
 // ==========================================
 // n8n OWNER DASHBOARD WEBHOOK
 // ==========================================
 
-// PRODUCTION URL
 const N8N_DASHBOARD_WEBHOOK =
     "https://maatapita.app.n8n.cloud/webhook/owner-dashboard";
-
 
 // ==========================================
 // PAGE LOAD
@@ -42,7 +39,6 @@ document.addEventListener(
             "DASHBOARD: Checking authentication..."
         );
 
-
         const session =
             await requireAuthentication();
 
@@ -70,365 +66,10 @@ document.addEventListener(
             "DASHBOARD: Authentication successful."
         );
 
-
         console.log(
             "DASHBOARD SESSION:",
             session
         );
-
-
-        // ==================================
-        // GET SESSION SECTIONS
-        // ==================================
-
-        const client =
-            session.client || {};
-
-
-        const restaurant =
-            session.restaurant || {};
-
-
-        const plan =
-            session.plan || {};
-
-
-        // ==================================
-        // OWNER NAME
-        // ==================================
-
-        const ownerName =
-            client.ownerName ||
-            "Owner";
-
-
-        // ==================================
-        // OWNER EMAIL
-        // ==================================
-
-        const ownerEmail =
-            client.email ||
-            "";
-
-
-        // ==================================
-        // USER ID
-        // ==================================
-
-        const userId =
-            session.userId ||
-            "-";
-
-
-        // ==================================
-        // CLIENT ID
-        // ==================================
-
-        const clientId =
-            session.clientId ||
-            "-";
-
-
-        // ==================================
-        // RESTAURANT ID
-        // ==================================
-
-        const restaurantId =
-            session.restaurantId ||
-            "-";
-
-
-        // ==================================
-        // ROLE
-        // ==================================
-
-        const role =
-            session.role ||
-            "Owner";
-
-
-        // ==================================
-        // RESTAURANT STATUS
-        // ==================================
-
-        const restaurantStatus =
-            restaurant.status ||
-            "Active";
-
-
-        // ==================================
-        // UPDATE TOP USER NAME
-        // ==================================
-
-        const userName =
-            document.getElementById(
-                "userName"
-            );
-
-
-        if (userName) {
-
-            userName.textContent =
-                ownerName;
-
-        }
-
-
-        // ==================================
-        // UPDATE TOP USER ROLE
-        // ==================================
-
-        const userRole =
-            document.getElementById(
-                "userRole"
-            );
-
-
-        if (userRole) {
-
-            userRole.textContent =
-                role;
-
-        }
-
-
-        // ==================================
-        // UPDATE WELCOME MESSAGE
-        // ==================================
-
-        const welcomeMessage =
-            document.getElementById(
-                "welcomeMessage"
-            );
-
-
-        if (welcomeMessage) {
-
-            welcomeMessage.textContent =
-                `Welcome back, ${ownerName}!`;
-
-        }
-
-
-        // ==================================
-        // UPDATE RESTAURANT ID
-        // ==================================
-
-        const restaurantIdElement =
-            document.getElementById(
-                "restaurantId"
-            );
-
-
-        if (restaurantIdElement) {
-
-            restaurantIdElement.textContent =
-                restaurantId;
-
-        }
-
-
-        // ==================================
-        // UPDATE CLIENT ID
-        // ==================================
-
-        const clientIdElement =
-            document.getElementById(
-                "clientId"
-            );
-
-
-        if (clientIdElement) {
-
-            clientIdElement.textContent =
-                clientId;
-
-        }
-
-
-        // ==================================
-        // UPDATE ROLE CARD
-        // ==================================
-
-        const roleElement =
-            document.getElementById(
-                "role"
-            );
-
-
-        if (roleElement) {
-
-            roleElement.textContent =
-                role;
-
-        }
-
-
-        // ==================================
-        // UPDATE USER ID
-        // ==================================
-
-        const userIdElement =
-            document.getElementById(
-                "userId"
-            );
-
-
-        if (userIdElement) {
-
-            userIdElement.textContent =
-                userId;
-
-        }
-
-
-        // ==================================
-        // UPDATE EMAIL
-        // ==================================
-
-        const emailElement =
-            document.getElementById(
-                "email"
-            );
-
-
-        if (emailElement) {
-
-            emailElement.textContent =
-                ownerEmail;
-
-        }
-
-
-        // ==================================
-        // UPDATE TENANT RESTAURANT ID
-        // ==================================
-
-        const tenantRestaurantIdElement =
-            document.getElementById(
-                "tenantRestaurantId"
-            );
-
-
-        if (tenantRestaurantIdElement) {
-
-            tenantRestaurantIdElement.textContent =
-                restaurantId;
-
-        }
-
-
-        // ==================================
-        // UPDATE AVATAR
-        // ==================================
-
-        const avatar =
-            document.querySelector(
-                ".user-avatar"
-            );
-
-
-        if (avatar) {
-
-            avatar.textContent =
-                ownerName
-                    .charAt(0)
-                    .toUpperCase();
-
-        }
-
-
-        // ==================================
-        // UPDATE RESTAURANT STATUS
-        // ==================================
-
-        const restaurantStatusElement =
-            document.getElementById(
-                "restaurantStatus"
-            );
-
-
-        if (restaurantStatusElement) {
-
-            restaurantStatusElement.textContent =
-                restaurantStatus;
-
-        }
-
-
-        // ==================================
-        // PLAN NAME
-        // ==================================
-
-        const planNameElement =
-            document.getElementById(
-                "planName"
-            );
-
-
-        if (planNameElement) {
-
-            planNameElement.textContent =
-                plan.planName ||
-                "Starter";
-
-        }
-
-
-        // ==================================
-        // PLAN PRICE
-        // ==================================
-
-        const planPriceElement =
-            document.getElementById(
-                "planPrice"
-            );
-
-
-        if (planPriceElement) {
-
-            planPriceElement.textContent =
-                `${restaurant.currency || "AED"} ${plan.price ?? 0}`;
-
-        }
-
-
-        // ==================================
-        // MAX ORDERS
-        // ==================================
-
-        const maxOrdersElement =
-            document.getElementById(
-                "maxOrders"
-            );
-
-
-        if (maxOrdersElement) {
-
-            maxOrdersElement.textContent =
-                plan.maxOrders ??
-                "-";
-
-        }
-
-
-        // ==================================
-        // MAX BRANCHES
-        // ==================================
-
-        const maxBranchesElement =
-            document.getElementById(
-                "maxBranches"
-            );
-
-
-        if (maxBranchesElement) {
-
-            maxBranchesElement.textContent =
-                plan.maxBranches ??
-                "-";
-
-        }
 
 
         // ==========================================
@@ -446,6 +87,410 @@ document.addEventListener(
 
 
         // ==========================================
+        // DASHBOARD API FAILED
+        // ==========================================
+
+        if (!dashboardData) {
+
+            console.error(
+                "DASHBOARD: Business dashboard data could not be loaded."
+            );
+
+            return;
+
+        }
+
+
+        // ==========================================
+        // GET DASHBOARD DATA
+        // ==========================================
+
+        const client =
+            dashboardData.client || {};
+
+        const restaurant =
+            dashboardData.restaurant || {};
+
+        const plan =
+            dashboardData.plan || {};
+
+        const metrics =
+            dashboardData.metrics || {};
+
+
+        // ==========================================
+        // OWNER NAME
+        // ==========================================
+
+        const ownerName =
+            client.ownerName ||
+            "Owner";
+
+
+        // ==========================================
+        // OWNER EMAIL
+        // ==========================================
+
+        const ownerEmail =
+            client.email ||
+            "";
+
+
+        // ==========================================
+        // USER ID
+        // ==========================================
+
+        const userId =
+            dashboardData.userId ||
+            session.userId ||
+            "-";
+
+
+        // ==========================================
+        // CLIENT ID
+        // ==========================================
+
+        const clientId =
+            dashboardData.clientId ||
+            session.clientId ||
+            "-";
+
+
+        // ==========================================
+        // RESTAURANT ID
+        // ==========================================
+
+        const restaurantId =
+            dashboardData.restaurantId ||
+            session.restaurantId ||
+            "-";
+
+
+        // ==========================================
+        // ROLE
+        // ==========================================
+
+        const role =
+            dashboardData.role ||
+            session.role ||
+            "Owner";
+
+
+        // ==========================================
+        // RESTAURANT STATUS
+        // ==========================================
+
+        const restaurantStatus =
+            restaurant.status ||
+            "Active";
+
+
+        // ==========================================
+        // UPDATE TOP USER NAME
+        // ==========================================
+
+        const userName =
+            document.getElementById(
+                "userName"
+            );
+
+        if (userName) {
+
+            userName.textContent =
+                ownerName;
+
+        }
+
+
+        // ==========================================
+        // UPDATE TOP USER ROLE
+        // ==========================================
+
+        const userRole =
+            document.getElementById(
+                "userRole"
+            );
+
+        if (userRole) {
+
+            userRole.textContent =
+                role;
+
+        }
+
+
+        // ==========================================
+        // UPDATE WELCOME MESSAGE
+        // ==========================================
+
+        const welcomeMessage =
+            document.getElementById(
+                "welcomeMessage"
+            );
+
+        if (welcomeMessage) {
+
+            welcomeMessage.textContent =
+                `Welcome back, ${ownerName}!`;
+
+        }
+
+
+        // ==========================================
+        // UPDATE RESTAURANT ID
+        // ==========================================
+
+        const restaurantIdElement =
+            document.getElementById(
+                "restaurantId"
+            );
+
+        if (restaurantIdElement) {
+
+            restaurantIdElement.textContent =
+                restaurantId;
+
+        }
+
+
+        // ==========================================
+        // UPDATE CLIENT ID
+        // ==========================================
+
+        const clientIdElement =
+            document.getElementById(
+                "clientId"
+            );
+
+        if (clientIdElement) {
+
+            clientIdElement.textContent =
+                clientId;
+
+        }
+
+
+        // ==========================================
+        // UPDATE ROLE
+        // ==========================================
+
+        const roleElement =
+            document.getElementById(
+                "role"
+            );
+
+        if (roleElement) {
+
+            roleElement.textContent =
+                role;
+
+        }
+
+
+        // ==========================================
+        // UPDATE USER ID
+        // ==========================================
+
+        const userIdElement =
+            document.getElementById(
+                "userId"
+            );
+
+        if (userIdElement) {
+
+            userIdElement.textContent =
+                userId;
+
+        }
+
+
+        // ==========================================
+        // UPDATE EMAIL
+        // ==========================================
+
+        const emailElement =
+            document.getElementById(
+                "email"
+            );
+
+        if (emailElement) {
+
+            emailElement.textContent =
+                ownerEmail;
+
+        }
+
+
+        // ==========================================
+        // UPDATE TENANT RESTAURANT ID
+        // ==========================================
+
+        const tenantRestaurantIdElement =
+            document.getElementById(
+                "tenantRestaurantId"
+            );
+
+        if (tenantRestaurantIdElement) {
+
+            tenantRestaurantIdElement.textContent =
+                restaurantId;
+
+        }
+
+
+        // ==========================================
+        // UPDATE AVATAR
+        // ==========================================
+
+        const avatar =
+            document.querySelector(
+                ".user-avatar"
+            );
+
+        if (avatar) {
+
+            avatar.textContent =
+                ownerName
+                    .charAt(0)
+                    .toUpperCase();
+
+        }
+
+
+        // ==========================================
+        // UPDATE RESTAURANT STATUS
+        // ==========================================
+
+        const restaurantStatusElement =
+            document.getElementById(
+                "restaurantStatus"
+            );
+
+        if (restaurantStatusElement) {
+
+            restaurantStatusElement.textContent =
+                restaurantStatus;
+
+        }
+
+
+        // ==========================================
+        // PLAN NAME
+        // ==========================================
+
+        const planNameElement =
+            document.getElementById(
+                "planName"
+            );
+
+        if (planNameElement) {
+
+            planNameElement.textContent =
+                plan.planName ||
+                "Starter";
+
+        }
+
+
+        // ==========================================
+        // PLAN PRICE
+        // ==========================================
+
+        const planPriceElement =
+            document.getElementById(
+                "planPrice"
+            );
+
+        if (planPriceElement) {
+
+            planPriceElement.textContent =
+                `${restaurant.currency || "AED"} ${plan.price ?? 0}`;
+
+        }
+
+
+        // ==========================================
+        // MAX ORDERS
+        // ==========================================
+
+        const maxOrdersElement =
+            document.getElementById(
+                "maxOrders"
+            );
+
+        if (maxOrdersElement) {
+
+            maxOrdersElement.textContent =
+                plan.maxOrders ??
+                "-";
+
+        }
+
+
+        // ==========================================
+        // MAX BRANCHES
+        // ==========================================
+
+        const maxBranchesElement =
+            document.getElementById(
+                "maxBranches"
+            );
+
+        if (maxBranchesElement) {
+
+            maxBranchesElement.textContent =
+                plan.maxBranches ??
+                "-";
+
+        }
+
+
+        // ==========================================
+        // DASHBOARD METRICS
+        // ==========================================
+
+        setElementText(
+            "totalOrders",
+            metrics.totalOrders ?? 0
+        );
+
+        setElementText(
+            "totalRevenue",
+            `${restaurant.currency || "AED"} ${metrics.totalRevenue ?? 0}`
+        );
+
+        setElementText(
+            "pendingOrders",
+            metrics.pendingOrders ?? 0
+        );
+
+        setElementText(
+            "preparingOrders",
+            metrics.preparingOrders ?? 0
+        );
+
+        setElementText(
+            "readyOrders",
+            metrics.readyOrders ?? 0
+        );
+
+        setElementText(
+            "completedOrders",
+            metrics.completedOrders ?? 0
+        );
+
+        setElementText(
+            "rejectedOrders",
+            metrics.rejectedOrders ?? 0
+        );
+
+        setElementText(
+            "averageOrderValue",
+            `${restaurant.currency || "AED"} ${metrics.averageOrderValue ?? 0}`
+        );
+
+
+        // ==========================================
         // LOGOUT
         // ==========================================
 
@@ -453,7 +498,6 @@ document.addEventListener(
             document.getElementById(
                 "logoutBtn"
             );
-
 
         if (logoutButton) {
 
@@ -465,9 +509,7 @@ document.addEventListener(
                         "DASHBOARD: Logging out."
                     );
 
-
                     clearSession();
-
 
                     window.location.href =
                         "login.html";
@@ -478,58 +520,80 @@ document.addEventListener(
         }
 
 
-        // ==================================
+        // ==========================================
         // FINAL DEBUG
-        // ==================================
+        // ==========================================
 
         console.log(
             "DASHBOARD: UI populated successfully."
         );
-
 
         console.log(
             "Owner:",
             ownerName
         );
 
-
         console.log(
             "Email:",
             ownerEmail
         );
-
 
         console.log(
             "User ID:",
             userId
         );
 
-
         console.log(
             "Client ID:",
             clientId
         );
-
 
         console.log(
             "Restaurant ID:",
             restaurantId
         );
 
-
         console.log(
             "Role:",
             role
         );
-
 
         console.log(
             "Plan:",
             plan.planName
         );
 
+        console.log(
+            "Metrics:",
+            metrics
+        );
+
     }
 );
+
+
+// ==========================================
+// HELPER — SET ELEMENT TEXT
+// ==========================================
+
+function setElementText(
+    elementId,
+    value
+) {
+
+    const element =
+        document.getElementById(
+            elementId
+        );
+
+    if (element) {
+
+        element.textContent =
+            value;
+
+    }
+
+}
 
 
 // ==========================================
@@ -684,11 +748,9 @@ async function loadDashboardData() {
             result
         );
 
-
         return null;
 
     }
-
 
     catch (error) {
 
@@ -704,7 +766,6 @@ async function loadDashboardData() {
         console.error(
             "=================================="
         );
-
 
         return null;
 
