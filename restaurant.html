@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>QR Order SaaS — Restaurants</title>
+
+    <link
+        rel="stylesheet"
+        href="restaurants.css">
+
+</head>
+
+
+<body>
+
+<div class="app">
+
+
+    <!-- ==================================
+         SIDEBAR
+    =================================== -->
+
+    <aside class="sidebar">
+
+        <div class="brand">
+
+            <div class="brand-logo">
+                QR
+            </div>
+
+            <div>
+
+                <div class="brand-name">
+                    QR Order
+                </div>
+
+                <div class="brand-subtitle">
+                    SaaS
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <nav class="navigation">
+
+            <a
+                href="dashboard.html"
+                class="nav-item">
+
+                <span>📊</span>
+
+                Dashboard
+
+            </a>
+
+
+            <a
+                href="restaurants.html"
+                class="nav-item active">
+
+                <span>🏪</span>
+
+                Restaurants
+
+            </a>
+
+
+            <a
+                href="#"
+                class="nav-item">
+
+                <span>🏢</span>
+
+                Branches
+
+            </a>
+
+
+            <a
+                href="#"
+                class="nav-item">
+
+                <span>🍽️</span>
+
+                Menu
+
+            </a>
+
+
+            <a
+                href="#"
+                class="nav-item">
+
+                <span>👥</span>
+
+                Users
+
+            </a>
+
+
+            <a
+                href="#"
+                class="nav-item">
+
+                <span>📦</span>
+
+                Orders
+
+            </a>
+
+
+            <a
+                href="#"
+                class="nav-item">
+
+                <span>📈</span>
+
+                Reports
+
+            </a>
+
+
+            <a
+                href="#"
+                class="nav-item">
+
+                <span>⚙️</span>
+
+                Settings
+
+            </a>
+
+        </nav>
+
+
+        <div class="sidebar-footer">
+
+            <button
+                id="logoutBtn"
+                class="logout-btn">
+
+                🚪 Logout
+
+            </button>
+
+        </div>
+
+    </aside>
+
+
+
+    <!-- ==================================
+         MAIN
+    =================================== -->
+
+    <main class="main">
+
+
+        <!-- ==================================
+             TOP BAR
+        =================================== -->
+
+        <header class="topbar">
+
+            <div>
+
+                <div class="page-label">
+                    OWNER PORTAL
+                </div>
+
+                <h1>
+                    Restaurants
+                </h1>
+
+            </div>
+
+
+            <div class="user-area">
+
+                <div class="user-avatar">
+                    A
+                </div>
+
+                <div class="user-info">
+
+                    <strong id="userName">
+                        Loading...
+                    </strong>
+
+                    <span id="userRole">
+                        Owner
+                    </span>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+
+        <!-- ==================================
+             RESTAURANT HEADER
+        =================================== -->
+
+        <section class="page-card">
+
+            <div>
+
+                <span class="eyebrow">
+                    RESTAURANT MANAGEMENT
+                </span>
+
+                <h2>
+                    Restaurant Information
+                </h2>
+
+                <p>
+                    View and manage your restaurant
+                    profile and business information.
+                </p>
+
+            </div>
+
+
+            <div
+                id="restaurantStatus"
+                class="status-pill">
+
+                Active
+
+            </div>
+
+        </section>
+
+
+
+        <!-- ==================================
+             RESTAURANT INFORMATION
+        =================================== -->
+
+        <section class="content-card">
+
+            <div class="section-header">
+
+                <div>
+
+                    <span class="eyebrow">
+                        PROFILE
+                    </span>
+
+                    <h2>
+                        Business Information
+                    </h2>
+
+                </div>
+
+            </div>
+
+
+            <div class="details-grid">
+
+
+                <!-- RESTAURANT ID -->
+
+                <div class="detail-item">
+
+                    <span>
+                        Restaurant ID
+                    </span>
+
+                    <strong id="restaurantId">
+                        —
+                    </strong>
+
+                </div>
+
+
+                <!-- RESTAURANT NAME -->
+
+                <div class="detail-item">
+
+                    <span>
+                        Restaurant Name
+                    </span>
+
+                    <strong id="restaurantName">
+                        —
+                    </strong>
+
+                </div>
+
+
+                <!-- CLIENT ID -->
+
+                <div class="detail-item">
+
+                    <span>
+                        Client ID
+                    </span>
+
+                    <strong id="clientId">
+                        —
+                    </strong>
+
+                </div>
+
+
+                <!-- BUSINESS TYPE -->
+
+                <div class="detail-item">
+
+                    <span>
+                        Business Type
+                    </span>
+
+                    <strong id="businessType">
+                        —
+                    </strong>
+
+                </div>
+
+
+                <!-- EMAIL -->
+
+                <div class="detail-item">
+
+                    <span>
+                        Email
+                    </span>
+
+                    <strong id="restaurantEmail">
+                        —
+                    </strong>
+
+                </div>
+
+
+                <!-- PHONE -->
+
+                <div class="detail-item">
+
+                    <span>
+                        Phone
+                    </span>
+
+                    <strong id="restaurantPhone">
+                        —
+                    </strong>
+
+                </div>
+
+
+                <!-- CITY -->
+
+                <div class="detail-item">
+
+                    <span>
+                        City
+                    </span>
+
+                    <strong id="city">
+                        —
+                    </strong>
+
+                </div>
+
+
+                <!-- COUNTRY -->
+
+                <div class="detail-item">
+
+                    <span>
+                        Country
+                    </span>
+
+                    <strong id="country">
+                        —
+                    </strong>
+
+                </div>
+
+
+                <!-- CURRENCY -->
+
+                <div class="detail-item">
+
+                    <span>
+                        Currency
+                    </span>
+
+                    <strong id="currency">
+                        —
+                    </strong>
+
+                </div>
+
+
+                <!-- TAX -->
+
+                <div class="detail-item">
+
+                    <span>
+                        Tax / VAT
+                    </span>
+
+                    <strong id="tax">
+                        —
+                    </strong>
+
+                </div>
+
+
+                <!-- TOTAL BRANCHES -->
+
+                <div class="detail-item">
+
+                    <span>
+                        Total Branches
+                    </span>
+
+                    <strong id="totalBranches">
+                        —
+                    </strong>
+
+                </div>
+
+
+                <!-- STATUS -->
+
+                <div class="detail-item">
+
+                    <span>
+                        Status
+                    </span>
+
+                    <strong id="status">
+                        —
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- ==================================
+             OWNER INFORMATION
+        =================================== -->
+
+        <section class="content-card">
+
+            <div class="section-header">
+
+                <div>
+
+                    <span class="eyebrow">
+                        ACCOUNT
+                    </span>
+
+                    <h2>
+                        Owner Information
+                    </h2>
+
+                </div>
+
+            </div>
+
+
+            <div class="details-grid">
+
+
+                <!-- OWNER NAME -->
+
+                <div class="detail-item">
+
+                    <span>
+                        Owner Name
+                    </span>
+
+                    <strong id="ownerName">
+                        —
+                    </strong>
+
+                </div>
+
+
+                <!-- OWNER EMAIL -->
+
+                <div class="detail-item">
+
+                    <span>
+                        Owner Email
+                    </span>
+
+                    <strong id="ownerEmail">
+                        —
+                    </strong>
+
+                </div>
+
+
+                <!-- USER ID -->
+
+                <div class="detail-item">
+
+                    <span>
+                        User ID
+                    </span>
+
+                    <strong id="userId">
+                        —
+                    </strong>
+
+                </div>
+
+
+                <!-- ROLE -->
+
+                <div class="detail-item">
+
+                    <span>
+                        Role
+                    </span>
+
+                    <strong id="role">
+                        Owner
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- ==================================
+             SUBSCRIPTION
+        =================================== -->
+
+        <section class="content-card">
+
+            <div class="section-header">
+
+                <div>
+
+                    <span class="eyebrow">
+                        SUBSCRIPTION
+                    </span>
+
+                    <h2>
+                        Current Plan
+                    </h2>
+
+                </div>
+
+            </div>
+
+
+            <div class="details-grid">
+
+
+                <!-- PLAN -->
+
+                <div class="detail-item">
+
+                    <span>
+                        Plan
+                    </span>
+
+                    <strong id="planName">
+                        —
+                    </strong>
+
+                </div>
+
+
+                <!-- PRICE -->
+
+                <div class="detail-item">
+
+                    <span>
+                        Monthly Price
+                    </span>
+
+                    <strong id="planPrice">
+                        AED 0
+                    </strong>
+
+                </div>
+
+
+                <!-- ORDER LIMIT -->
+
+                <div class="detail-item">
+
+                    <span>
+                        Order Limit
+                    </span>
+
+                    <strong id="maxOrders">
+                        —
+                    </strong>
+
+                </div>
+
+
+                <!-- BRANCH LIMIT -->
+
+                <div class="detail-item">
+
+                    <span>
+                        Branch Limit
+                    </span>
+
+                    <strong id="maxBranches">
+                        —
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+    </main>
+
+</div>
+
+
+
+<!-- ==================================
+     JAVASCRIPT
+=================================== -->
+
+<script src="auth.js"></script>
+
+<script src="restaurants.js"></script>
+
+
+</body>
+
+</html>
