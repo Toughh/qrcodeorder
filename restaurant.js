@@ -726,9 +726,9 @@ async function loadRestaurantData() {
         );
 
 
-        // ==================================
+        // ==========================================
         // SUCCESS
-        // ==================================
+        // ==========================================
 
         if (
             response.ok &&
@@ -740,14 +740,60 @@ async function loadRestaurantData() {
                 "RESTAURANT PAGE: Data loaded successfully."
             );
 
-
             return result.data || {};
         }
 
 
-        // ==================================
-        // API ERROR
-        // ==================================
+        // ==========================================
+        // SESSION INVALID / EXPIRED
+        // ==========================================
+
+        if (
+            result &&
+            result.success === false &&
+            result.code === "RESTAURANT_SESSION_INVALID"
+        ) {
+
+            console.warn(
+                "RESTAURANT PAGE: Restaurant session is invalid or expired."
+            );
+
+
+            // ==========================================
+            // CLEAR EXISTING SESSION
+            // ==========================================
+
+            if (
+                typeof clearSession ===
+                "function"
+            ) {
+
+                clearSession();
+
+            } else {
+
+                localStorage.removeItem(
+                    "sessionToken"
+                );
+
+            }
+
+
+            // ==========================================
+            // REDIRECT TO LOGIN
+            // ==========================================
+
+            window.location.href =
+                "login.html";
+
+
+            return null;
+        }
+
+
+        // ==========================================
+        // OTHER API ERROR
+        // ==========================================
 
         console.error(
             "RESTAURANT API ERROR:",
@@ -756,7 +802,6 @@ async function loadRestaurantData() {
 
 
         return null;
-
     }
 
 
