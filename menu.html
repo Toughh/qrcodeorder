@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>QR Order SaaS — Menu</title>
+
+    <link
+        rel="stylesheet"
+        href="menu.css">
+
+</head>
+
+
+<body>
+
+<div class="app">
+
+
+    <!-- ==========================================
+         SIDEBAR
+    =========================================== -->
+
+    <aside class="sidebar">
+
+        <div class="brand">
+
+            <div class="brand-logo">
+                QR
+            </div>
+
+            <div>
+
+                <div class="brand-name">
+                    QR Order
+                </div>
+
+                <div class="brand-subtitle">
+                    SaaS
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <nav class="navigation">
+
+            <a
+                href="dashboard.html"
+                class="nav-item">
+
+                <span>📊</span>
+                Dashboard
+
+            </a>
+
+
+            <a
+                href="restaurant.html"
+                class="nav-item">
+
+                <span>🏪</span>
+                Restaurants
+
+            </a>
+
+
+            <a
+                href="branches.html"
+                class="nav-item">
+
+                <span>🏢</span>
+                Branches
+
+            </a>
+
+
+            <a
+                href="menu.html"
+                class="nav-item active">
+
+                <span>🍽️</span>
+                Menu
+
+            </a>
+
+
+            <a
+                href="users.html"
+                class="nav-item">
+
+                <span>👥</span>
+                Users
+
+            </a>
+
+
+            <a
+                href="orders.html"
+                class="nav-item">
+
+                <span>📦</span>
+                Orders
+
+            </a>
+
+
+            <a
+                href="reports.html"
+                class="nav-item">
+
+                <span>📈</span>
+                Reports
+
+            </a>
+
+
+            <a
+                href="settings.html"
+                class="nav-item">
+
+                <span>⚙️</span>
+                Settings
+
+            </a>
+
+        </nav>
+
+
+        <div class="sidebar-footer">
+
+            <button
+                id="logoutBtn"
+                class="logout-btn">
+
+                🚪 Logout
+
+            </button>
+
+        </div>
+
+    </aside>
+
+
+
+    <!-- ==========================================
+         MAIN
+    =========================================== -->
+
+    <main class="main">
+
+
+        <!-- ======================================
+             TOP BAR
+        ======================================= -->
+
+        <header class="topbar">
+
+            <div>
+
+                <div class="page-label">
+                    OWNER PORTAL
+                </div>
+
+                <h1>
+                    Menu
+                </h1>
+
+            </div>
+
+
+            <div class="user-area">
+
+                <div class="user-avatar">
+                    A
+                </div>
+
+
+                <div class="user-info">
+
+                    <strong id="userName">
+                        Loading...
+                    </strong>
+
+                    <span id="userRole">
+                        Owner
+                    </span>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+
+        <!-- ======================================
+             MENU HEADER
+        ======================================= -->
+
+        <section class="page-card">
+
+            <div>
+
+                <span class="eyebrow">
+                    MENU MANAGEMENT
+                </span>
+
+
+                <h2>
+                    Restaurant Menu
+                </h2>
+
+
+                <p>
+                    Manage menu items for each
+                    restaurant branch.
+                </p>
+
+            </div>
+
+
+            <button
+                id="addMenuItemBtn"
+                class="primary-btn"
+                type="button">
+
+                + Add Menu Item
+
+            </button>
+
+        </section>
+
+
+
+        <!-- ======================================
+             BRANCH SELECTOR
+        ======================================= -->
+
+        <section class="content-card">
+
+            <div class="section-header">
+
+                <div>
+
+                    <span class="eyebrow">
+                        BRANCH
+                    </span>
+
+
+                    <h2>
+                        Select Branch
+                    </h2>
+
+
+                    <p>
+                        Choose a branch to view its
+                        menu items.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="branch-selector">
+
+                <label
+                    for="branchSelect">
+
+                    Branch
+
+                </label>
+
+
+                <select
+                    id="branchSelect">
+
+                    <option value="">
+                        Select Branch
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div
+                class="selected-branch">
+
+                Selected Branch:
+
+                <strong
+                    id="selectedBranchName">
+
+                    Select a Branch
+
+                </strong>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- ======================================
+             MENU SUMMARY
+        ======================================= -->
+
+        <section class="summary-grid">
+
+
+            <div class="summary-card">
+
+                <div class="summary-icon">
+                    🍽️
+                </div>
+
+
+                <div>
+
+                    <span>
+                        Total Items
+                    </span>
+
+
+                    <strong id="totalItems">
+                        0
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="summary-card">
+
+                <div class="summary-icon">
+                    ✅
+                </div>
+
+
+                <div>
+
+                    <span>
+                        Available
+                    </span>
+
+
+                    <strong id="availableItems">
+                        0
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="summary-card">
+
+                <div class="summary-icon">
+                    ⛔
+                </div>
+
+
+                <div>
+
+                    <span>
+                        Unavailable
+                    </span>
+
+
+                    <strong id="unavailableItems">
+                        0
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="summary-card">
+
+                <div class="summary-icon">
+                    📂
+                </div>
+
+
+                <div>
+
+                    <span>
+                        Categories
+                    </span>
+
+
+                    <strong id="totalCategories">
+                        0
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- ======================================
+             LOADING
+        ======================================= -->
+
+        <section
+            id="menuLoading"
+            class="state-card">
+
+            <div class="loading-spinner">
+                ⏳
+            </div>
+
+
+            <h3>
+                Loading Menu...
+            </h3>
+
+
+            <p>
+                Please wait while we load your
+                restaurant menu.
+            </p>
+
+        </section>
+
+
+
+        <!-- ======================================
+             ERROR
+        ======================================= -->
+
+        <section
+            id="menuError"
+            class="state-card error-state hidden">
+
+            <div class="state-icon">
+                ⚠️
+            </div>
+
+
+            <h3>
+                Unable to Load Menu
+            </h3>
+
+
+            <p id="menuErrorMessage">
+                Something went wrong.
+            </p>
+
+
+            <button
+                id="retryMenuBtn"
+                class="secondary-btn"
+                type="button">
+
+                Try Again
+
+            </button>
+
+        </section>
+
+
+
+        <!-- ======================================
+             EMPTY
+        ======================================= -->
+
+        <section
+            id="menuEmpty"
+            class="state-card hidden">
+
+            <div class="state-icon">
+                🍽️
+            </div>
+
+
+            <h3>
+                No Menu Items
+            </h3>
+
+
+            <p>
+                This branch does not have any
+                menu items yet.
+            </p>
+
+
+            <button
+                id="emptyAddMenuBtn"
+                class="primary-btn"
+                type="button">
+
+                + Add Menu Item
+
+            </button>
+
+        </section>
+
+
+
+        <!-- ======================================
+             MENU CONTAINER
+        ======================================= -->
+
+        <section
+            id="menuContainer"
+            class="menu-container hidden">
+
+        </section>
+
+
+
+        <!-- ======================================
+             ADD / EDIT MENU ITEM MODAL
+        ======================================= -->
+
+        <div
+            id="menuItemModal"
+            class="modal-overlay hidden">
+
+            <div
+                class="modal"
+                onclick="event.stopPropagation()">
+
+
+                <div class="modal-header">
+
+                    <div>
+
+                        <span class="eyebrow">
+                            MENU ITEM
+                        </span>
+
+
+                        <h2>
+                            Add / Edit Menu Item
+                        </h2>
+
+                    </div>
+
+
+                    <button
+                        id="closeModalBtn"
+                        class="modal-close"
+                        type="button">
+
+                        ×
+
+                    </button>
+
+                </div>
+
+
+
+                <div class="modal-body">
+
+                    <p>
+                        Menu item creation and editing
+                        will be connected in the next
+                        step.
+                    </p>
+
+                </div>
+
+
+
+                <div class="modal-footer">
+
+                    <button
+                        id="cancelModalBtn"
+                        class="secondary-btn"
+                        type="button">
+
+                        Cancel
+
+                    </button>
+
+
+                    <button
+                        class="primary-btn"
+                        type="button"
+                        disabled>
+
+                        Save Menu Item
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+    </main>
+
+</div>
+
+
+
+<!-- ==========================================
+     JAVASCRIPT
+=========================================== -->
+
+<script src="auth.js"></script>
+
+<script src="menu.js"></script>
+
+
+</body>
+
+</html>
