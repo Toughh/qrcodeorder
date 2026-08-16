@@ -1,492 +1,552 @@
-/* =========================================================
-   MENU CONFIGURATION
-========================================================= */
+// ==========================================
+// QR RESTAURANT SAAS
+// OWNER — MENU PAGE
+// ==========================================
 
-const N8N_MENU_WEBHOOK_URL =
+
+// ==========================================
+// n8n OWNER MENU WEBHOOK
+// ==========================================
+
+const N8N_MENU_WEBHOOK =
     "https://maatapita.app.n8n.cloud/webhook/owner-menu";
 
 
-/* =========================================================
-   STATE
-========================================================= */
+// ==========================================
+// PAGE LOAD
+// ==========================================
 
-let menuItems = [];
-let selectedBranchId = "";
-let branches = [];
+document.addEventListener(
+    "DOMContentLoaded",
+    async function () {
 
-
-/* =========================================================
-   DOM READY
-========================================================= */
-
-document.addEventListener("DOMContentLoaded", () => {
-
-    initializePage();
-
-});
+        console.log("==================================");
+        console.log("MENU PAGE: Page loaded");
+        console.log("==================================");
 
 
-/* =========================================================
-   INITIALIZE
-========================================================= */
+        // ==================================
+        // CHECK AUTHENTICATION
+        // ==================================
 
-function initializePage() {
+        console.log(
+            "MENU PAGE: Checking authentication..."
+        );
 
-    requireAuthentication();
-
-    loadUserInformation();
-
-    loadBranches();
-
-    setupEventListeners();
-
-}
-
-
-/* =========================================================
-   AUTHENTICATION
-========================================================= */
-
-function requireAuthentication() {
-
-    const sessionToken = localStorage.getItem("sessionToken");
-
-    if (!sessionToken) {
-
-        window.location.href = "login.html";
-
-        return false;
-    }
-
-    return true;
-}
-
-
-/* =========================================================
-   USER INFORMATION
-========================================================= */
-
-function loadUserInformation() {
-
-    const userName =
-        localStorage.getItem("userName") ||
-        localStorage.getItem("name") ||
-        "Owner";
-
-    const userRole =
-        localStorage.getItem("role") ||
-        "Owner";
-
-    const userNameElement =
-        document.getElementById("userName");
-
-    const userRoleElement =
-        document.getElementById("userRole");
-
-    const userAvatar =
-        document.getElementById("userAvatar");
-
-    if (userNameElement) {
-
-        userNameElement.textContent = userName;
-
-    }
-
-    if (userRoleElement) {
-
-        userRoleElement.textContent = userRole;
-
-    }
-
-    if (userAvatar) {
-
-        userAvatar.textContent =
-            userName.charAt(0).toUpperCase();
-
-    }
-}
-
-
-/* =========================================================
-   LOAD BRANCHES
-========================================================= */
-
-function loadBranches() {
-
-    /*
-     * We expect branches to have been stored after login /
-     * restaurant loading.
-     *
-     * Example:
-     *
-     * localStorage.setItem(
-     *     "branches",
-     *     JSON.stringify(branches)
-     * );
-     */
-
-    const storedBranches =
-        localStorage.getItem("branches");
-
-    if (storedBranches) {
 
         try {
 
-            branches = JSON.parse(storedBranches);
+            const session =
+                await requireAuthentication();
 
-        } catch (error) {
+
+            // ==================================
+            // AUTHENTICATION FAILED
+            // ==================================
+
+            if (!session) {
+
+                console.warn(
+                    "MENU PAGE: Authentication failed."
+                );
+
+                return;
+            }
+
+
+            // ==================================
+            // AUTHENTICATION SUCCESSFUL
+            // ==================================
+
+            console.log(
+                "MENU PAGE: Authentication successful."
+            );
+
+            console.log(
+                "MENU AUTH SESSION:",
+                session
+            );
+
+
+            // ==================================
+            // INITIALIZE USER INFORMATION
+            // ==================================
+
+            loadUserInformation(
+                session
+            );
+
+
+            // ==================================
+            // SETUP UI
+            // ==================================
+
+            setupEventListeners();
+
+
+            // ==================================
+            // LOAD MENU
+            // ==================================
+
+            await loadMenu(
+                session
+            );
+
+
+            console.log("==================================");
+            console.log(
+                "MENU PAGE: Initialization completed."
+            );
+            console.log("==================================");
+
+        }
+
+        catch (error) {
 
             console.error(
-                "Unable to parse branches:",
+                "MENU PAGE: Initialization error:",
                 error
             );
 
-            branches = [];
+            /*
+             * IMPORTANT:
+             *
+             * Do NOT redirect here.
+             *
+             * If menu API fails, keep the page visible
+             * and show the error message.
+             */
+
+            showError(
+                "Unable to load the menu. Please try again."
+            );
 
         }
 
     }
-
-    populateBranchSelector();
-
-}
+);
 
 
-/* =========================================================
-   POPULATE BRANCH SELECT
-========================================================= */
+// ==========================================
+// LOAD USER INFORMATION
+// ==========================================
 
-function populateBranchSelector() {
+function loadUserInformation(
+    session
+) {
 
-    const branchSelect =
-        document.getElementById("branchSelect");
+    console.log(
+        "MENU PAGE: Loading user information..."
+    );
 
-    if (!branchSelect) {
-        return;
-    }
-
-    branchSelect.innerHTML =
-        `<option value="">Select Branch</option>`;
-
-    branches.forEach(branch => {
-
-        const branchId =
-            branch.id ||
-            branch.BranchId ||
-            branch.branchId;
-
-        const branchName =
-            branch.Name ||
-            branch.BranchName ||
-            branch.name ||
-            branch.branchName ||
-            "Branch";
-
-        if (!branchId) {
-            return;
-        }
-
-        const option =
-            document.createElement("option");
-
-        option.value = branchId;
-
-        option.textContent = branchName;
-
-        branchSelect.appendChild(option);
-
-    });
 
     /*
-     * If only one branch exists,
-     * automatically select it.
+     * Try values from authentication session first.
+     * Then fall back to existing localStorage values.
      */
 
-    if (branches.length === 1) {
+    const ownerName =
+        session?.ownerName ||
+        session?.OwnerName ||
+        session?.name ||
+        session?.userName ||
+        localStorage.getItem("ownerName") ||
+        localStorage.getItem("userName") ||
+        "Owner";
 
-        const branch =
-            branches[0];
 
-        selectedBranchId =
-            branch.id ||
-            branch.BranchId ||
-            branch.branchId;
+    const role =
+        session?.role ||
+        session?.Role ||
+        localStorage.getItem("role") ||
+        "Owner";
 
-        branchSelect.value =
-            selectedBranchId;
 
-        updateBranchName();
+    // ==================================
+    // USER NAME
+    // ==================================
 
-        loadMenu();
+    const userNameElement =
+        document.getElementById(
+            "userName"
+        );
+
+
+    if (userNameElement) {
+
+        userNameElement.textContent =
+            ownerName;
+
+    }
+
+
+    // ==================================
+    // USER ROLE
+    // ==================================
+
+    const userRoleElement =
+        document.getElementById(
+            "userRole"
+        );
+
+
+    if (userRoleElement) {
+
+        userRoleElement.textContent =
+            role;
+
+    }
+
+
+    // ==================================
+    // AVATAR
+    // ==================================
+
+    const avatar =
+        document.querySelector(
+            ".user-avatar"
+        );
+
+
+    if (avatar) {
+
+        avatar.textContent =
+            ownerName
+                .charAt(0)
+                .toUpperCase();
 
     }
 
 }
 
 
-/* =========================================================
-   EVENT LISTENERS
-========================================================= */
+// ==========================================
+// LOAD MENU
+// ==========================================
 
-function setupEventListeners() {
+async function loadMenu(
+    session
+) {
 
-    const branchSelect =
-        document.getElementById("branchSelect");
-
-    const searchInput =
-        document.getElementById("menuSearch");
-
-    const categoryFilter =
-        document.getElementById("categoryFilter");
-
-    const logoutBtn =
-        document.getElementById("logoutBtn");
-
-    const mobileMenuBtn =
-        document.getElementById("mobileMenuBtn");
+    console.log("==================================");
+    console.log(
+        "MENU PAGE: Loading menu..."
+    );
+    console.log("==================================");
 
 
-    if (branchSelect) {
-
-        branchSelect.addEventListener(
-            "change",
-            event => {
-
-                selectedBranchId =
-                    event.target.value;
-
-                updateBranchName();
-
-                if (selectedBranchId) {
-
-                    loadMenu();
-
-                } else {
-
-                    clearMenu();
-
-                }
-
-            }
-        );
-
-    }
-
-
-    if (searchInput) {
-
-        searchInput.addEventListener(
-            "input",
-            renderFilteredMenu
-        );
-
-    }
-
-
-    if (categoryFilter) {
-
-        categoryFilter.addEventListener(
-            "change",
-            renderFilteredMenu
-        );
-
-    }
-
-
-    if (logoutBtn) {
-
-        logoutBtn.addEventListener(
-            "click",
-            logout
-        );
-
-    }
-
-
-    if (mobileMenuBtn) {
-
-        mobileMenuBtn.addEventListener(
-            "click",
-            toggleMobileMenu
-        );
-
-    }
-
-}
-
-
-/* =========================================================
-   LOAD MENU FROM N8N
-========================================================= */
-
-async function loadMenu() {
+    // ==================================
+    // GET SESSION TOKEN
+    // ==================================
 
     const sessionToken =
-        localStorage.getItem("sessionToken");
+        getSessionToken();
 
-    const restaurantId =
-        getRestaurantId();
-
-    const branchId =
-        selectedBranchId;
 
     if (!sessionToken) {
 
+        console.error(
+            "MENU PAGE: No session token found."
+        );
+
         showError(
-            "Your session has expired. Please login again."
+            "Your session could not be found. Please login again."
         );
 
         return;
 
     }
+
+
+    console.log(
+        "MENU PAGE: Session token found."
+    );
+
+
+    // ==================================
+    // GET RESTAURANT ID
+    // ==================================
+
+    const restaurantId =
+        getRestaurantId(
+            session
+        );
+
+
+    console.log(
+        "MENU PAGE: Restaurant ID:",
+        restaurantId
+    );
 
 
     if (!restaurantId) {
 
+        console.error(
+            "MENU PAGE: Restaurant ID not found."
+        );
+
         showError(
-            "Restaurant information is missing."
+            "Restaurant information could not be determined."
         );
 
         return;
 
     }
 
+
+    // ==================================
+    // GET BRANCH ID
+    // ==================================
+
+    const branchId =
+        getBranchId(
+            session
+        );
+
+
+    console.log(
+        "MENU PAGE: Branch ID:",
+        branchId
+    );
+
+
+    /*
+     * If branch is not available yet,
+     * don't redirect.
+     *
+     * Just show a useful message.
+     */
 
     if (!branchId) {
 
-        showError(
-            "Please select a branch."
+        console.warn(
+            "MENU PAGE: Branch ID not available."
         );
+
+
+        showBranchRequiredMessage();
 
         return;
 
     }
 
+
+    // ==================================
+    // SHOW LOADING
+    // ==================================
 
     showLoading();
 
 
-    try {
+    // ==================================
+    // REQUEST BODY
+    // ==================================
 
-        const requestBody = {
+    const requestBody = {
 
+        sessionToken:
             sessionToken,
 
+        restaurantId:
             restaurantId,
 
+        branchId:
             branchId
 
-        };
+    };
 
 
-        console.log(
-            "Menu request:",
-            requestBody
-        );
+    console.log(
+        "MENU API REQUEST:",
+        {
+            ...requestBody,
+            sessionToken:
+                "[HIDDEN]"
+        }
+    );
 
+
+    // ==================================
+    // CALL n8n
+    // ==================================
+
+    try {
 
         const response =
             await fetch(
-                N8N_MENU_WEBHOOK_URL,
+                N8N_MENU_WEBHOOK,
                 {
+
                     method: "POST",
 
                     headers: {
+
                         "Content-Type":
                             "application/json"
+
                     },
 
                     body:
                         JSON.stringify(
                             requestBody
                         )
+
                 }
             );
 
 
-        if (!response.ok) {
+        // ==================================
+        // HTTP STATUS
+        // ==================================
 
-            throw new Error(
-                `HTTP ${response.status}`
-            );
+        console.log(
+            "MENU API HTTP STATUS:",
+            response.status
+        );
 
-        }
 
+        // ==================================
+        // READ RESPONSE
+        // ==================================
 
-        const result =
+        const rawResult =
             await response.json();
 
 
         console.log(
-            "Menu API response:",
+            "MENU API RAW RESPONSE:",
+            rawResult
+        );
+
+
+        // ==================================
+        // NORMALIZE RESPONSE
+        // ==================================
+
+        const result =
+            Array.isArray(rawResult)
+                ? rawResult[0]
+                : rawResult;
+
+
+        console.log(
+            "MENU API NORMALIZED RESPONSE:",
             result
         );
 
 
-        /*
-         * INVALID SESSION
-         */
+        // ==========================================
+        // SUCCESS
+        // ==========================================
 
         if (
-            result.success === false &&
-            result.code === "INVALID_SESSION"
+            response.ok &&
+            result &&
+            result.success === true
         ) {
 
-            handleInvalidSession();
-
-            return;
-
-        }
+            console.log(
+                "MENU PAGE: Menu loaded successfully."
+            );
 
 
-        /*
-         * SUCCESS
-         */
-
-        if (
-            result.success === true &&
-            result.code === "MENU_DATA_READY"
-        ) {
-
-            menuItems =
+            const menuItems =
                 Array.isArray(
                     result.menuItems
                 )
                     ? result.menuItems
                     : [];
 
-            populateCategoryFilter();
 
-            updateSummary();
+            renderMenu(
+                menuItems
+            );
 
-            renderFilteredMenu();
 
             hideLoading();
+
 
             return;
 
         }
 
 
-        /*
-         * UNKNOWN RESPONSE
-         */
+        // ==========================================
+        // INVALID / EXPIRED SESSION
+        // ==========================================
 
-        throw new Error(
-            result.message ||
-            "Unexpected response from server."
+        if (
+            result &&
+            result.success === false &&
+            (
+                result.code ===
+                    "INVALID_SESSION"
+                ||
+                result.code ===
+                    "RESTAURANT_SESSION_INVALID"
+            )
+        ) {
+
+            console.warn(
+                "MENU PAGE: Session is invalid or expired."
+            );
+
+
+            if (
+                typeof clearSession ===
+                "function"
+            ) {
+
+                clearSession();
+
+            }
+
+            else {
+
+                localStorage.removeItem(
+                    "sessionToken"
+                );
+
+            }
+
+
+            window.location.href =
+                "login.html";
+
+
+            return;
+
+        }
+
+
+        // ==========================================
+        // OTHER API ERROR
+        // ==========================================
+
+        console.error(
+            "MENU API ERROR:",
+            result
         );
 
 
-    } catch (error) {
+        showError(
+            result?.message ||
+            "Unable to load menu."
+        );
+
+
+    }
+
+    catch (error) {
 
         console.error(
-            "Menu loading error:",
+            "MENU API CONNECTION ERROR:",
             error
         );
 
+
         showError(
-            "Unable to load menu. Please try again."
+            "Unable to connect to the menu service."
         );
 
     }
@@ -494,90 +554,716 @@ async function loadMenu() {
 }
 
 
-/* =========================================================
-   GET RESTAURANT ID
-========================================================= */
+// ==========================================
+// GET RESTAURANT ID
+// ==========================================
 
-function getRestaurantId() {
+function getRestaurantId(
+    session
+) {
 
     /*
-     * Try the most common storage locations
+     * Follow the same flexible structure
+     * used by restaurant.js.
      */
 
-    return (
-        localStorage.getItem("restaurantId") ||
-        localStorage.getItem("RestaurantId") ||
-        sessionStorage.getItem("restaurantId") ||
-        ""
+    const restaurant =
+        session?.restaurant ||
+        {};
+
+
+    const restaurantId =
+        session?.restaurantId ||
+        session?.RestaurantId ||
+        restaurant.restaurantId ||
+        restaurant.RestaurantId ||
+        localStorage.getItem(
+            "restaurantId"
+        ) ||
+        localStorage.getItem(
+            "RestaurantId"
+        ) ||
+        "";
+
+
+    return restaurantId;
+
+}
+
+
+// ==========================================
+// GET BRANCH ID
+// ==========================================
+
+function getBranchId(
+    session
+) {
+
+    /*
+     * First try session-level branch.
+     */
+
+    let branchId =
+        session?.branchId ||
+        session?.BranchId ||
+        "";
+
+
+    /*
+     * Then try restaurant object.
+     */
+
+    if (!branchId) {
+
+        const restaurant =
+            session?.restaurant ||
+            {};
+
+
+        branchId =
+            restaurant.branchId ||
+            restaurant.BranchId ||
+            "";
+
+    }
+
+
+    /*
+     * Then try URL parameter.
+     *
+     * Example:
+     *
+     * menu.html?branchId=BR001
+     */
+
+    if (!branchId) {
+
+        const params =
+            new URLSearchParams(
+                window.location.search
+            );
+
+
+        branchId =
+            params.get(
+                "branchId"
+            ) ||
+            "";
+
+    }
+
+
+    /*
+     * Then try localStorage.
+     */
+
+    if (!branchId) {
+
+        branchId =
+            localStorage.getItem(
+                "branchId"
+            ) ||
+            localStorage.getItem(
+                "BranchId"
+            ) ||
+            "";
+
+    }
+
+
+    return branchId;
+
+}
+
+
+// ==========================================
+// RENDER MENU
+// ==========================================
+
+function renderMenu(
+    menuItems
+) {
+
+    console.log(
+        "MENU PAGE: Rendering menu items:",
+        menuItems
+    );
+
+
+    const menuGrid =
+        document.getElementById(
+            "menuGrid"
+        );
+
+
+    const emptyState =
+        document.getElementById(
+            "emptyState"
+        );
+
+
+    const menuItemCount =
+        document.getElementById(
+            "menuItemCount"
+        );
+
+
+    if (!menuGrid) {
+
+        console.error(
+            "MENU PAGE: menuGrid element not found."
+        );
+
+        return;
+
+    }
+
+
+    // ==================================
+    // CLEAR EXISTING MENU
+    // ==================================
+
+    menuGrid.innerHTML = "";
+
+
+    // ==================================
+    // UPDATE COUNT
+    // ==================================
+
+    if (menuItemCount) {
+
+        menuItemCount.textContent =
+            `${menuItems.length} ${
+                menuItems.length === 1
+                    ? "item"
+                    : "items"
+            }`;
+
+    }
+
+
+    // ==================================
+    // EMPTY MENU
+    // ==================================
+
+    if (
+        !menuItems ||
+        menuItems.length === 0
+    ) {
+
+        if (emptyState) {
+
+            emptyState.classList.remove(
+                "hidden"
+            );
+
+        }
+
+
+        updateSummary(
+            []
+        );
+
+
+        return;
+
+    }
+
+
+    // ==================================
+    // HIDE EMPTY STATE
+    // ==================================
+
+    if (emptyState) {
+
+        emptyState.classList.add(
+            "hidden"
+        );
+
+    }
+
+
+    // ==================================
+    // RENDER ITEMS
+    // ==================================
+
+    menuItems.forEach(
+        function (item) {
+
+            const card =
+                createMenuCard(
+                    item
+                );
+
+
+            menuGrid.appendChild(
+                card
+            );
+
+        }
+    );
+
+
+    // ==================================
+    // UPDATE SUMMARY
+    // ==================================
+
+    updateSummary(
+        menuItems
+    );
+
+
+    // ==================================
+    // UPDATE CATEGORIES
+    // ==================================
+
+    populateCategoryFilter(
+        menuItems
+    );
+
+
+    // ==================================
+    // SETUP SEARCH
+    // ==================================
+
+    applyMenuFilters(
+        menuItems
     );
 
 }
 
 
-/* =========================================================
-   UPDATE BRANCH NAME
-========================================================= */
+// ==========================================
+// CREATE MENU CARD
+// ==========================================
 
-function updateBranchName() {
+function createMenuCard(
+    item
+) {
 
-    const branchNameElement =
-        document.getElementById("branchName");
+    const card =
+        document.createElement(
+            "div"
+        );
 
-    if (!branchNameElement) {
-        return;
+
+    card.className =
+        "menu-card";
+
+
+    // ==================================
+    // IMAGE
+    // ==================================
+
+    const imageWrapper =
+        document.createElement(
+            "div"
+        );
+
+
+    imageWrapper.className =
+        "menu-image-wrapper";
+
+
+    const imageURL =
+        item.imageURL ||
+        item.ImageURL ||
+        "";
+
+
+    if (imageURL) {
+
+        const image =
+            document.createElement(
+                "img"
+            );
+
+
+        image.className =
+            "menu-image";
+
+
+        image.src =
+            imageURL;
+
+
+        image.alt =
+            item.itemName ||
+            item.ItemName ||
+            "Menu item";
+
+
+        image.onerror =
+            function () {
+
+                image.remove();
+
+
+                const placeholder =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                placeholder.className =
+                    "menu-image-placeholder";
+
+
+                placeholder.textContent =
+                    "🍽️";
+
+
+                imageWrapper.appendChild(
+                    placeholder
+                );
+
+            };
+
+
+        imageWrapper.appendChild(
+            image
+        );
+
+    }
+
+    else {
+
+        const placeholder =
+            document.createElement(
+                "div"
+            );
+
+
+        placeholder.className =
+            "menu-image-placeholder";
+
+
+        placeholder.textContent =
+            "🍽️";
+
+
+        imageWrapper.appendChild(
+            placeholder
+        );
+
     }
 
 
-    const selectedBranch =
-        branches.find(branch => {
+    // ==================================
+    // CONTENT
+    // ==================================
 
-            const id =
-                branch.id ||
-                branch.BranchId ||
-                branch.branchId;
-
-            return id === selectedBranchId;
-
-        });
+    const content =
+        document.createElement(
+            "div"
+        );
 
 
-    if (!selectedBranch) {
-
-        branchNameElement.textContent =
-            "Select a branch to view menu";
-
-        return;
-
-    }
+    content.className =
+        "menu-card-content";
 
 
-    const branchName =
-        selectedBranch.Name ||
-        selectedBranch.BranchName ||
-        selectedBranch.name ||
-        selectedBranch.branchName ||
-        "Selected Branch";
+    // ==================================
+    // CATEGORY
+    // ==================================
+
+    const category =
+        document.createElement(
+            "div"
+        );
 
 
-    branchNameElement.textContent =
-        branchName;
+    category.className =
+        "menu-category";
+
+
+    category.textContent =
+        item.category ||
+        item.Category ||
+        "Menu";
+
+
+    // ==================================
+    // NAME
+    // ==================================
+
+    const name =
+        document.createElement(
+            "div"
+        );
+
+
+    name.className =
+        "menu-name";
+
+
+    name.textContent =
+        item.itemName ||
+        item.ItemName ||
+        "Unnamed Item";
+
+
+    // ==================================
+    // DESCRIPTION
+    // ==================================
+
+    const description =
+        document.createElement(
+            "div"
+        );
+
+
+    description.className =
+        "menu-description";
+
+
+    description.textContent =
+        item.description ||
+        item.Description ||
+        "No description available.";
+
+
+    // ==================================
+    // FOOTER
+    // ==================================
+
+    const footer =
+        document.createElement(
+            "div"
+        );
+
+
+    footer.className =
+        "menu-card-footer";
+
+
+    // ==================================
+    // PRICE
+    // ==================================
+
+    const price =
+        document.createElement(
+            "div"
+        );
+
+
+    price.className =
+        "menu-price";
+
+
+    const itemPrice =
+        item.price ??
+        item.Price ??
+        0;
+
+
+    price.textContent =
+        formatPrice(
+            itemPrice
+        );
+
+
+    // ==================================
+    // AVAILABILITY
+    // ==================================
+
+    const badge =
+        document.createElement(
+            "span"
+        );
+
+
+    const available =
+        isItemAvailable(
+            item.available ??
+            item.Available
+        );
+
+
+    badge.className =
+        `availability-badge ${
+            available
+                ? "available"
+                : "unavailable"
+        }`;
+
+
+    badge.textContent =
+        available
+            ? "Available"
+            : "Unavailable";
+
+
+    // ==================================
+    // BUILD CARD
+    // ==================================
+
+    footer.appendChild(
+        price
+    );
+
+
+    footer.appendChild(
+        badge
+    );
+
+
+    content.appendChild(
+        category
+    );
+
+
+    content.appendChild(
+        name
+    );
+
+
+    content.appendChild(
+        description
+    );
+
+
+    content.appendChild(
+        footer
+    );
+
+
+    card.appendChild(
+        imageWrapper
+    );
+
+
+    card.appendChild(
+        content
+    );
+
+
+    return card;
 
 }
 
 
-/* =========================================================
-   POPULATE CATEGORIES
-========================================================= */
+// ==========================================
+// AVAILABILITY
+// ==========================================
 
-function populateCategoryFilter() {
+function isItemAvailable(
+    value
+) {
+
+    if (
+        value === false ||
+        value === "false" ||
+        value === "False" ||
+        value === "0"
+    ) {
+
+        return false;
+
+    }
+
+
+    return true;
+
+}
+
+
+// ==========================================
+// FORMAT PRICE
+// ==========================================
+
+function formatPrice(
+    price
+) {
+
+    const numericPrice =
+        Number(
+            price || 0
+        );
+
+
+    return new Intl.NumberFormat(
+        "en-AE",
+        {
+            style: "currency",
+            currency: "AED",
+            minimumFractionDigits: 2
+        }
+    ).format(
+        numericPrice
+    );
+
+}
+
+
+// ==========================================
+// UPDATE SUMMARY
+// ==========================================
+
+function updateSummary(
+    menuItems
+) {
+
+    const total =
+        menuItems.length;
+
+
+    const available =
+        menuItems.filter(
+            function (item) {
+
+                return isItemAvailable(
+                    item.available ??
+                    item.Available
+                );
+
+            }
+        ).length;
+
+
+    const unavailable =
+        total -
+        available;
+
+
+    setText(
+        "totalItems",
+        total
+    );
+
+
+    setText(
+        "availableItems",
+        available
+    );
+
+
+    setText(
+        "unavailableItems",
+        unavailable
+    );
+
+}
+
+
+// ==========================================
+// CATEGORY FILTER
+// ==========================================
+
+function populateCategoryFilter(
+    menuItems
+) {
 
     const categoryFilter =
         document.getElementById(
             "categoryFilter"
         );
 
+
     if (!categoryFilter) {
+
         return;
+
     }
 
 
@@ -585,8 +1271,16 @@ function populateCategoryFilter() {
         [
             ...new Set(
                 menuItems
-                    .map(item =>
-                        item.category
+                    .map(
+                        function (item) {
+
+                            return (
+                                item.category ||
+                                item.Category ||
+                                ""
+                            );
+
+                        }
                     )
                     .filter(Boolean)
             )
@@ -598,32 +1292,46 @@ function populateCategoryFilter() {
         `<option value="">All Categories</option>`;
 
 
-    categories.forEach(category => {
+    categories.forEach(
+        function (category) {
 
-        const option =
-            document.createElement("option");
+            const option =
+                document.createElement(
+                    "option"
+                );
 
-        option.value = category;
 
-        option.textContent = category;
+            option.value =
+                category;
 
-        categoryFilter.appendChild(option);
 
-    });
+            option.textContent =
+                category;
+
+
+            categoryFilter.appendChild(
+                option
+            );
+
+        }
+    );
 
 }
 
 
-/* =========================================================
-   FILTER MENU
-========================================================= */
+// ==========================================
+// SEARCH / FILTER
+// ==========================================
 
-function renderFilteredMenu() {
+function applyMenuFilters(
+    menuItems
+) {
 
     const searchInput =
         document.getElementById(
             "menuSearch"
         );
+
 
     const categoryFilter =
         document.getElementById(
@@ -631,81 +1339,119 @@ function renderFilteredMenu() {
         );
 
 
-    const searchTerm =
-        (
-            searchInput?.value ||
-            ""
-        )
-        .trim()
-        .toLowerCase();
+    if (!searchInput) {
+
+        return;
+
+    }
 
 
-    const category =
-        categoryFilter?.value ||
-        "";
+    function filterItems() {
 
-
-    const filteredItems =
-        menuItems.filter(item => {
-
-            const name =
-                (
-                    item.itemName ||
-                    ""
-                )
+        const searchText =
+            searchInput.value
+                .trim()
                 .toLowerCase();
 
-            const description =
-                (
-                    item.description ||
-                    ""
-                )
-                .toLowerCase();
 
-            const itemCategory =
-                item.category ||
-                "";
+        const category =
+            categoryFilter?.value ||
+            "";
 
 
-            const matchesSearch =
-                !searchTerm ||
-                name.includes(searchTerm) ||
-                description.includes(searchTerm);
+        const filteredItems =
+            menuItems.filter(
+                function (item) {
+
+                    const name =
+                        (
+                            item.itemName ||
+                            item.ItemName ||
+                            ""
+                        )
+                        .toLowerCase();
 
 
-            const matchesCategory =
-                !category ||
-                itemCategory === category;
+                    const description =
+                        (
+                            item.description ||
+                            item.Description ||
+                            ""
+                        )
+                        .toLowerCase();
 
 
-            return (
-                matchesSearch &&
-                matchesCategory
+                    const itemCategory =
+                        item.category ||
+                        item.Category ||
+                        "";
+
+
+                    const matchesSearch =
+                        !searchText ||
+                        name.includes(
+                            searchText
+                        ) ||
+                        description.includes(
+                            searchText
+                        );
+
+
+                    const matchesCategory =
+                        !category ||
+                        itemCategory ===
+                            category;
+
+
+                    return (
+                        matchesSearch &&
+                        matchesCategory
+                    );
+
+                }
             );
 
-        });
+
+        renderFilteredMenu(
+            filteredItems
+        );
+
+    }
 
 
-    renderMenu(filteredItems);
+    searchInput.oninput =
+        filterItems;
+
+
+    if (categoryFilter) {
+
+        categoryFilter.onchange =
+            filterItems;
+
+    }
 
 }
 
 
-/* =========================================================
-   RENDER MENU
-========================================================= */
+// ==========================================
+// RENDER FILTERED MENU
+// ==========================================
 
-function renderMenu(items) {
+function renderFilteredMenu(
+    items
+) {
 
     const menuGrid =
         document.getElementById(
             "menuGrid"
         );
 
+
     const emptyState =
         document.getElementById(
             "emptyState"
         );
+
 
     const menuItemCount =
         document.getElementById(
@@ -714,7 +1460,9 @@ function renderMenu(items) {
 
 
     if (!menuGrid) {
+
         return;
+
     }
 
 
@@ -733,7 +1481,10 @@ function renderMenu(items) {
     }
 
 
-    if (!items.length) {
+    if (
+        !items ||
+        items.length === 0
+    ) {
 
         if (emptyState) {
 
@@ -757,367 +1508,105 @@ function renderMenu(items) {
     }
 
 
-    items.forEach(item => {
+    items.forEach(
+        function (item) {
 
-        menuGrid.appendChild(
-            createMenuCard(item)
-        );
-
-    });
-
-}
-
-
-/* =========================================================
-   CREATE MENU CARD
-========================================================= */
-
-function createMenuCard(item) {
-
-    const card =
-        document.createElement("div");
-
-    card.className =
-        "menu-card";
-
-
-    const imageWrapper =
-        document.createElement("div");
-
-    imageWrapper.className =
-        "menu-image-wrapper";
-
-
-    if (item.imageURL) {
-
-        const image =
-            document.createElement("img");
-
-        image.className =
-            "menu-image";
-
-        image.src =
-            item.imageURL;
-
-        image.alt =
-            item.itemName ||
-            "Menu item";
-
-
-        image.onerror = () => {
-
-            image.remove();
-
-            const placeholder =
-                document.createElement("div");
-
-            placeholder.className =
-                "menu-image-placeholder";
-
-            placeholder.textContent =
-                "🍽️";
-
-            imageWrapper.appendChild(
-                placeholder
+            menuGrid.appendChild(
+                createMenuCard(
+                    item
+                )
             );
 
-        };
-
-
-        imageWrapper.appendChild(image);
-
-    } else {
-
-        const placeholder =
-            document.createElement("div");
-
-        placeholder.className =
-            "menu-image-placeholder";
-
-        placeholder.textContent =
-            "🍽️";
-
-        imageWrapper.appendChild(
-            placeholder
-        );
-
-    }
-
-
-    const content =
-        document.createElement("div");
-
-    content.className =
-        "menu-card-content";
-
-
-    const category =
-        document.createElement("div");
-
-    category.className =
-        "menu-category";
-
-    category.textContent =
-        item.category ||
-        "Menu";
-
-
-    const name =
-        document.createElement("div");
-
-    name.className =
-        "menu-name";
-
-    name.textContent =
-        item.itemName ||
-        "Unnamed Item";
-
-
-    const description =
-        document.createElement("div");
-
-    description.className =
-        "menu-description";
-
-    description.textContent =
-        item.description ||
-        "No description available.";
-
-
-    const footer =
-        document.createElement("div");
-
-    footer.className =
-        "menu-card-footer";
-
-
-    const price =
-        document.createElement("div");
-
-    price.className =
-        "menu-price";
-
-    price.textContent =
-        formatPrice(item.price);
-
-
-    const badge =
-        document.createElement("span");
-
-    const available =
-        isItemAvailable(
-            item.available
-        );
-
-
-    badge.className =
-        `availability-badge ${
-            available
-                ? "available"
-                : "unavailable"
-        }`;
-
-
-    badge.textContent =
-        available
-            ? "Available"
-            : "Unavailable";
-
-
-    footer.appendChild(price);
-
-    footer.appendChild(badge);
-
-
-    content.appendChild(category);
-
-    content.appendChild(name);
-
-    content.appendChild(description);
-
-    content.appendChild(footer);
-
-
-    card.appendChild(imageWrapper);
-
-    card.appendChild(content);
-
-
-    return card;
-
-}
-
-
-/* =========================================================
-   AVAILABILITY
-========================================================= */
-
-function isItemAvailable(value) {
-
-    if (value === false) {
-        return false;
-    }
-
-    if (
-        value === "false" ||
-        value === "False" ||
-        value === "0"
-    ) {
-        return false;
-    }
-
-    return true;
-
-}
-
-
-/* =========================================================
-   PRICE
-========================================================= */
-
-function formatPrice(price) {
-
-    const numericPrice =
-        Number(price || 0);
-
-
-    return new Intl.NumberFormat(
-        "en-AE",
-        {
-            style: "currency",
-            currency: "AED",
-            minimumFractionDigits: 2
         }
-    ).format(numericPrice);
+    );
 
 }
 
 
-/* =========================================================
-   SUMMARY
-========================================================= */
-
-function updateSummary() {
-
-    const total =
-        menuItems.length;
-
-
-    const available =
-        menuItems.filter(
-            item =>
-                isItemAvailable(
-                    item.available
-                )
-        ).length;
-
-
-    const unavailable =
-        total - available;
-
-
-    const totalElement =
-        document.getElementById(
-            "totalItems"
-        );
-
-    const availableElement =
-        document.getElementById(
-            "availableItems"
-        );
-
-    const unavailableElement =
-        document.getElementById(
-            "unavailableItems"
-        );
-
-
-    if (totalElement) {
-
-        totalElement.textContent =
-            total;
-
-    }
-
-
-    if (availableElement) {
-
-        availableElement.textContent =
-            available;
-
-    }
-
-
-    if (unavailableElement) {
-
-        unavailableElement.textContent =
-            unavailable;
-
-    }
-
-}
-
-
-/* =========================================================
-   LOADING
-========================================================= */
+// ==========================================
+// SHOW LOADING
+// ==========================================
 
 function showLoading() {
 
-    document
-        .getElementById("loadingState")
-        ?.classList.remove("hidden");
+    const loadingState =
+        document.getElementById(
+            "loadingState"
+        );
 
 
-    document
-        .getElementById("emptyState")
-        ?.classList.add("hidden");
+    const emptyState =
+        document.getElementById(
+            "emptyState"
+        );
 
 
-    document
-        .getElementById("menuGrid")
-        .innerHTML = "";
+    const menuGrid =
+        document.getElementById(
+            "menuGrid"
+        );
+
+
+    if (loadingState) {
+
+        loadingState.classList.remove(
+            "hidden"
+        );
+
+    }
+
+
+    if (emptyState) {
+
+        emptyState.classList.add(
+            "hidden"
+        );
+
+    }
+
+
+    if (menuGrid) {
+
+        menuGrid.innerHTML = "";
+
+    }
 
 }
 
 
-/* =========================================================
-   HIDE LOADING
-========================================================= */
+// ==========================================
+// HIDE LOADING
+// ==========================================
 
 function hideLoading() {
 
-    document
-        .getElementById("loadingState")
-        ?.classList.add("hidden");
+    const loadingState =
+        document.getElementById(
+            "loadingState"
+        );
+
+
+    if (loadingState) {
+
+        loadingState.classList.add(
+            "hidden"
+        );
+
+    }
 
 }
 
 
-/* =========================================================
-   CLEAR MENU
-========================================================= */
+// ==========================================
+// ERROR MESSAGE
+// ==========================================
 
-function clearMenu() {
-
-    menuItems = [];
-
-    updateSummary();
-
-    renderMenu([]);
+function showError(
+    message
+) {
 
     hideLoading();
 
-}
-
-
-/* =========================================================
-   ERROR
-========================================================= */
-
-function showError(message) {
-
-    hideLoading();
 
     const messageBox =
         document.getElementById(
@@ -1126,12 +1615,20 @@ function showError(message) {
 
 
     if (!messageBox) {
+
+        console.error(
+            "MENU PAGE ERROR:",
+            message
+        );
+
         return;
+
     }
 
 
     messageBox.textContent =
         message;
+
 
     messageBox.className =
         "message-box error";
@@ -1144,67 +1641,155 @@ function showError(message) {
 }
 
 
-/* =========================================================
-   INVALID SESSION
-========================================================= */
+// ==========================================
+// BRANCH REQUIRED MESSAGE
+// ==========================================
 
-function handleInvalidSession() {
+function showBranchRequiredMessage() {
 
-    localStorage.removeItem(
-        "sessionToken"
-    );
-
-    localStorage.removeItem(
-        "sessionExpiresAt"
-    );
-
-    alert(
-        "Your session has expired. Please login again."
-    );
-
-    window.location.href =
-        "login.html";
-
-}
+    hideLoading();
 
 
-/* =========================================================
-   LOGOUT
-========================================================= */
-
-function logout() {
-
-    localStorage.removeItem(
-        "sessionToken"
-    );
-
-    localStorage.removeItem(
-        "sessionExpiresAt"
-    );
-
-    window.location.href =
-        "login.html";
-
-}
-
-
-/* =========================================================
-   MOBILE SIDEBAR
-========================================================= */
-
-function toggleMobileMenu() {
-
-    const sidebar =
-        document.querySelector(
-            ".sidebar"
+    const messageBox =
+        document.getElementById(
+            "messageBox"
         );
 
-    if (!sidebar) {
+
+    if (!messageBox) {
+
         return;
+
     }
 
-    sidebar.classList.toggle(
-        "open"
+
+    messageBox.textContent =
+        "Please select a branch to view its menu.";
+
+
+    messageBox.className =
+        "message-box";
+
+
+    messageBox.classList.remove(
+        "hidden"
     );
+
+}
+
+
+// ==========================================
+// EVENT LISTENERS
+// ==========================================
+
+function setupEventListeners() {
+
+    // ==================================
+    // LOGOUT
+    // ==================================
+
+    const logoutButton =
+        document.getElementById(
+            "logoutBtn"
+        );
+
+
+    if (logoutButton) {
+
+        logoutButton.addEventListener(
+            "click",
+            function () {
+
+                console.log(
+                    "MENU PAGE: Logging out."
+                );
+
+
+                if (
+                    typeof clearSession ===
+                    "function"
+                ) {
+
+                    clearSession();
+
+                }
+
+                else {
+
+                    localStorage.removeItem(
+                        "sessionToken"
+                    );
+
+                }
+
+
+                window.location.href =
+                    "login.html";
+
+            }
+        );
+
+    }
+
+
+    // ==================================
+    // MOBILE MENU
+    // ==================================
+
+    const mobileMenuButton =
+        document.getElementById(
+            "mobileMenuBtn"
+        );
+
+
+    if (mobileMenuButton) {
+
+        mobileMenuButton.addEventListener(
+            "click",
+            function () {
+
+                const sidebar =
+                    document.querySelector(
+                        ".sidebar"
+                    );
+
+
+                if (sidebar) {
+
+                    sidebar.classList.toggle(
+                        "open"
+                    );
+
+                }
+
+            }
+        );
+
+    }
+
+}
+
+
+// ==========================================
+// HELPER — SET TEXT
+// ==========================================
+
+function setText(
+    elementId,
+    value
+) {
+
+    const element =
+        document.getElementById(
+            elementId
+        );
+
+
+    if (element) {
+
+        element.textContent =
+            value ?? "-";
+
+    }
 
 }
