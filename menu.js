@@ -5,11 +5,19 @@
 
 
 // ==========================================
-// n8n OWNER MENU WEBHOOK
+// N8N OWNER MENU WEBHOOK
 // ==========================================
 
 const N8N_MENU_WEBHOOK =
     "https://maatapita.app.n8n.cloud/webhook/owner-menu";
+
+
+// ==========================================
+// N8N OWNER BRANCHES WEBHOOK
+// ==========================================
+
+const N8N_BRANCHES_WEBHOOK =
+    "https://maatapita.app.n8n.cloud/webhook/owner-branches";
 
 
 // ==========================================
@@ -51,6 +59,7 @@ document.addEventListener(
                 );
 
                 return;
+
             }
 
 
@@ -85,10 +94,10 @@ document.addEventListener(
 
 
             // ==================================
-            // LOAD MENU
+            // LOAD BRANCHES FIRST
             // ==================================
 
-            await loadMenu(
+            await loadBranchesForMenu(
                 session
             );
 
@@ -101,12 +110,14 @@ document.addEventListener(
 
         }
 
+
         catch (error) {
 
             console.error(
                 "MENU PAGE: Initialization error:",
                 error
             );
+
 
             /*
              * IMPORTANT:
@@ -221,11 +232,488 @@ function loadUserInformation(
 
 
 // ==========================================
+// LOAD BRANCHES FOR MENU
+// ==========================================
+
+async function loadBranchesForMenu(
+    session
+) {
+
+    console.log("==================================");
+    console.log(
+        "MENU PAGE: Loading branches..."
+    );
+    console.log("==================================");
+
+
+    // ==================================
+    // GET SESSION TOKEN
+    // ==================================
+
+    const sessionToken =
+        getSessionToken();
+
+
+    if (!sessionToken) {
+
+        console.error(
+            "MENU PAGE: No session token found."
+        );
+
+
+        showError(
+            "Your session could not be found. Please login again."
+        );
+
+
+        return;
+
+    }
+
+
+    console.log(
+        "MENU PAGE: Session token found."
+    );
+
+
+    // ==================================
+    // GET BRANCH SELECT
+    // ==================================
+
+    const branchSelect =
+        document.getElementById(
+            "branchSelect"
+        );
+
+
+    if (!branchSelect) {
+
+        console.error(
+            "MENU PAGE: branchSelect element not found."
+        );
+
+
+        showError(
+            "Branch selector could not be found."
+        );
+
+
+        return;
+
+    }
+
+
+    // ==================================
+    // SHOW LOADING
+    // ==================================
+
+    showLoading();
+
+
+    try {
+
+        // ==================================
+        // CALL OWNER BRANCHES N8N
+        // ==================================
+
+        console.log(
+            "MENU PAGE: Calling owner-branches..."
+        );
+
+
+        const response =
+            await fetch(
+                N8N_BRANCHES_WEBHOOK,
+                {
+
+                    method: "POST",
+
+                    headers: {
+
+                        "Content-Type":
+                            "application/json"
+
+                    },
+
+                    body:
+                        JSON.stringify({
+
+                            sessionToken:
+                                sessionToken
+
+                        })
+
+                }
+            );
+
+
+        // ==================================
+        // HTTP STATUS
+        // ==================================
+
+        console.log(
+            "MENU BRANCH API HTTP STATUS:",
+            response.status
+        );
+
+
+        // ==================================
+        // READ RESPONSE
+        // ==================================
+
+        const rawResult =
+            await response.json();
+
+
+        console.log(
+            "MENU BRANCH API RAW RESPONSE:",
+            rawResult
+        );
+
+
+        // ==================================
+        // NORMALIZE RESPONSE
+        // ==================================
+
+        const result =
+            Array.isArray(rawResult)
+                ? rawResult[0]
+                : rawResult;
+
+
+        console.log(
+            "MENU BRANCH API NORMALIZED RESPONSE:",
+            result
+        );
+
+
+        // ==================================
+        // API ERROR
+        // ==================================
+
+        if (
+            !response.ok ||
+            !result ||
+            result.success !== true
+        ) {
+
+            console.error(
+                "MENU BRANCH API ERROR:",
+                result
+            );
+
+
+            // ==================================
+            // INVALID SESSION
+            // ==================================
+
+            if (
+                result &&
+                result.success === false &&
+                (
+                    result.code ===
+                        "INVALID_SESSION"
+                    ||
+                    result.code ===
+                        "RESTAURANT_SESSION_INVALID"
+                )
+            ) {
+
+                handleInvalidSession();
+
+                return;
+
+            }
+
+
+            showError(
+                result?.message ||
+                "Unable to load branches."
+            );
+
+
+            return;
+
+        }
+
+
+        // ==================================
+        // GET DATA
+        // ==================================
+
+        const data =
+            result.data || {};
+
+
+        const branches =
+            Array.isArray(
+                data.branches
+            )
+                ? data.branches
+                : [];
+
+
+        console.log(
+            "MENU PAGE: Branches received:",
+            branches
+        );
+
+
+        // ==================================
+        // NO BRANCHES
+        // ==================================
+
+        if (
+            branches.length === 0
+        ) {
+
+            console.warn(
+                "MENU PAGE: No branches found."
+            );
+
+
+            branchSelect.innerHTML = "";
+
+
+            const option =
+                document.createElement(
+                    "option"
+                );
+
+
+            option.value = "";
+
+
+            option.textContent =
+                "No branches available";
+
+
+            branchSelect.appendChild(
+                option
+            );
+
+
+            hideLoading();
+
+
+            showBranchRequiredMessage();
+
+
+            return;
+
+        }
+
+
+        // ==================================
+        // CLEAR EXISTING OPTIONS
+        // ==================================
+
+        branchSelect.innerHTML = "";
+
+
+        // ==================================
+        // ADD BRANCHES TO DROPDOWN
+        // ==================================
+
+        branches.forEach(
+            function (branch) {
+
+                const branchId =
+                    branch.branchId ||
+                    branch.BranchId ||
+                    "";
+
+
+                const branchName =
+                    branch.branchName ||
+                    branch.BranchName ||
+                    branch.name ||
+                    branch.Name ||
+                    "Unnamed Branch";
+
+
+                if (!branchId) {
+
+                    console.warn(
+                        "MENU PAGE: Branch without BranchId:",
+                        branch
+                    );
+
+
+                    return;
+
+                }
+
+
+                const option =
+                    document.createElement(
+                        "option"
+                    );
+
+
+                option.value =
+                    branchId;
+
+
+                option.textContent =
+                    branchName;
+
+
+                branchSelect.appendChild(
+                    option
+                );
+
+            }
+        );
+
+
+        // ==================================
+        // VERIFY VALID OPTIONS
+        // ==================================
+
+        if (
+            branchSelect.options.length === 0
+        ) {
+
+            console.error(
+                "MENU PAGE: No valid branch IDs received."
+            );
+
+
+            hideLoading();
+
+
+            showError(
+                "No valid branches were returned."
+            );
+
+
+            return;
+
+        }
+
+
+        // ==================================
+        // RESTORE PREVIOUS BRANCH
+        // ==================================
+
+        const savedBranchId =
+            localStorage.getItem(
+                "menuBranchId"
+            );
+
+
+        let selectedBranchId = "";
+
+
+        if (
+            savedBranchId &&
+            Array.from(
+                branchSelect.options
+            ).some(
+                function (option) {
+
+                    return (
+                        option.value ===
+                        savedBranchId
+                    );
+
+                }
+            )
+        ) {
+
+            selectedBranchId =
+                savedBranchId;
+
+        }
+
+
+        // ==================================
+        // OTHERWISE SELECT FIRST BRANCH
+        // ==================================
+
+        if (!selectedBranchId) {
+
+            selectedBranchId =
+                branchSelect
+                    .options[0]
+                    .value;
+
+        }
+
+
+        // ==================================
+        // SET SELECTED BRANCH
+        // ==================================
+
+        branchSelect.value =
+            selectedBranchId;
+
+
+        // ==================================
+        // SAVE SELECTED BRANCH
+        // ==================================
+
+        localStorage.setItem(
+            "menuBranchId",
+            selectedBranchId
+        );
+
+
+        console.log(
+            "MENU PAGE: Selected Branch ID:",
+            selectedBranchId
+        );
+
+
+        // ==================================
+        // UPDATE BRANCH NAME
+        // ==================================
+
+        updateSelectedBranchName(
+            branchSelect
+        );
+
+
+        // ==================================
+        // LOAD MENU FOR BRANCH
+        // ==================================
+
+        await loadMenu(
+            session,
+            selectedBranchId
+        );
+
+    }
+
+
+    catch (error) {
+
+        console.error(
+            "MENU PAGE: Branch loading error:",
+            error
+        );
+
+
+        hideLoading();
+
+
+        showError(
+            "Unable to connect to the branch service."
+        );
+
+    }
+
+}
+
+
+// ==========================================
 // LOAD MENU
 // ==========================================
 
 async function loadMenu(
-    session
+    session,
+    selectedBranchId = ""
 ) {
 
     console.log("==================================");
@@ -249,9 +737,11 @@ async function loadMenu(
             "MENU PAGE: No session token found."
         );
 
+
         showError(
             "Your session could not be found. Please login again."
         );
+
 
         return;
 
@@ -285,9 +775,11 @@ async function loadMenu(
             "MENU PAGE: Restaurant ID not found."
         );
 
+
         showError(
             "Restaurant information could not be determined."
         );
+
 
         return;
 
@@ -299,6 +791,7 @@ async function loadMenu(
     // ==================================
 
     const branchId =
+        selectedBranchId ||
         getBranchId(
             session
         );
@@ -310,23 +803,50 @@ async function loadMenu(
     );
 
 
-    /*
-     * If branch is not available yet,
-     * don't redirect.
-     *
-     * Just show a useful message.
-     */
-
     if (!branchId) {
 
-        console.warn(
+        console.error(
             "MENU PAGE: Branch ID not available."
         );
 
 
         showBranchRequiredMessage();
 
+
         return;
+
+    }
+
+
+    // ==================================
+    // SAVE BRANCH ID
+    // ==================================
+
+    localStorage.setItem(
+        "menuBranchId",
+        branchId
+    );
+
+
+    // ==================================
+    // UPDATE BRANCH NAME
+    // ==================================
+
+    const branchSelect =
+        document.getElementById(
+            "branchSelect"
+        );
+
+
+    if (branchSelect) {
+
+        branchSelect.value =
+            branchId;
+
+
+        updateSelectedBranchName(
+            branchSelect
+        );
 
     }
 
@@ -367,10 +887,15 @@ async function loadMenu(
 
 
     // ==================================
-    // CALL n8n
+    // CALL N8N
     // ==================================
 
     try {
+
+        console.log(
+            "MENU PAGE: Calling owner-menu..."
+        );
+
 
         const response =
             await fetch(
@@ -492,26 +1017,7 @@ async function loadMenu(
             );
 
 
-            if (
-                typeof clearSession ===
-                "function"
-            ) {
-
-                clearSession();
-
-            }
-
-            else {
-
-                localStorage.removeItem(
-                    "sessionToken"
-                );
-
-            }
-
-
-            window.location.href =
-                "login.html";
+            handleInvalidSession();
 
 
             return;
@@ -529,13 +1035,16 @@ async function loadMenu(
         );
 
 
+        hideLoading();
+
+
         showError(
             result?.message ||
             "Unable to load menu."
         );
 
-
     }
+
 
     catch (error) {
 
@@ -543,6 +1052,9 @@ async function loadMenu(
             "MENU API CONNECTION ERROR:",
             error
         );
+
+
+        hideLoading();
 
 
         showError(
@@ -599,9 +1111,9 @@ function getBranchId(
     session
 ) {
 
-    /*
-     * First try session-level branch.
-     */
+    // ==================================
+    // SESSION LEVEL
+    // ==================================
 
     let branchId =
         session?.branchId ||
@@ -609,9 +1121,9 @@ function getBranchId(
         "";
 
 
-    /*
-     * Then try restaurant object.
-     */
+    // ==================================
+    // RESTAURANT OBJECT
+    // ==================================
 
     if (!branchId) {
 
@@ -628,13 +1140,9 @@ function getBranchId(
     }
 
 
-    /*
-     * Then try URL parameter.
-     *
-     * Example:
-     *
-     * menu.html?branchId=BR001
-     */
+    // ==================================
+    // URL PARAMETER
+    // ==================================
 
     if (!branchId) {
 
@@ -653,9 +1161,9 @@ function getBranchId(
     }
 
 
-    /*
-     * Then try localStorage.
-     */
+    // ==================================
+    // GENERIC LOCAL STORAGE
+    // ==================================
 
     if (!branchId) {
 
@@ -671,7 +1179,104 @@ function getBranchId(
     }
 
 
+    // ==================================
+    // MENU-SPECIFIC LOCAL STORAGE
+    // ==================================
+
+    if (!branchId) {
+
+        branchId =
+            localStorage.getItem(
+                "menuBranchId"
+            ) ||
+            "";
+
+    }
+
+
     return branchId;
+
+}
+
+
+// ==========================================
+// UPDATE SELECTED BRANCH NAME
+// ==========================================
+
+function updateSelectedBranchName(
+    branchSelect
+) {
+
+    if (!branchSelect) {
+
+        return;
+
+    }
+
+
+    const selectedOption =
+        branchSelect.options[
+            branchSelect.selectedIndex
+        ];
+
+
+    const branchNameElement =
+        document.getElementById(
+            "branchName"
+        );
+
+
+    if (!branchNameElement) {
+
+        return;
+
+    }
+
+
+    if (
+        selectedOption &&
+        selectedOption.value
+    ) {
+
+        branchNameElement.textContent =
+            selectedOption.textContent;
+
+    }
+
+}
+
+
+// ==========================================
+// HANDLE INVALID SESSION
+// ==========================================
+
+function handleInvalidSession() {
+
+    console.warn(
+        "MENU PAGE: Clearing invalid session."
+    );
+
+
+    if (
+        typeof clearSession ===
+        "function"
+    ) {
+
+        clearSession();
+
+    }
+
+    else {
+
+        localStorage.removeItem(
+            "sessionToken"
+        );
+
+    }
+
+
+    window.location.href =
+        "login.html";
 
 }
 
@@ -713,6 +1318,7 @@ function renderMenu(
         console.error(
             "MENU PAGE: menuGrid element not found."
         );
+
 
         return;
 
@@ -1466,7 +2072,8 @@ function renderFilteredMenu(
     }
 
 
-    menuGrid.innerHTML = "";
+    menuGrid.innerHTML =
+        "";
 
 
     if (menuItemCount) {
@@ -1493,6 +2100,7 @@ function renderFilteredMenu(
             );
 
         }
+
 
         return;
 
@@ -1567,7 +2175,8 @@ function showLoading() {
 
     if (menuGrid) {
 
-        menuGrid.innerHTML = "";
+        menuGrid.innerHTML =
+            "";
 
     }
 
@@ -1620,6 +2229,7 @@ function showError(
             "MENU PAGE ERROR:",
             message
         );
+
 
         return;
 
@@ -1761,6 +2371,112 @@ function setupEventListeners() {
                     );
 
                 }
+
+            }
+        );
+
+    }
+
+
+    // ==================================
+    // BRANCH SELECTOR
+    // ==================================
+
+    const branchSelect =
+        document.getElementById(
+            "branchSelect"
+        );
+
+
+    if (branchSelect) {
+
+        branchSelect.addEventListener(
+            "change",
+            async function () {
+
+                const selectedBranchId =
+                    this.value;
+
+
+                console.log(
+                    "=================================="
+                );
+
+
+                console.log(
+                    "MENU PAGE: Branch changed:",
+                    selectedBranchId
+                );
+
+
+                console.log(
+                    "=================================="
+                );
+
+
+                if (!selectedBranchId) {
+
+                    showBranchRequiredMessage();
+
+                    return;
+
+                }
+
+
+                // ==================================
+                // SAVE BRANCH
+                // ==================================
+
+                localStorage.setItem(
+                    "menuBranchId",
+                    selectedBranchId
+                );
+
+
+                // ==================================
+                // UPDATE BRANCH NAME
+                // ==================================
+
+                updateSelectedBranchName(
+                    branchSelect
+                );
+
+
+                // ==================================
+                // GET SESSION
+                // ==================================
+
+                let session = null;
+
+
+                try {
+
+                    session =
+                        JSON.parse(
+                            localStorage.getItem(
+                                "userSession"
+                            ) || "{}"
+                        );
+
+                }
+
+                catch (error) {
+
+                    console.warn(
+                        "MENU PAGE: Unable to read userSession."
+                    );
+
+                }
+
+
+                // ==================================
+                // LOAD SELECTED BRANCH MENU
+                // ==================================
+
+                await loadMenu(
+                    session,
+                    selectedBranchId
+                );
 
             }
         );
