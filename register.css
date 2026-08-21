@@ -817,6 +817,16 @@ footer {
 
 }
 
+.terms label a {
+    color: #2563eb;
+    text-decoration: underline;
+    font-weight: 600;
+}
+
+.terms label a:hover {
+    opacity: 0.8;
+}
+
 
 
 }
