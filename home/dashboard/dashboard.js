@@ -9,7 +9,7 @@
 // ==========================================
 
 const N8N_DASHBOARD_WEBHOOK =
-    "https://merakya.app.n8n.cloud/webhook/owner-dashboard";
+    `${N8N_BASE_URL}/owner-dashboard`;
 
 
 // ==========================================

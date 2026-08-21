@@ -9,7 +9,7 @@
 // ==========================================
 
 const N8N_RESTAURANT_WEBHOOK =
-    "https://merakya.app.n8n.cloud/webhook/owner-restaurants";
+    `${N8N_BASE_URL}/owner-restaurants`;
 
 
 // ==========================================

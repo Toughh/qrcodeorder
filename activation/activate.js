@@ -4,7 +4,7 @@
 // ==========================================
 
 const ACTIVATION_WEBHOOK =
-    "https://merakya.app.n8n.cloud/webhook/owner-activate";
+    `${N8N_BASE_URL}/owner-activate`;
 
 
 // ==========================================

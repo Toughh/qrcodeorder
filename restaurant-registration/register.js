@@ -5,11 +5,205 @@
 
 
 // ==========================================
+// FORM DATA PERSISTENCE
+// ==========================================
+
+const REGISTRATION_STORAGE_KEY =
+"qrOrderRegistrationFormData";
+
+
+const registrationForm =
+document.getElementById("registrationForm");
+
+
+const registrationFields = [
+    "restaurantName",
+    "ownerName",
+    "email",
+    "mobile",
+    "country",
+    "city",
+    "businessType",
+    "branches",
+    "plan",
+    "website",
+    "notes",
+    "terms"
+];
+
+
+// ==========================================
+// SAVE FORM DATA
+// ==========================================
+
+function saveRegistrationFormData() {
+
+    const savedData = {};
+
+    registrationFields.forEach(fieldId => {
+
+        const field =
+        document.getElementById(fieldId);
+
+        if (!field) {
+            return;
+        }
+
+
+        if (
+            field.type === "checkbox" ||
+            field.type === "radio"
+        ) {
+
+            savedData[fieldId] =
+            field.checked;
+
+        }
+
+        else {
+
+            savedData[fieldId] =
+            field.value;
+
+        }
+
+    });
+
+
+    localStorage.setItem(
+        REGISTRATION_STORAGE_KEY,
+        JSON.stringify(savedData)
+    );
+
+}
+
+
+// ==========================================
+// RESTORE FORM DATA
+// ==========================================
+
+function restoreRegistrationFormData() {
+
+    const storedData =
+    localStorage.getItem(
+        REGISTRATION_STORAGE_KEY
+    );
+
+
+    if (!storedData) {
+        return;
+    }
+
+
+    try {
+
+        const savedData =
+        JSON.parse(storedData);
+
+
+        registrationFields.forEach(fieldId => {
+
+            const field =
+            document.getElementById(fieldId);
+
+            if (
+                !field ||
+                savedData[fieldId] === undefined
+            ) {
+                return;
+            }
+
+
+            if (
+                field.type === "checkbox" ||
+                field.type === "radio"
+            ) {
+
+                field.checked =
+                savedData[fieldId];
+
+            }
+
+            else {
+
+                field.value =
+                savedData[fieldId];
+
+            }
+
+        });
+
+    }
+
+    catch(error) {
+
+        console.error(
+            "Unable to restore registration data:",
+            error
+        );
+
+        localStorage.removeItem(
+            REGISTRATION_STORAGE_KEY
+        );
+
+    }
+
+}
+
+
+// ==========================================
+// CLEAR SAVED FORM DATA
+// ONLY AFTER SUCCESSFUL REGISTRATION
+// ==========================================
+
+function clearRegistrationFormData() {
+
+    localStorage.removeItem(
+        REGISTRATION_STORAGE_KEY
+    );
+
+}
+
+
+// ==========================================
+// RESTORE DATA WHEN PAGE LOADS
+// ==========================================
+
+restoreRegistrationFormData();
+
+
+// ==========================================
+// SAVE DATA WHILE USER TYPES
+// ==========================================
+
+registrationForm.addEventListener(
+    "input",
+    saveRegistrationFormData
+);
+
+
+registrationForm.addEventListener(
+    "change",
+    saveRegistrationFormData
+);
+
+
+// ==========================================
+// SAVE DATA BEFORE LEAVING PAGE
+// ==========================================
+
+window.addEventListener(
+    "beforeunload",
+    saveRegistrationFormData
+);
+
+
+// ==========================================
 // n8n REGISTRATION WEBHOOK
 // ==========================================
 
 const N8N_REGISTRATION_WEBHOOK =
-"https://merakya.app.n8n.cloud/webhook/restaurant-registration";
+    `${N8N_BASE_URL}/restaurant-registration`;
 
 
 // ==========================================
@@ -237,6 +431,13 @@ document
                 </div>
 
             `;
+
+
+            // ==================================
+            // CLEAR SAVED DATA ONLY AFTER SUCCESS
+            // ==================================
+
+            clearRegistrationFormData();
 
 
             // Reset form only after SUCCESS

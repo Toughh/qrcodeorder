@@ -9,7 +9,7 @@
 // ==========================================
 
 const N8N_MENU_WEBHOOK =
-    "https://merakya.app.n8n.cloud/webhook/owner-menu";
+    `${N8N_BASE_URL}/owner-menu`;
 
 
 // ==========================================
@@ -17,7 +17,7 @@ const N8N_MENU_WEBHOOK =
 // ==========================================
 
 const N8N_BRANCHES_WEBHOOK =
-    "https://merakya.app.n8n.cloud/webhook/owner-branches";
+    `${N8N_BASE_URL}/owner-branches`;
 
 
 // ==========================================

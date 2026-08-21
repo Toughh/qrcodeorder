@@ -137,7 +137,7 @@ async function updateOrder(orderId, status) {
 
     try {
 
-        await fetch("https://merakya.app.n8n.cloud/webhook/update-order?token=" +
+        await fetch(`${N8N_BASE_URL}/update-order?token=` +
             window.adminToken,
             {
 
