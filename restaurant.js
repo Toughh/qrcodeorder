@@ -9,7 +9,7 @@
 // ==========================================
 
 const N8N_RESTAURANT_WEBHOOK =
-    "https://maatapita.app.n8n.cloud/webhook/owner-restaurants";
+    "https://merakya.app.n8n.cloud/webhook/owner-restaurants";
 
 
 // ==========================================

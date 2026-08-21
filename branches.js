@@ -9,7 +9,7 @@
 // ==========================================
 
 const N8N_BRANCHES_WEBHOOK =
-    "https://maatapita.app.n8n.cloud/webhook/owner-branches";
+    "https://merakya.app.n8n.cloud/webhook/owner-branches";
 
 
 // ==========================================

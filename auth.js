@@ -8,7 +8,7 @@
 // ==========================================
 
 const N8N_VALIDATE_SESSION_WEBHOOK =
-    "https://maatapita.app.n8n.cloud/webhook/validate-session";
+    "https://merakya.app.n8n.cloud/webhook/validate-session";
 
 
 // ==========================================

@@ -4,7 +4,7 @@
 // ==========================================
 
 const ACTIVATION_WEBHOOK =
-    "https://maatapita.app.n8n.cloud/webhook/owner-activate";
+    "https://merakya.app.n8n.cloud/webhook/owner-activate";
 
 
 // ==========================================
