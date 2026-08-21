@@ -45,8 +45,8 @@ QR Order
 
 Already registered?
 
-<a href="https://qrcodeorder006.vercel.app/login.html">
-Login
+<a href="#" data-web-link="/login/login.html">
+    Login
 </a>
 
 </div>
@@ -688,6 +688,11 @@ We never share your business details.
 
 
 <script src="../config/config.js"></script>
+<script>
+    document.querySelectorAll('[data-web-link]').forEach(link => {
+        link.href = `${WEB_URL}${link.dataset.webLink}`;
+    });
+</script>
 <script src="register.js"></script>
 
 
