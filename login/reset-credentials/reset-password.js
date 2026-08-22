@@ -56,7 +56,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // ==========================================
 
     const RESET_PASSWORD_WEBHOOK =
-        `${N8N_WEBHOOK_BASE_URL}/reset-password`;
+        `${N8N_BASE_URL}/reset-password`;
 
 
     // ==========================================
