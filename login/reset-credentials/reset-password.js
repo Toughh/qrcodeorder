@@ -569,7 +569,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         () => {
 
                             window.location.href =
-                                "../login/login.html";
+                                "../login.html";
 
                         },
                         2500
