@@ -227,11 +227,15 @@
         backLink.textContent = "← Back to Registration";
     } 
     else if (from === "reset-password") {
-        backLink.href = "../reset-password.html";
+        backLink.href = "../../login/reset-credentials/reset-password.html";
         backLink.textContent = "← Back to Reset Password";
-    } 
+    }
+    else if (from === "forgot-password") {
+        backLink.href = "../../login/reset-credentials/forgot-password.html";
+        backLink.textContent = "← Back to Forgot Password";
+    }
     else if (from === "login") {
-        backLink.href = "../login.html";
+        backLink.href = "../../login/login.html";
         backLink.textContent = "← Back to Login";
     } 
     else {
