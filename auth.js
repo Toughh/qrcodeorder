@@ -501,24 +501,48 @@ async function requireAuthentication() {
     );
 
 
+    // ==================================
+    // VALIDATE CURRENT SESSION
+    // ==================================
+
     const result =
         await validateSession();
 
 
+    console.log(
+        "AUTH: requireAuthentication result:",
+        result
+    );
+
+
     // ==================================
-    // INVALID
+    // INVALID SESSION
     // ==================================
 
     if (!result.valid) {
 
         console.warn(
             "AUTH: Authentication failed:",
-            result.code
+            result.code,
+            result.message
         );
 
 
+        // ==================================
+        // CLEAR INVALID SESSION
+        // ==================================
+
         clearSession();
 
+
+        console.warn(
+            "AUTH: Redirecting to login..."
+        );
+
+
+        // ==================================
+        // ROOT-RELATIVE LOGIN URL
+        // ==================================
 
         window.location.href =
             "/login/login.html";
@@ -530,11 +554,17 @@ async function requireAuthentication() {
 
 
     // ==================================
-    // VALID
+    // VALID SESSION
     // ==================================
 
     console.log(
         "AUTH: Authentication successful."
+    );
+
+
+    console.log(
+        "AUTH: Validated session data:",
+        result.data
     );
 
 
