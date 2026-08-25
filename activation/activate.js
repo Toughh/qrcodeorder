@@ -380,7 +380,7 @@ activationForm.addEventListener(
 
             <br><br>
 
-            <a href="login.html">
+            <a href="../login/login.html">
 
                 🔐 Go to Login
 

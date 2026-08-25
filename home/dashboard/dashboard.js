@@ -115,28 +115,6 @@ document.addEventListener(
             "=================================="
         );
 
-
-        // ==========================================
-        // IMPORTANT
-        //
-        // The Owner Dashboard API is now the
-        // authoritative source for dashboard data.
-        //
-        // Structure:
-        //
-        // dashboardData
-        //   ├── sessionId
-        //   ├── userId
-        //   ├── clientId
-        //   ├── restaurantId
-        //   ├── role
-        //   ├── client
-        //   ├── restaurant
-        //   ├── plan
-        //   └── metrics
-        // ==========================================
-
-
         // ==================================
         // GET CLIENT
         // ==================================

@@ -2334,7 +2334,7 @@ function setupEventListeners() {
 
 
                 window.location.href =
-                    "login.html";
+                    "../login/login.html";
 
             }
         );

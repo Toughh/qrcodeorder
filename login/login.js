@@ -432,7 +432,7 @@ loginForm.addEventListener(
                     function () {
 
                         window.location.href =
-                            "dashboard.html";
+                            "../home/dashboard/dashboard.html";
 
                     },
                     800
