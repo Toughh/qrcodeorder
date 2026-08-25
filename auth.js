@@ -521,7 +521,7 @@ async function requireAuthentication() {
 
 
         window.location.href =
-            "login.html";
+            "../../login/login.html";
 
 
         return null;
