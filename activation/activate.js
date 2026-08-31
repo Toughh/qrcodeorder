@@ -235,31 +235,6 @@ activationForm.addEventListener(
 
 
         // ==================================
-        // TERMS
-        // ==================================
-
-        const terms =
-            document.getElementById("terms");
-
-        if (!terms.checked) {
-
-            messageBox.innerHTML = `
-
-                <div class="error-message">
-
-                    ❌ Please accept the
-                    Terms & Conditions.
-
-                </div>
-
-            `;
-
-            return;
-
-        }
-
-
-        // ==================================
         // DISABLE BUTTON
         // ==================================
 

@@ -38,6 +38,16 @@ const togglePassword =
 const messageBox =
     document.getElementById("message");
 
+const resendActivationSection =
+    document.getElementById("activationResendSection");
+
+const resendActivationButton =
+    document.getElementById("resendActivationButton");
+
+const N8N_RESEND_ACTIVATION_WEBHOOK =
+    `${N8N_BASE_URL}/resend-activation`;
+
+
 
 // ==========================================
 // SAFETY CHECK
@@ -158,6 +168,148 @@ function clearMessage() {
 
 }
 
+// ==========================================
+// RESEND ACTIVATION EMAIL
+// ==========================================
+
+if (resendActivationButton) {
+    resendActivationButton.addEventListener(
+        "click",
+        async function () {
+
+            clearMessage();
+
+            const email = emailInput.value.trim().toLowerCase();
+
+            // ==================================
+            // EMAIL VALIDATION
+            // ==================================
+
+            if (!email) {
+
+                showMessage("error",
+                    `❌ <strong>
+                Please enter your email address first.
+                </strong>
+                <br><br>
+                Enter the email you used when registering
+                your restaurant.`
+                );
+                emailInput.focus();
+                return;
+            }
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                showMessage(
+                    "error", `
+                ❌ <strong>
+                Please enter a valid email address.
+                </strong>`
+                );
+                emailInput.focus();
+                return;
+            }
+
+            // ==================================
+            // DISABLE BUTTON
+            // ==================================
+            resendActivationButton.disabled = true;
+            resendActivationButton.textContent = "Sending...";
+            try {
+                console.log(
+                    "Resend activation request:",
+                    {
+                        email
+                    }
+                );
+                const response =
+                    await fetch(
+                        N8N_RESEND_ACTIVATION_WEBHOOK,
+                        {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body:
+                                JSON.stringify({
+                                    email: email
+                                })
+                        }
+                    );
+                console.log(
+                    "Resend activation HTTP status:", response.status
+                );
+
+                // ==================================
+                // READ RESPONSE
+                // ==================================
+
+                const rawResult = await response.json();
+                console.log("Raw resend activation response:", rawResult);
+
+                const result =
+                    Array.isArray(rawResult)
+                        ? rawResult[0]
+                        : rawResult;
+                console.log("Normalized resend activation response:", result);
+
+                // ==================================
+                // SUCCESS
+                // ==================================
+
+                if (
+                    response.ok &&
+                    result &&
+                    result.success === true
+                ) {
+                    showMessage(
+                        "success", `
+                    ✅ <strong>
+                    Activation email requested.
+                    </strong>
+                    <br><br>
+                    If an account exists with this email
+                    address, a new activation email will be sent.`
+                    );
+                    return;
+
+                }
+                // ==================================
+                // ERROR
+                // ==================================
+
+                showMessage(
+                    "error", `
+                ❌ <strong>
+                Unable to resend activation email.
+                </strong>
+                <br><br>
+                ${result?.message ||
+                "Please try again later."}`
+                );
+            }
+
+            catch (error) {
+                console.error("Resend activation error:", error);
+                showMessage(
+                    "error", `
+                ❌ <strong>
+                Unable to connect.
+                </strong>
+                <br><br>
+                Please check your internet connection
+                and try again.`
+                );
+            }
+            finally {
+                resendActivationButton.disabled =
+                    false;
+                resendActivationButton.textContent =
+                    "Resend Activation Email";
+            }
+        }
+    );
+}
 
 // ==========================================
 // FORM SUBMIT
@@ -506,26 +658,27 @@ loginForm.addEventListener(
 
             if (
                 result?.code ===
-                "EMAIL_NOT_VERIFIED"
+                "ACCOUNT_NOT_ACTIVE"
             ) {
-
                 showMessage(
                     "warning",
-                    `
-                    ⚠️ <strong>
-                    Email verification required.
-                    </strong>
-
-                    <br><br>
-
-                    Please check your email
-                    and activate your account.
-                    `
+                    `⚠️ <strong>
+    Account not activated.
+    </strong>
+    <br><br>
+    Please activate your account
+    using the activation email.
+    <br><br>
+    Didn't receive the activation email?`
                 );
-
+                if (resendActivationSection) {
+                    resendActivationSection.classList.remove(
+                        "hidden"
+                    );
+                }
                 return;
-
             }
+
 
 
             // ==================================
@@ -569,9 +722,8 @@ loginForm.addEventListener(
 
                 <br><br>
 
-                ${
-                    result?.message ||
-                    "Unable to sign in. Please try again."
+                ${result?.message ||
+                "Unable to sign in. Please try again."
                 }
                 `
             );

@@ -1076,3 +1076,49 @@ input:focus-visible {
     outline-offset: 2px;
 
 }
+
+/* ==========================================
+RESEND ACTIVATION
+========================================== */
+
+.activation-resend-section {
+display: flex;
+flex-direction: column;
+align-items: center;
+gap: 7px;
+margin-top: 4px;
+text-align: center;
+font-size: 12px;
+color: #9ca3af;
+}
+
+.resend-activation-button {
+border: none;
+background: transparent;
+color: #635bff;
+font-size: 12px;
+font-weight: 700;
+cursor: pointer;
+padding: 4px 6px;
+transition:
+    color 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.resend-activation-button:hover {
+color: #4f46e5;
+text-decoration: underline;
+}
+
+.resend-activation-button:disabled {
+opacity: 0.55;
+cursor: not-allowed;
+text-decoration: none;
+}
+
+.activation-resend-section.hidden {
+display: none;
+}
+
+
+
