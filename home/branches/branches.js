@@ -100,7 +100,7 @@ document.addEventListener(
 
 
                     window.location.href =
-                        "login.html";
+                        "../../login/login.html";
 
                 }
             );
