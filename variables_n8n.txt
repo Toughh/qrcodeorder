@@ -1,0 +1,5 @@
+Key	Value	Usage Syntax	
+AIRTABLE_APP_TOKEN	patOyxTVYb10RUpnf.2c...	$vars.AIRTABLE_APP_TOKEN	
+AIRTABLE_BASE_TOKEN	appuobih52xkMNrFC	$vars.AIRTABLE_BASE_TOKEN	
+AIRTABLE_USER_TABLE_ID	tblo7zZnZZJgoNdTl	$vars.AIRTABLE_USER_TABLE_ID	
+WEB_URL	https://qrcodeorder0...	$vars.WEB_URL
