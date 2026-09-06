@@ -5,8 +5,7 @@
 
     <meta charset="UTF-8">
 
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>QR Order SaaS — Owner Dashboard</title>
 
@@ -92,9 +91,7 @@
 
             <div class="sidebar-footer">
 
-                <button
-                    id="logoutBtn"
-                    class="logout-btn">
+                <button id="logoutBtn" class="logout-btn">
 
                     🚪 Logout
 
@@ -173,6 +170,295 @@
                         Your restaurant SaaS command center
                         is ready.
                     </p>
+
+                </div>
+
+            </section>
+
+            <!-- ==================================
+     ORDER ANALYTICS
+=================================== -->
+
+            <section class="analytics-section">
+
+                <div class="analytics-card">
+
+                    <div class="analytics-header">
+
+                        <div>
+
+                            <span class="eyebrow">
+                                BUSINESS INTELLIGENCE
+                            </span>
+
+                            <h2>
+                                Order Analytics
+                            </h2>
+
+                            <p>
+                                Monitor your restaurant performance
+                                across the selected period.
+                            </p>
+
+                        </div>
+
+
+                        <div class="analytics-controls">
+
+                            <button class="range-btn active" data-days="7">
+                                7 Days
+                            </button>
+
+                            <button class="range-btn" data-days="14">
+                                14 Days
+                            </button>
+
+                            <button class="range-btn" data-days="30">
+                                30 Days
+                            </button>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- CHART LEGEND -->
+
+                    <div class="chart-legend">
+
+                        <span>
+                            <i class="legend-dot total"></i>
+                            Total Orders
+                        </span>
+
+                        <span>
+                            <i class="legend-dot accepted"></i>
+                            Accepted
+                        </span>
+
+                        <span>
+                            <i class="legend-dot rejected"></i>
+                            Rejected
+                        </span>
+
+                    </div>
+
+
+                    <!-- CHART -->
+
+                    <div class="chart-wrapper">
+
+                        <canvas id="ordersAnalyticsChart">
+                        </canvas>
+
+                    </div>
+
+
+                    <!-- ANALYTICS SUMMARY -->
+
+                    <div class="analytics-summary">
+
+                        <div class="analytics-summary-item">
+
+                            <span>
+                                Period Orders
+                            </span>
+
+                            <strong id="analyticsTotalOrders">
+                                0
+                            </strong>
+
+                        </div>
+
+
+                        <div class="analytics-summary-item">
+
+                            <span>
+                                Accepted
+                            </span>
+
+                            <strong id="analyticsAcceptedOrders">
+                                0
+                            </strong>
+
+                        </div>
+
+
+                        <div class="analytics-summary-item">
+
+                            <span>
+                                Rejected
+                            </span>
+
+                            <strong id="analyticsRejectedOrders">
+                                0
+                            </strong>
+
+                        </div>
+
+
+                        <div class="analytics-summary-item">
+
+                            <span>
+                                Revenue
+                            </span>
+
+                            <strong id="analyticsRevenue">
+                                AED 0
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ==================================
+         ORDER STATUS
+    =================================== -->
+
+                <div class="analytics-grid">
+
+                    <div class="analytics-card status-card">
+
+                        <div class="section-header">
+
+                            <div>
+
+                                <span class="eyebrow">
+                                    ORDER MIX
+                                </span>
+
+                                <h2>
+                                    Order Status
+                                </h2>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="status-bars">
+
+                            <div class="status-row">
+
+                                <div class="status-label">
+                                    <span>Pending</span>
+                                    <strong id="analyticsPending">
+                                        0
+                                    </strong>
+                                </div>
+
+                                <div class="status-track">
+                                    <div class="status-fill pending" id="pendingBar">
+                                    </div>
+                                </div>
+
+                            </div>
+
+
+                            <div class="status-row">
+
+                                <div class="status-label">
+                                    <span>Accepted</span>
+                                    <strong id="analyticsAccepted">
+                                        0
+                                    </strong>
+                                </div>
+
+                                <div class="status-track">
+                                    <div class="status-fill accepted" id="acceptedBar">
+                                    </div>
+                                </div>
+
+                            </div>
+
+
+                            <div class="status-row">
+
+                                <div class="status-label">
+                                    <span>Rejected</span>
+                                    <strong id="analyticsRejected">
+                                        0
+                                    </strong>
+                                </div>
+
+                                <div class="status-track">
+                                    <div class="status-fill rejected" id="rejectedBar">
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- REVENUE CARD -->
+
+                    <div class="analytics-card revenue-card">
+
+                        <div class="section-header">
+
+                            <div>
+
+                                <span class="eyebrow">
+                                    PERFORMANCE
+                                </span>
+
+                                <h2>
+                                    Revenue Overview
+                                </h2>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="revenue-highlight">
+
+                            <span>
+                                Selected Period Revenue
+                            </span>
+
+                            <strong id="revenueHighlight">
+                                AED 0
+                            </strong>
+
+                        </div>
+
+
+                        <div class="revenue-meta">
+
+                            <div>
+
+                                <span>
+                                    Avg. Daily Revenue
+                                </span>
+
+                                <strong id="averageDailyRevenue">
+                                    AED 0
+                                </strong>
+
+                            </div>
+
+                            <div>
+
+                                <span>
+                                    Avg. Order Value
+                                </span>
+
+                                <strong id="analyticsAverageOrder">
+                                    AED 0
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+                    </div>
 
                 </div>
 
@@ -377,9 +663,7 @@
 
                     </div>
 
-                    <div
-                        class="status-pill"
-                        id="restaurantStatus">
+                    <div class="status-pill" id="restaurantStatus">
 
                         Active
 
@@ -586,9 +870,11 @@
          JAVASCRIPT
     =================================== -->
 
-<script src="../../config/config.js"></script>
-<script src="../../auth.js"></script>
-<script src="dashboard.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script src="../../config/config.js"></script>
+    <script src="../../auth.js"></script>
+    <script src="dashboard.js"></script>
 
 
 </body>
