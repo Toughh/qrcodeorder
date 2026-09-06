@@ -5,551 +5,428 @@
 <head>
 
 
-<meta charset="UTF-8">
+    <meta charset="UTF-8">
 
-<meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<meta
-    name="description"
-    content="Manage your restaurant menu"
->
+    <meta name="description" content="Manage your restaurant menu">
 
-<title>Menu | Restaurant SaaS</title>
+    <title>Menu | Restaurant SaaS</title>
 
-<link
-    rel="stylesheet"
-    href="menu.css"
->
+    <link rel="stylesheet" href="menu.css">
 
 
 </head>
 
 <body>
 
-<div class="app-container">
+    <div class="app-container">
 
 
-<!-- ==========================================
-     SIDEBAR
-=========================================== -->
+        <!-- ==================================
+             SIDEBAR
+        =================================== -->
 
-<aside class="sidebar">
+        <aside class="sidebar">
 
-    <!-- LOGO -->
+            <div class="brand">
 
-    <div class="sidebar-logo">
+                <div class="brand-logo">
+                    QR
+                </div>
 
-        <div class="logo-icon">
-            QR
-        </div>
+                <div>
 
-        <div>
+                    <div class="brand-name">
+                        QR Order
+                    </div>
 
-            <div class="logo-title">
-                Restaurant SaaS
+                    <div class="brand-subtitle">
+                        SaaS
+                    </div>
+
+                </div>
+
             </div>
 
-            <div class="logo-subtitle">
-                Owner Portal
+
+            <!-- NAVIGATION -->
+
+            <nav class="navigation">
+
+                <a href="../dashboard/dashboard.html" class="nav-item active">
+                    <span>📊</span>
+                    Dashboard
+                </a>
+
+                <a href="../restaurant/restaurant.html" class="nav-item">
+                    <span>🏪</span>
+                    Restaurant
+                </a>
+
+                <a href="../branches/branches.html" class="nav-item">
+                    <span>🏢</span>
+                    Branches
+                </a>
+
+                <a href="../menu/menu.html" class="nav-item">
+                    <span>🍽️</span>
+                    Menu
+                </a>
+
+                <a href="../users/users.html" class="nav-item">
+                    <span>👥</span>
+                    Users
+                </a>
+
+                <a href="../orders/orders.html" class="nav-item">
+                    <span>📦</span>
+                    Orders
+                </a>
+
+                <a href="../reports/reports.html" class="nav-item">
+                    <span>📈</span>
+                    Reports
+                </a>
+
+                <a href="../settings/settings.html" class="nav-item">
+                    <span>⚙️</span>
+                    Settings
+                </a>
+
+            </nav>
+
+
+            <div class="sidebar-footer">
+
+                <button id="logoutBtn" class="logout-btn">
+
+                    🚪 Logout
+
+                </button>
+
             </div>
 
-        </div>
-
-    </div>
-
-
-    <!-- NAVIGATION -->
-
-    <nav class="sidebar-nav">
-
-        <a
-            href="../dashboard/dashboard.html"
-            class="nav-item"
-        >
-
-            <span class="nav-icon">
-                ▦
-            </span>
-
-            <span>
-                Dashboard
-            </span>
-
-        </a>
-
-
-        <a
-            href="../restaurant/restaurant.html"
-            class="nav-item"
-        >
-
-            <span class="nav-icon">
-                🏪
-            </span>
-
-            <span>
-                Restaurant
-            </span>
-
-        </a>
-
-
-        <a
-            href="../branches/branches.html"
-            class="nav-item"
-        >
-
-            <span class="nav-icon">
-                ⌖
-            </span>
-
-            <span>
-                Branches
-            </span>
-
-        </a>
-
-
-        <a
-            href="../menu/menu.html"
-            class="nav-item active"
-        >
-
-            <span class="nav-icon">
-                ☰
-            </span>
-
-            <span>
-                Menu
-            </span>
-
-        </a>
-
-
-        <a
-            href="../orders/orders.html"
-            class="nav-item"
-        >
-
-            <span class="nav-icon">
-                🧾
-            </span>
-
-            <span>
-                Orders
-            </span>
-
-        </a>
-
-
-        <a
-            href="../settings/settings.html"
-            class="nav-item"
-        >
-
-            <span class="nav-icon">
-                ⚙
-            </span>
-
-            <span>
-                Settings
-            </span>
-
-        </a>
-
-    </nav>
-
-
-    <!-- LOGOUT -->
-
-    <div class="sidebar-bottom">
-
-        <button
-            type="button"
-            id="logoutBtn"
-            class="logout-btn"
-        >
-
-            <span>
-                ↪
-            </span>
-
-            Logout
-
-        </button>
-
-    </div>
-
-</aside>
+        </aside>
 
 
 
-<!-- ==========================================
+        <!-- ==========================================
      MAIN CONTENT
 =========================================== -->
 
-<main class="main-content">
+        <main class="main-content">
 
 
-    <!-- ======================================
+            <!-- ======================================
          TOP BAR
     ======================================= -->
 
-    <header class="topbar">
+            <header class="topbar">
 
-        <div class="topbar-left">
+                <div class="topbar-left">
 
-            <button
-                type="button"
-                id="mobileMenuBtn"
-                class="mobile-menu-btn"
-                aria-label="Open navigation"
-                aria-expanded="false"
-            >
-                ☰
-            </button>
+                    <button type="button" id="mobileMenuBtn" class="mobile-menu-btn" aria-label="Open navigation"
+                        aria-expanded="false">
+                        ☰
+                    </button>
 
-            <div>
+                    <div>
 
-                <h1>
-                    Menu
-                </h1>
+                        <h1>
+                            Menu
+                        </h1>
 
-                <p>
-                    Manage your restaurant menu
-                </p>
+                        <p>
+                            Manage your restaurant menu
+                        </p>
 
-            </div>
+                    </div>
 
-        </div>
-
-
-        <!-- USER -->
-
-        <div class="topbar-right">
-
-            <div class="user-info">
-
-                <div
-                    id="userName"
-                    class="user-name"
-                >
-                    Owner
                 </div>
 
-                <div
-                    id="userRole"
-                    class="user-role"
-                >
-                    Owner
+
+                <!-- USER -->
+
+                <div class="topbar-right">
+
+                    <div class="user-info">
+
+                        <div id="userName" class="user-name">
+                            Owner
+                        </div>
+
+                        <div id="userRole" class="user-role">
+                            Owner
+                        </div>
+
+                    </div>
+
+
+                    <div id="userAvatar" class="user-avatar">
+                        O
+                    </div>
+
                 </div>
 
-            </div>
-
-
-            <div
-                id="userAvatar"
-                class="user-avatar"
-            >
-                O
-            </div>
-
-        </div>
-
-    </header>
+            </header>
 
 
 
-    <!-- ======================================
+            <!-- ======================================
          PAGE CONTENT
     ======================================= -->
 
-    <section class="page-content">
+            <section class="page-content">
 
 
-        <!-- ==================================
+                <!-- ==================================
              RESTAURANT / BRANCH HEADER
         =================================== -->
 
-        <div class="restaurant-header">
+                <div class="restaurant-header">
 
-            <div class="restaurant-title">
+                    <div class="restaurant-title">
 
-                <h2 id="restaurantName">
-                    Restaurant Menu
-                </h2>
+                        <h2 id="restaurantName">
+                            Restaurant Menu
+                        </h2>
 
-                <p id="branchName">
-                    Select a branch to view its menu
-                </p>
+                        <p id="branchName">
+                            Select a branch to view its menu
+                        </p>
 
-            </div>
+                    </div>
 
 
-            <div class="branch-selector-wrapper">
+                    <div class="branch-selector-wrapper">
 
-                <label for="branchSelect">
-                    Branch
-                </label>
+                        <label for="branchSelect">
+                            Branch
+                        </label>
 
-                <select
-                    id="branchSelect"
-                    aria-label="Select branch"
-                >
+                        <select id="branchSelect" aria-label="Select branch">
 
-                    <option value="">
-                        Loading branches...
-                    </option>
+                            <option value="">
+                                Loading branches...
+                            </option>
 
-                </select>
+                        </select>
 
-            </div>
+                    </div>
 
-        </div>
+                </div>
 
 
 
-        <!-- ==================================
+                <!-- ==================================
              MESSAGE
         =================================== -->
 
-        <div
-            id="messageBox"
-            class="message-box hidden"
-            role="alert"
-        >
-        </div>
+                <div id="messageBox" class="message-box hidden" role="alert">
+                </div>
 
 
 
-        <!-- ==================================
+                <!-- ==================================
              SUMMARY CARDS
         =================================== -->
 
-        <div class="summary-grid">
+                <div class="summary-grid">
 
 
-            <!-- TOTAL -->
+                    <!-- TOTAL -->
 
-            <div class="summary-card">
+                    <div class="summary-card">
 
-                <div class="summary-icon">
-                    🍽️
-                </div>
+                        <div class="summary-icon">
+                            🍽️
+                        </div>
 
-                <div>
+                        <div>
 
-                    <div class="summary-label">
-                        Total Items
+                            <div class="summary-label">
+                                Total Items
+                            </div>
+
+                            <div id="totalItems" class="summary-value">
+                                0
+                            </div>
+
+                        </div>
+
                     </div>
 
-                    <div
-                        id="totalItems"
-                        class="summary-value"
-                    >
-                        0
+
+                    <!-- AVAILABLE -->
+
+                    <div class="summary-card">
+
+                        <div class="summary-icon">
+                            ✓
+                        </div>
+
+                        <div>
+
+                            <div class="summary-label">
+                                Available
+                            </div>
+
+                            <div id="availableItems" class="summary-value">
+                                0
+                            </div>
+
+                        </div>
+
                     </div>
 
-                </div>
 
-            </div>
+                    <!-- UNAVAILABLE -->
 
+                    <div class="summary-card">
 
-            <!-- AVAILABLE -->
+                        <div class="summary-icon">
+                            ⛔
+                        </div>
 
-            <div class="summary-card">
+                        <div>
 
-                <div class="summary-icon">
-                    ✓
-                </div>
+                            <div class="summary-label">
+                                Unavailable
+                            </div>
 
-                <div>
+                            <div id="unavailableItems" class="summary-value">
+                                0
+                            </div>
 
-                    <div class="summary-label">
-                        Available
-                    </div>
+                        </div>
 
-                    <div
-                        id="availableItems"
-                        class="summary-value"
-                    >
-                        0
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <!-- UNAVAILABLE -->
-
-            <div class="summary-card">
-
-                <div class="summary-icon">
-                    ⛔
-                </div>
-
-                <div>
-
-                    <div class="summary-label">
-                        Unavailable
-                    </div>
-
-                    <div
-                        id="unavailableItems"
-                        class="summary-value"
-                    >
-                        0
                     </div>
 
                 </div>
 
-            </div>
-
-        </div>
 
 
-
-        <!-- ==================================
+                <!-- ==================================
              MENU SECTION
         =================================== -->
 
-        <div class="menu-section">
+                <div class="menu-section">
 
 
-            <!-- SECTION HEADER -->
+                    <!-- SECTION HEADER -->
 
-            <div class="section-header">
+                    <div class="section-header">
 
-                <div>
+                        <div>
 
-                    <h2>
-                        Menu Items
-                    </h2>
+                            <h2>
+                                Menu Items
+                            </h2>
 
-                    <p id="menuItemCount">
-                        0 items
-                    </p>
+                            <p id="menuItemCount">
+                                0 items
+                            </p>
 
-                </div>
+                        </div>
 
 
-                <!-- SEARCH / FILTER -->
+                        <!-- SEARCH / FILTER -->
 
-                <div class="menu-actions">
+                        <div class="menu-actions">
 
-                    <div class="search-wrapper">
+                            <div class="search-wrapper">
 
-                        <span class="search-icon">
-                            🔍
-                        </span>
+                                <span class="search-icon">
+                                    🔍
+                                </span>
 
-                        <input
-                            type="text"
-                            id="menuSearch"
-                            placeholder="Search menu..."
-                            autocomplete="off"
-                            aria-label="Search menu"
-                        >
+                                <input type="text" id="menuSearch" placeholder="Search menu..." autocomplete="off"
+                                    aria-label="Search menu">
+
+                            </div>
+
+
+                            <select id="categoryFilter" aria-label="Filter by category">
+
+                                <option value="">
+                                    All Categories
+                                </option>
+
+                            </select>
+
+                        </div>
 
                     </div>
 
 
-                    <select
-                        id="categoryFilter"
-                        aria-label="Filter by category"
-                    >
 
-                        <option value="">
-                            All Categories
-                        </option>
-
-                    </select>
-
-                </div>
-
-            </div>
-
-
-
-            <!-- ==================================
+                    <!-- ==================================
                  LOADING
             =================================== -->
 
-            <div
-                id="loadingState"
-                class="loading-state"
-            >
+                    <div id="loadingState" class="loading-state">
 
-                <div class="spinner">
-                </div>
+                        <div class="spinner">
+                        </div>
 
-                <p>
-                    Loading menu...
-                </p>
+                        <p>
+                            Loading menu...
+                        </p>
 
-            </div>
+                    </div>
 
 
 
-            <!-- ==================================
+                    <!-- ==================================
                  EMPTY
             =================================== -->
 
-            <div
-                id="emptyState"
-                class="empty-state hidden"
-            >
+                    <div id="emptyState" class="empty-state hidden">
 
-                <div class="empty-icon">
-                    🍽️
-                </div>
+                        <div class="empty-icon">
+                            🍽️
+                        </div>
 
-                <h3>
-                    No Menu Items Found
-                </h3>
+                        <h3>
+                            No Menu Items Found
+                        </h3>
 
-                <p>
-                    No menu items are available
-                    for this branch.
-                </p>
+                        <p>
+                            No menu items are available
+                            for this branch.
+                        </p>
 
-            </div>
+                    </div>
 
 
 
-            <!-- ==================================
+                    <!-- ==================================
                  MENU GRID
             =================================== -->
 
-            <div
-                id="menuGrid"
-                class="menu-grid"
-            >
-            </div>
+                    <div id="menuGrid" class="menu-grid">
+                    </div>
 
 
-        </div>
+                </div>
 
-    </section>
+            </section>
 
-</main>
+        </main>
 
 
-</div>
+    </div>
 
-<!-- ==========================================
+    <!-- ==========================================
      JAVASCRIPT
 =========================================== -->
 
-<script src="../../config/config.js"></script>
+    <script src="../../config/config.js"></script>
 
-<script src="../../auth.js"></script>
+    <script src="../../auth.js"></script>
 
-<script src="menu.js"></script>
+    <script src="menu.js"></script>
 
 </body>
 
