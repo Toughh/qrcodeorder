@@ -1357,11 +1357,56 @@ imageWrapper.className =
     "menu-image-wrapper";
 
 
-const imageURL =
+let imageURL =
     item.imageURL ||
     item.ImageURL ||
     "";
 
+
+// ==================================
+// HANDLE AIRTABLE IMAGE FORMAT
+// ==================================
+
+if (Array.isArray(imageURL)) {
+
+    imageURL =
+        imageURL[0]?.url ||
+        "";
+
+}
+
+
+// ==================================
+// HANDLE AIRTABLE STRING FORMAT
+// Example:
+// ZingerBerger.png (https://....)
+// ==================================
+
+if (typeof imageURL === "string") {
+
+    imageURL =
+        imageURL.trim();
+
+
+    const urlMatch =
+        imageURL.match(
+            /\((https?:\/\/[^)]+)\)/
+        );
+
+
+    if (urlMatch) {
+
+        imageURL =
+            urlMatch[1];
+
+    }
+
+}
+
+
+// ==================================
+// CREATE IMAGE
+// ==================================
 
 if (imageURL) {
 
