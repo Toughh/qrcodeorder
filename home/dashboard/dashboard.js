@@ -151,7 +151,8 @@ document.addEventListener(
         // ==================================
 
         const ownerName =
-            client.ownerName ||
+            dashboardData.client?.ownerName ||
+            dashboardData.client?.OwnerName ||
             "Owner";
 
 
@@ -947,539 +948,549 @@ function updateDashboardMetrics(
 
     }
 
-    // ==========================================
-    // ORDER ANALYTICS
-    // ==========================================
-
-    let ordersAnalyticsChart = null;
+}
 
 
-    // ==========================================
-    // UPDATE ORDER ANALYTICS
-    // ==========================================
+// ==========================================
+// ORDER ANALYTICS
+// ==========================================
 
-    function updateOrderAnalytics(
-        analytics,
-        restaurant
-    ) {
-
-        const dailyOrders =
-            analytics.dailyOrders || [];
+let ordersAnalyticsChart = null;
 
 
-        const currency =
-            restaurant.currency ||
-            "AED";
+// ==========================================
+// UPDATE ORDER ANALYTICS
+// ==========================================
+
+function updateOrderAnalytics(
+    analytics,
+    restaurant
+) {
+
+    const dailyOrders =
+        analytics.dailyOrders || [];
 
 
-        // ======================================
-        // TOTALS
-        // ======================================
-
-        let totalOrders = 0;
-        let acceptedOrders = 0;
-        let rejectedOrders = 0;
-        let pendingOrders = 0;
-        let totalRevenue = 0;
+    const currency =
+        restaurant.currency ||
+        "AED";
 
 
-        dailyOrders.forEach(day => {
+    // ======================================
+    // TOTALS
+    // ======================================
 
-            totalOrders +=
-                Number(day.total) || 0;
-
-            acceptedOrders +=
-                Number(day.accepted) || 0;
-
-            rejectedOrders +=
-                Number(day.rejected) || 0;
-
-            pendingOrders +=
-                Number(day.pending) || 0;
-
-            totalRevenue +=
-                Number(day.revenue) || 0;
-
-        });
+    let totalOrders = 0;
+    let acceptedOrders = 0;
+    let rejectedOrders = 0;
+    let pendingOrders = 0;
+    let totalRevenue = 0;
 
 
-        totalRevenue =
-            Number(
-                totalRevenue.toFixed(2)
-            );
+    dailyOrders.forEach(day => {
+
+        totalOrders +=
+            Number(day.total) || 0;
+
+        acceptedOrders +=
+            Number(day.accepted) || 0;
+
+        rejectedOrders +=
+            Number(day.rejected) || 0;
+
+        pendingOrders +=
+            Number(day.pending) || 0;
+
+        totalRevenue +=
+            Number(day.revenue) || 0;
+
+    });
 
 
-        // ======================================
-        // UPDATE SUMMARY
-        // ======================================
-
-        const totalElement =
-            document.getElementById(
-                "analyticsTotalOrders"
-            );
-
-        if (totalElement) {
-
-            totalElement.textContent =
-                totalOrders;
-
-        }
-
-
-        const acceptedElement =
-            document.getElementById(
-                "analyticsAcceptedOrders"
-            );
-
-        if (acceptedElement) {
-
-            acceptedElement.textContent =
-                acceptedOrders;
-
-        }
-
-
-        const rejectedElement =
-            document.getElementById(
-                "analyticsRejectedOrders"
-            );
-
-        if (rejectedElement) {
-
-            rejectedElement.textContent =
-                rejectedOrders;
-
-        }
-
-
-        const revenueElement =
-            document.getElementById(
-                "analyticsRevenue"
-            );
-
-        if (revenueElement) {
-
-            revenueElement.textContent =
-                `${currency} ${totalRevenue.toFixed(2)}`;
-
-        }
-
-
-        // ======================================
-        // STATUS CARD
-        // ======================================
-
-        setText(
-            "analyticsPending",
-            pendingOrders
-        );
-
-        setText(
-            "analyticsAccepted",
-            acceptedOrders
-        );
-
-        setText(
-            "analyticsRejected",
-            rejectedOrders
+    totalRevenue =
+        Number(
+            totalRevenue.toFixed(2)
         );
 
 
-        // ======================================
-        // STATUS BAR WIDTH
-        // ======================================
+    // ======================================
+    // UPDATE SUMMARY
+    // ======================================
 
-        const statusTotal =
-            pendingOrders +
-            acceptedOrders +
+    const totalElement =
+        document.getElementById(
+            "analyticsTotalOrders"
+        );
+
+    if (totalElement) {
+
+        totalElement.textContent =
+            totalOrders;
+
+    }
+
+
+    const acceptedElement =
+        document.getElementById(
+            "analyticsAcceptedOrders"
+        );
+
+    if (acceptedElement) {
+
+        acceptedElement.textContent =
+            acceptedOrders;
+
+    }
+
+
+    const rejectedElement =
+        document.getElementById(
+            "analyticsRejectedOrders"
+        );
+
+    if (rejectedElement) {
+
+        rejectedElement.textContent =
             rejectedOrders;
 
+    }
 
-        setBarWidth(
-            "pendingBar",
-            pendingOrders,
-            statusTotal
+
+    const revenueElement =
+        document.getElementById(
+            "analyticsRevenue"
         );
 
-        setBarWidth(
-            "acceptedBar",
-            acceptedOrders,
-            statusTotal
-        );
+    if (revenueElement) {
 
-        setBarWidth(
-            "rejectedBar",
-            rejectedOrders,
-            statusTotal
-        );
-
-
-        // ======================================
-        // REVENUE HIGHLIGHT
-        // ======================================
-
-        setText(
-            "revenueHighlight",
-            `${currency} ${totalRevenue.toFixed(2)}`
-        );
-
-
-        // ======================================
-        // AVERAGE DAILY REVENUE
-        // ======================================
-
-        const days =
-            dailyOrders.length || 1;
-
-
-        const averageDailyRevenue =
-            totalRevenue / days;
-
-
-        setText(
-            "averageDailyRevenue",
-            `${currency} ${averageDailyRevenue.toFixed(2)}`
-        );
-
-
-        // ======================================
-        // AVERAGE ORDER
-        // ======================================
-
-        const averageOrder =
-            totalOrders > 0
-                ? totalRevenue / totalOrders
-                : 0;
-
-
-        setText(
-            "analyticsAverageOrder",
-            `${currency} ${averageOrder.toFixed(2)}`
-        );
-
-
-        // ======================================
-        // RENDER CHART
-        // ======================================
-
-        renderOrdersChart(
-            dailyOrders,
-            currency
-        );
+        revenueElement.textContent =
+            `${currency} ${totalRevenue.toFixed(2)}`;
 
     }
 
 
-    // ==========================================
-    // SAFE TEXT HELPER
-    // ==========================================
+    // ======================================
+    // STATUS CARD
+    // ======================================
 
-    function setText(
-        id,
-        value
-    ) {
+    setText(
+        "analyticsPending",
+        pendingOrders
+    );
 
-        const element =
-            document.getElementById(id);
+    setText(
+        "analyticsAccepted",
+        acceptedOrders
+    );
 
-        if (element) {
-
-            element.textContent =
-                value;
-
-        }
-
-    }
+    setText(
+        "analyticsRejected",
+        rejectedOrders
+    );
 
 
-    // ==========================================
-    // BAR WIDTH
-    // ==========================================
+    // ======================================
+    // STATUS BAR WIDTH
+    // ======================================
 
-    function setBarWidth(
-        id,
-        value,
-        total
-    ) {
-
-        const element =
-            document.getElementById(id);
-
-        if (!element) {
-
-            return;
-
-        }
+    const statusTotal =
+        pendingOrders +
+        acceptedOrders +
+        rejectedOrders;
 
 
-        const percentage =
-            total > 0
-                ? (
-                    value /
-                    total
-                ) * 100
-                : 0;
+    setBarWidth(
+        "pendingBar",
+        pendingOrders,
+        statusTotal
+    );
+
+    setBarWidth(
+        "acceptedBar",
+        acceptedOrders,
+        statusTotal
+    );
+
+    setBarWidth(
+        "rejectedBar",
+        rejectedOrders,
+        statusTotal
+    );
 
 
-        element.style.width =
-            `${percentage}%`;
+    // ======================================
+    // REVENUE HIGHLIGHT
+    // ======================================
 
-    }
+    setText(
+        "revenueHighlight",
+        `${currency} ${totalRevenue.toFixed(2)}`
+    );
 
 
-    // ==========================================
-    // RENDER ORDERS CHART
-    // ==========================================
+    // ======================================
+    // AVERAGE DAILY REVENUE
+    // ======================================
 
-    function renderOrdersChart(
+    const days =
+        dailyOrders.length || 1;
+
+
+    const averageDailyRevenue =
+        totalRevenue / days;
+
+
+    setText(
+        "averageDailyRevenue",
+        `${currency} ${averageDailyRevenue.toFixed(2)}`
+    );
+
+
+    // ======================================
+    // AVERAGE ORDER
+    // ======================================
+
+    const averageOrder =
+        totalOrders > 0
+            ? totalRevenue / totalOrders
+            : 0;
+
+
+    setText(
+        "analyticsAverageOrder",
+        `${currency} ${averageOrder.toFixed(2)}`
+    );
+
+
+    // ======================================
+    // RENDER CHART
+    // ======================================
+
+    renderOrdersChart(
         dailyOrders,
         currency
+    );
+
+}
+
+
+// ==========================================
+// SAFE TEXT HELPER
+// ==========================================
+
+function setText(
+    id,
+    value
+) {
+
+    const element =
+        document.getElementById(id);
+
+    if (element) {
+
+        element.textContent =
+            value;
+
+    }
+
+}
+
+
+// ==========================================
+// BAR WIDTH
+// ==========================================
+
+function setBarWidth(
+    id,
+    value,
+    total
+) {
+
+    const element =
+        document.getElementById(id);
+
+    if (!element) {
+
+        return;
+
+    }
+
+
+    const percentage =
+        total > 0
+            ? (
+                value /
+                total
+            ) * 100
+            : 0;
+
+
+    element.style.width =
+        `${percentage}%`;
+
+}
+
+
+// ==========================================
+// RENDER ORDERS CHART
+// ==========================================
+
+function renderOrdersChart(
+    dailyOrders,
+    currency
+) {
+
+    const canvas =
+        document.getElementById(
+            "ordersAnalyticsChart"
+        );
+
+
+    if (!canvas) {
+
+        return;
+
+    }
+
+    if (typeof Chart === "undefined") {
+
+        console.error(
+            "Chart.js is not loaded."
+        );
+
+        return;
+    }
+
+
+    const ctx =
+        canvas.getContext("2d");
+
+
+    // ======================================
+    // DESTROY OLD CHART
+    // ======================================
+
+    if (
+        ordersAnalyticsChart
     ) {
 
-        const canvas =
-            document.getElementById(
-                "ordersAnalyticsChart"
-            );
+        ordersAnalyticsChart.destroy();
+
+    }
 
 
-        if (!canvas) {
+    // ======================================
+    // LABELS
+    // ======================================
 
-            return;
-
-        }
-
-
-        const ctx =
-            canvas.getContext("2d");
-
-
-        // ======================================
-        // DESTROY OLD CHART
-        // ======================================
-
-        if (
-            ordersAnalyticsChart
-        ) {
-
-            ordersAnalyticsChart.destroy();
-
-        }
+    const labels =
+        dailyOrders.map(
+            day => formatChartDate(
+                day.date
+            )
+        );
 
 
-        // ======================================
-        // LABELS
-        // ======================================
+    // ======================================
+    // DATASETS
+    // ======================================
 
-        const labels =
-            dailyOrders.map(
-                day => formatChartDate(
-                    day.date
-                )
-            );
+    ordersAnalyticsChart =
+        new Chart(
+            ctx,
+            {
 
+                type: "line",
 
-        // ======================================
-        // DATASETS
-        // ======================================
+                data: {
 
-        ordersAnalyticsChart =
-            new Chart(
-                ctx,
-                {
+                    labels,
 
-                    type: "line",
+                    datasets: [
 
-                    data: {
+                        {
 
-                        labels,
+                            label:
+                                "Total Orders",
 
-                        datasets: [
+                            data:
+                                dailyOrders.map(
+                                    day =>
+                                        day.total
+                                ),
 
-                            {
+                            borderWidth: 3,
 
-                                label:
-                                    "Total Orders",
+                            tension: 0.4,
 
-                                data:
-                                    dailyOrders.map(
-                                        day =>
-                                            day.total
-                                    ),
+                            fill: true,
 
-                                borderWidth: 3,
+                            pointRadius: 4,
 
-                                tension: 0.4,
+                            pointHoverRadius: 7
 
-                                fill: true,
-
-                                pointRadius: 4,
-
-                                pointHoverRadius: 7
-
-                            },
+                        },
 
 
-                            {
+                        {
 
-                                label:
-                                    "Accepted",
+                            label:
+                                "Accepted",
 
-                                data:
-                                    dailyOrders.map(
-                                        day =>
-                                            day.accepted
-                                    ),
+                            data:
+                                dailyOrders.map(
+                                    day =>
+                                        day.accepted
+                                ),
 
-                                borderWidth: 2,
+                            borderWidth: 2,
 
-                                tension: 0.4,
+                            tension: 0.4,
 
-                                fill: false,
+                            fill: false,
 
-                                pointRadius: 3,
+                            pointRadius: 3,
 
-                                pointHoverRadius: 6
+                            pointHoverRadius: 6
 
-                            },
+                        },
 
 
-                            {
+                        {
 
-                                label:
-                                    "Rejected",
+                            label:
+                                "Rejected",
 
-                                data:
-                                    dailyOrders.map(
-                                        day =>
-                                            day.rejected
-                                    ),
+                            data:
+                                dailyOrders.map(
+                                    day =>
+                                        day.rejected
+                                ),
 
-                                borderWidth: 2,
+                            borderWidth: 2,
 
-                                tension: 0.4,
+                            tension: 0.4,
 
-                                fill: false,
+                            fill: false,
 
-                                pointRadius: 3,
+                            pointRadius: 3,
 
-                                pointHoverRadius: 6
+                            pointHoverRadius: 6
 
-                            }
+                        }
 
-                        ]
+                    ]
+
+                },
+
+
+                options: {
+
+                    responsive: true,
+
+                    maintainAspectRatio: false,
+
+                    interaction: {
+
+                        mode:
+                            "index",
+
+                        intersect:
+                            false
 
                     },
 
 
-                    options: {
+                    plugins: {
 
-                        responsive: true,
+                        legend: {
 
-                        maintainAspectRatio: false,
-
-                        interaction: {
-
-                            mode:
-                                "index",
-
-                            intersect:
+                            display:
                                 false
 
                         },
 
 
-                        plugins: {
+                        tooltip: {
 
-                            legend: {
+                            padding: 12,
+
+                            displayColors:
+                                true,
+
+                            callbacks: {
+
+                                title:
+                                    function (
+                                        items
+                                    ) {
+
+                                        return items[0]
+                                            .label;
+
+                                    },
+
+
+                                label:
+                                    function (
+                                        context
+                                    ) {
+
+                                        return ` ${context.dataset.label}: ${context.parsed.y}`;
+
+                                    }
+
+                            }
+
+                        }
+
+                    },
+
+
+                    scales: {
+
+                        x: {
+
+                            grid: {
 
                                 display:
                                     false
 
                             },
 
+                            border: {
 
-                            tooltip: {
-
-                                padding: 12,
-
-                                displayColors:
-                                    true,
-
-                                callbacks: {
-
-                                    title:
-                                        function (
-                                            items
-                                        ) {
-
-                                            return items[0]
-                                                .label;
-
-                                        },
-
-
-                                    label:
-                                        function (
-                                            context
-                                        ) {
-
-                                            return ` ${context.dataset.label}: ${context.parsed.y}`;
-
-                                        }
-
-                                }
+                                display:
+                                    false
 
                             }
 
                         },
 
 
-                        scales: {
+                        y: {
 
-                            x: {
+                            beginAtZero:
+                                true,
 
-                                grid: {
+                            ticks: {
 
-                                    display:
-                                        false
-
-                                },
-
-                                border: {
-
-                                    display:
-                                        false
-
-                                }
+                                precision:
+                                    0
 
                             },
 
+                            grid: {
 
-                            y: {
+                                drawBorder:
+                                    false
 
-                                beginAtZero:
-                                    true,
+                            },
 
-                                ticks: {
+                            border: {
 
-                                    precision:
-                                        0
-
-                                },
-
-                                grid: {
-
-                                    drawBorder:
-                                        false
-
-                                },
-
-                                border: {
-
-                                    display:
-                                        false
-
-                                }
+                                display:
+                                    false
 
                             }
 
@@ -1488,121 +1499,122 @@ function updateDashboardMetrics(
                     }
 
                 }
-            );
-
-    }
-
-
-    // ==========================================
-    // FORMAT CHART DATE
-    // ==========================================
-
-    function formatChartDate(
-        dateString
-    ) {
-
-        const date =
-            new Date(
-                `${dateString}T00:00:00`
-            );
-
-
-        return date.toLocaleDateString(
-            "en-US",
-            {
-
-                month: "short",
-
-                day: "numeric"
 
             }
         );
 
-    }
-
-    // ==========================================
-    // ANALYTICS RANGE BUTTONS
-    // ==========================================
-
-    document.addEventListener(
-        "click",
-        async function (event) {
-
-            const button =
-                event.target.closest(
-                    ".range-btn"
-                );
+}
 
 
-            if (!button) {
+// ==========================================
+// FORMAT CHART DATE
+// ==========================================
 
-                return;
+function formatChartDate(
+    dateString
+) {
 
-            }
-
-
-            const days =
-                Number(
-                    button.dataset.days
-                );
-
-
-            if (!days) {
-
-                return;
-
-            }
+    const date =
+        new Date(
+            `${dateString}T00:00:00`
+        );
 
 
-            // ==================================
-            // ACTIVE BUTTON
-            // ==================================
+    return date.toLocaleDateString(
+        "en-US",
+        {
 
-            document
-                .querySelectorAll(
-                    ".range-btn"
-                )
-                .forEach(
-                    btn =>
-                        btn.classList.remove(
-                            "active"
-                        )
-                );
+            month: "short",
 
-
-            button.classList.add(
-                "active"
-            );
-
-
-            // ==================================
-            // LOAD DATA
-            // ==================================
-
-            const dashboardData =
-                await loadDashboardData(
-                    days
-                );
-
-
-            if (!dashboardData) {
-
-                return;
-
-            }
-
-
-            // ==================================
-            // UPDATE ANALYTICS ONLY
-            // ==================================
-
-            updateOrderAnalytics(
-                dashboardData.analytics ||
-                {},
-                dashboardData.restaurant ||
-                {}
-            );
+            day: "numeric"
 
         }
     );
+
 }
+
+// ==========================================
+// ANALYTICS RANGE BUTTONS
+// ==========================================
+
+document.addEventListener(
+    "click",
+    async function (event) {
+
+        const button =
+            event.target.closest(
+                ".range-btn"
+            );
+
+
+        if (!button) {
+
+            return;
+
+        }
+
+
+        const days =
+            Number(
+                button.dataset.days
+            );
+
+
+        if (!days) {
+
+            return;
+
+        }
+
+
+        // ==================================
+        // ACTIVE BUTTON
+        // ==================================
+
+        document
+            .querySelectorAll(
+                ".range-btn"
+            )
+            .forEach(
+                btn =>
+                    btn.classList.remove(
+                        "active"
+                    )
+            );
+
+
+        button.classList.add(
+            "active"
+        );
+
+
+        // ==================================
+        // LOAD DATA
+        // ==================================
+
+        const dashboardData =
+            await loadDashboardData(
+                days
+            );
+
+
+        if (!dashboardData) {
+
+            return;
+
+        }
+
+
+        // ==================================
+        // UPDATE ANALYTICS ONLY
+        // ==================================
+
+        updateOrderAnalytics(
+            dashboardData.analytics ||
+            {},
+            dashboardData.restaurant ||
+            {}
+        );
+
+    }
+);
