@@ -910,7 +910,6 @@ function updateDashboardMetrics(
 
 }
 
-
 // ==========================================
 // ORDER ANALYTICS
 // ==========================================
@@ -928,7 +927,9 @@ function updateOrderAnalytics(
 ) {
 
     const dailyOrders =
-        analytics.dailyOrders || [];
+        Array.isArray(analytics.dailyOrders)
+            ? analytics.dailyOrders
+            : [];
 
 
     const currency =
@@ -947,24 +948,30 @@ function updateOrderAnalytics(
     let totalRevenue = 0;
 
 
-    dailyOrders.forEach(day => {
+    dailyOrders.forEach(
+        day => {
 
-        totalOrders +=
-            Number(day.total) || 0;
+            totalOrders +=
+                Number(day.total) || 0;
 
-        acceptedOrders +=
-            Number(day.accepted) || 0;
 
-        rejectedOrders +=
-            Number(day.rejected) || 0;
+            acceptedOrders +=
+                Number(day.accepted) || 0;
 
-        pendingOrders +=
-            Number(day.pending) || 0;
 
-        totalRevenue +=
-            Number(day.revenue) || 0;
+            rejectedOrders +=
+                Number(day.rejected) || 0;
 
-    });
+
+            pendingOrders +=
+                Number(day.pending) || 0;
+
+
+            totalRevenue +=
+                Number(day.revenue) || 0;
+
+        }
+    );
 
 
     totalRevenue =
@@ -974,63 +981,35 @@ function updateOrderAnalytics(
 
 
     // ======================================
-    // UPDATE SUMMARY
+    // SUMMARY
     // ======================================
 
-    const totalElement =
-        document.getElementById(
-            "analyticsTotalOrders"
-        );
-
-    if (totalElement) {
-
-        totalElement.textContent =
-            totalOrders;
-
-    }
+    setText(
+        "analyticsTotalOrders",
+        totalOrders
+    );
 
 
-    const acceptedElement =
-        document.getElementById(
-            "analyticsAcceptedOrders"
-        );
-
-    if (acceptedElement) {
-
-        acceptedElement.textContent =
-            acceptedOrders;
-
-    }
+    setText(
+        "analyticsAcceptedOrders",
+        acceptedOrders
+    );
 
 
-    const rejectedElement =
-        document.getElementById(
-            "analyticsRejectedOrders"
-        );
-
-    if (rejectedElement) {
-
-        rejectedElement.textContent =
-            rejectedOrders;
-
-    }
+    setText(
+        "analyticsRejectedOrders",
+        rejectedOrders
+    );
 
 
-    const revenueElement =
-        document.getElementById(
-            "analyticsRevenue"
-        );
-
-    if (revenueElement) {
-
-        revenueElement.textContent =
-            `${currency} ${totalRevenue.toFixed(2)}`;
-
-    }
+    setText(
+        "analyticsRevenue",
+        `${currency} ${totalRevenue.toFixed(2)}`
+    );
 
 
     // ======================================
-    // STATUS CARD
+    // STATUS
     // ======================================
 
     setText(
@@ -1038,10 +1017,12 @@ function updateOrderAnalytics(
         pendingOrders
     );
 
+
     setText(
         "analyticsAccepted",
         acceptedOrders
     );
+
 
     setText(
         "analyticsRejected",
@@ -1050,7 +1031,7 @@ function updateOrderAnalytics(
 
 
     // ======================================
-    // STATUS BAR WIDTH
+    // STATUS BARS
     // ======================================
 
     const statusTotal =
@@ -1065,11 +1046,13 @@ function updateOrderAnalytics(
         statusTotal
     );
 
+
     setBarWidth(
         "acceptedBar",
         acceptedOrders,
         statusTotal
     );
+
 
     setBarWidth(
         "rejectedBar",
@@ -1107,7 +1090,7 @@ function updateOrderAnalytics(
 
 
     // ======================================
-    // AVERAGE ORDER
+    // AVERAGE ORDER VALUE
     // ======================================
 
     const averageOrder =
@@ -1146,6 +1129,7 @@ function setText(
     const element =
         document.getElementById(id);
 
+
     if (element) {
 
         element.textContent =
@@ -1169,10 +1153,9 @@ function setBarWidth(
     const element =
         document.getElementById(id);
 
+
     if (!element) {
-
         return;
-
     }
 
 
@@ -1192,13 +1175,137 @@ function setBarWidth(
 
 
 // ==========================================
-// RENDER ORDERS CHART
+// RENDER ORDER ANALYTICS CHART
 // ==========================================
 
 function renderOrdersChart(
     dailyOrders,
     currency
 ) {
+
+    // ======================================
+    // FIND CHART WRAPPER FIRST
+    // ======================================
+    // IMPORTANT:
+    // We cannot depend on the canvas existing
+    // because the zero-data state removes it.
+    // ======================================
+
+    let chartWrapper =
+        document.querySelector(
+            ".chart-wrapper"
+        );
+
+
+    if (!chartWrapper) {
+        return;
+    }
+
+
+    // ======================================
+    // DESTROY EXISTING CHART
+    // ======================================
+
+    if (
+        ordersAnalyticsChart
+    ) {
+
+        ordersAnalyticsChart.destroy();
+
+        ordersAnalyticsChart =
+            null;
+
+    }
+
+
+    // ======================================
+    // CHECK FOR ORDER ACTIVITY
+    // ======================================
+
+    const hasOrderActivity =
+        dailyOrders.some(
+            day =>
+                Number(day.total || 0) > 0 ||
+                Number(day.accepted || 0) > 0 ||
+                Number(day.rejected || 0) > 0
+        );
+
+
+    // ======================================
+    // ZERO-DATA STATE
+    // ======================================
+
+    if (!hasOrderActivity) {
+
+        chartWrapper.classList.add(
+            "analytics-empty"
+        );
+
+
+        chartWrapper.innerHTML = `
+
+            <div class="analytics-empty-state">
+
+                <div class="analytics-empty-icon">
+
+                    <span>✦</span>
+
+                </div>
+
+
+                <div class="analytics-empty-title">
+
+                    No order activity yet
+
+                </div>
+
+
+                <div class="analytics-empty-text">
+
+                    Your order analytics will appear here
+                    once your restaurant starts receiving orders.
+
+                </div>
+
+
+                <div class="analytics-empty-period">
+
+                    Analytics are ready to track your performance
+
+                </div>
+
+            </div>
+
+        `;
+
+        return;
+    }
+
+
+    // ======================================
+    // REAL CHART STATE
+    // ======================================
+
+    chartWrapper.classList.remove(
+        "analytics-empty"
+    );
+
+
+    // ======================================
+    // RECREATE CANVAS
+    // ======================================
+    // This is what makes 7 → 14 → 30 work
+    // after the empty state removed the canvas.
+    // ======================================
+
+    chartWrapper.innerHTML = `
+
+        <canvas
+            id="ordersAnalyticsChart">
+        </canvas>
+
+    `;
+
 
     const canvas =
         document.getElementById(
@@ -1207,12 +1314,17 @@ function renderOrdersChart(
 
 
     if (!canvas) {
-
         return;
-
     }
 
-    if (typeof Chart === "undefined") {
+
+    // ======================================
+    // CHART.JS CHECK
+    // ======================================
+
+    if (
+        typeof Chart === "undefined"
+    ) {
 
         console.error(
             "Chart.js is not loaded."
@@ -1223,36 +1335,13 @@ function renderOrdersChart(
 
 
     const ctx =
-        canvas.getContext("2d");
-
-
-    // ======================================
-    // DESTROY OLD CHART
-    // ======================================
-
-    if (
-        ordersAnalyticsChart
-    ) {
-
-        ordersAnalyticsChart.destroy();
-
-    }
-
-
-    // ======================================
-    // LABELS
-    // ======================================
-
-    const labels =
-        dailyOrders.map(
-            day => formatChartDate(
-                day.date
-            )
+        canvas.getContext(
+            "2d"
         );
 
 
     // ======================================
-    // DATASETS
+    // CREATE CHART
     // ======================================
 
     ordersAnalyticsChart =
@@ -1262,11 +1351,23 @@ function renderOrdersChart(
 
                 type: "line",
 
+
                 data: {
 
-                    labels,
+                    labels:
+                        dailyOrders.map(
+                            day =>
+                                formatChartDate(
+                                    day.date
+                                )
+                        ),
+
 
                     datasets: [
+
+                        // ==================
+                        // TOTAL ORDERS
+                        // ==================
 
                         {
 
@@ -1276,21 +1377,32 @@ function renderOrdersChart(
                             data:
                                 dailyOrders.map(
                                     day =>
-                                        day.total
+                                        Number(
+                                            day.total || 0
+                                        )
                                 ),
 
-                            borderWidth: 3,
+                            borderWidth:
+                                3,
 
-                            tension: 0.4,
+                            tension:
+                                0.4,
 
-                            fill: true,
+                            fill:
+                                true,
 
-                            pointRadius: 4,
+                            pointRadius:
+                                4,
 
-                            pointHoverRadius: 7
+                            pointHoverRadius:
+                                7
 
                         },
 
+
+                        // ==================
+                        // ACCEPTED
+                        // ==================
 
                         {
 
@@ -1300,21 +1412,32 @@ function renderOrdersChart(
                             data:
                                 dailyOrders.map(
                                     day =>
-                                        day.accepted
+                                        Number(
+                                            day.accepted || 0
+                                        )
                                 ),
 
-                            borderWidth: 2,
+                            borderWidth:
+                                2,
 
-                            tension: 0.4,
+                            tension:
+                                0.4,
 
-                            fill: false,
+                            fill:
+                                false,
 
-                            pointRadius: 3,
+                            pointRadius:
+                                3,
 
-                            pointHoverRadius: 6
+                            pointHoverRadius:
+                                6
 
                         },
 
+
+                        // ==================
+                        // REJECTED
+                        // ==================
 
                         {
 
@@ -1324,18 +1447,25 @@ function renderOrdersChart(
                             data:
                                 dailyOrders.map(
                                     day =>
-                                        day.rejected
+                                        Number(
+                                            day.rejected || 0
+                                        )
                                 ),
 
-                            borderWidth: 2,
+                            borderWidth:
+                                2,
 
-                            tension: 0.4,
+                            tension:
+                                0.4,
 
-                            fill: false,
+                            fill:
+                                false,
 
-                            pointRadius: 3,
+                            pointRadius:
+                                3,
 
-                            pointHoverRadius: 6
+                            pointHoverRadius:
+                                6
 
                         }
 
@@ -1346,9 +1476,12 @@ function renderOrdersChart(
 
                 options: {
 
-                    responsive: true,
+                    responsive:
+                        true,
 
-                    maintainAspectRatio: false,
+                    maintainAspectRatio:
+                        false,
+
 
                     interaction: {
 
@@ -1373,17 +1506,17 @@ function renderOrdersChart(
 
                         tooltip: {
 
-                            padding: 12,
+                            padding:
+                                12,
 
                             displayColors:
                                 true,
 
+
                             callbacks: {
 
                                 title:
-                                    function (
-                                        items
-                                    ) {
+                                    function (items) {
 
                                         return items[0]
                                             .label;
@@ -1392,11 +1525,12 @@ function renderOrdersChart(
 
 
                                 label:
-                                    function (
-                                        context
-                                    ) {
+                                    function (context) {
 
-                                        return ` ${context.dataset.label}: ${context.parsed.y}`;
+                                        return (
+                                            ` ${context.dataset.label}: ` +
+                                            `${context.parsed.y}`
+                                        );
 
                                     }
 
@@ -1484,18 +1618,25 @@ function formatChartDate(
         "en-US",
         {
 
-            month: "short",
+            month:
+                "short",
 
-            day: "numeric"
+            day:
+                "numeric"
 
         }
     );
 
 }
 
+
 // ==========================================
 // ANALYTICS RANGE BUTTONS
 // ==========================================
+
+let analyticsLoading =
+    false;
+
 
 document.addEventListener(
     "click",
@@ -1508,9 +1649,7 @@ document.addEventListener(
 
 
         if (!button) {
-
             return;
-
         }
 
 
@@ -1520,15 +1659,38 @@ document.addEventListener(
             );
 
 
-        if (!days) {
-
+        if (
+            ![7, 14, 30].includes(days)
+        ) {
             return;
-
         }
 
 
         // ==================================
-        // ACTIVE BUTTON
+        // PREVENT DOUBLE REQUEST
+        // ==================================
+
+        if (analyticsLoading) {
+            return;
+        }
+
+
+        analyticsLoading =
+            true;
+
+
+        // ==================================
+        // REMEMBER CURRENT BUTTON
+        // ==================================
+
+        const currentActiveButton =
+            document.querySelector(
+                ".range-btn.active"
+            );
+
+
+        // ==================================
+        // DISABLE BUTTONS DURING REQUEST
         // ==================================
 
         document
@@ -1536,45 +1698,137 @@ document.addEventListener(
                 ".range-btn"
             )
             .forEach(
-                btn =>
-                    btn.classList.remove(
-                        "active"
-                    )
+                btn => {
+
+                    btn.disabled =
+                        true;
+
+                }
             );
 
 
-        button.classList.add(
-            "active"
-        );
+        try {
+
+            // ==============================
+            // LOAD SELECTED RANGE
+            // ==============================
+
+            const dashboardData =
+                await loadDashboardData(
+                    days
+                );
 
 
-        // ==================================
-        // LOAD DATA
-        // ==================================
+            // ==============================
+            // API FAILURE
+            // ==============================
 
-        const dashboardData =
-            await loadDashboardData(
-                days
+            if (!dashboardData) {
+
+                console.error(
+                    "Unable to load analytics data."
+                );
+
+                return;
+
+            }
+
+
+            // ==============================
+            // UPDATE ACTIVE BUTTON
+            // ==============================
+
+            document
+                .querySelectorAll(
+                    ".range-btn"
+                )
+                .forEach(
+                    btn =>
+                        btn.classList.remove(
+                            "active"
+                        )
+                );
+
+
+            button.classList.add(
+                "active"
             );
 
 
-        if (!dashboardData) {
+            // ==============================
+            // UPDATE ANALYTICS
+            // ==============================
 
-            return;
+            updateOrderAnalytics(
+                dashboardData.analytics ||
+                {},
+
+                dashboardData.restaurant ||
+                {}
+            );
 
         }
 
+        catch (error) {
 
-        // ==================================
-        // UPDATE ANALYTICS ONLY
-        // ==================================
+            console.error(
+                "Analytics range request failed:",
+                error
+            );
 
-        updateOrderAnalytics(
-            dashboardData.analytics ||
-            {},
-            dashboardData.restaurant ||
-            {}
-        );
+
+            // ==============================
+            // RESTORE PREVIOUS ACTIVE BUTTON
+            // ==============================
+
+            document
+                .querySelectorAll(
+                    ".range-btn"
+                )
+                .forEach(
+                    btn =>
+                        btn.classList.remove(
+                            "active"
+                        )
+                );
+
+
+            if (
+                currentActiveButton
+            ) {
+
+                currentActiveButton.classList.add(
+                    "active"
+                );
+
+            }
+
+        }
+
+        finally {
+
+            // ==============================
+            // ENABLE BUTTONS
+            // ==============================
+
+            document
+                .querySelectorAll(
+                    ".range-btn"
+                )
+                .forEach(
+                    btn => {
+
+                        btn.disabled =
+                            false;
+
+                    }
+                );
+
+
+            analyticsLoading =
+                false;
+
+        }
 
     }
 );
