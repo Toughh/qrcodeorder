@@ -464,6 +464,154 @@
 
             </section>
 
+            <!-- ==================================
+                 LIVE ORDER ANALYSIS
+            =================================== -->
+
+            <section class="live-orders-section">
+
+                <div class="live-orders-card">
+
+                    <div class="live-orders-header">
+
+                        <div>
+
+                            <span class="eyebrow">
+                                REAL-TIME OPERATIONS
+                            </span>
+
+                            <h2>
+                                Live Order Analysis
+                            </h2>
+
+                            <p>
+                                Monitor active customer orders currently being processed.
+                            </p>
+
+                        </div>
+
+                        <div class="live-status-indicator">
+
+                            <span class="live-status-dot"></span>
+
+                            <span>
+                                LIVE
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- LIVE ORDER SUMMARY -->
+
+                    <div class="live-orders-summary">
+
+                        <div class="live-summary-item">
+
+                            <span class="live-summary-icon pending">
+                                ⏳
+                            </span>
+
+                            <div>
+                                <span>
+                                    Pending
+                                </span>
+
+                                <strong id="livePendingOrders">
+                                    0
+                                </strong>
+                            </div>
+
+                        </div>
+
+
+                        <div class="live-summary-item">
+
+                            <span class="live-summary-icon preparing">
+                                👨‍🍳
+                            </span>
+
+                            <div>
+                                <span>
+                                    Preparing
+                                </span>
+
+                                <strong id="livePreparingOrders">
+                                    0
+                                </strong>
+                            </div>
+
+                        </div>
+
+
+                        <div class="live-summary-item">
+
+                            <span class="live-summary-icon ready">
+                                ✓
+                            </span>
+
+                            <div>
+                                <span>
+                                    Ready
+                                </span>
+
+                                <strong id="liveReadyOrders">
+                                    0
+                                </strong>
+                            </div>
+
+                        </div>
+
+
+                        <div class="live-summary-item total">
+
+                            <span class="live-summary-icon active">
+                                ●
+                            </span>
+
+                            <div>
+                                <span>
+                                    Active Orders
+                                </span>
+
+                                <strong id="liveTotalOrders">
+                                    0
+                                </strong>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- LIVE ORDER LIST -->
+
+                    <div class="live-orders-list" id="liveOrdersList">
+
+                        <div class="live-orders-empty">
+
+                            <div class="live-empty-icon">
+                                ✦
+                            </div>
+
+                            <div class="live-empty-title">
+                                No active orders right now
+                            </div>
+
+                            <div class="live-empty-text">
+                                New customer orders will appear here
+                                as soon as they are received.
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
 
             <!-- ==================================
                  BUSINESS METRICS
