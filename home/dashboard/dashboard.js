@@ -765,148 +765,93 @@ function updateDashboardMetrics(
     restaurant
 ) {
 
-    // ==================================
-    // TOTAL ORDERS
-    // ==================================
-
-    const totalOrdersElement =
-        document.getElementById(
-            "totalOrders"
-        );
-
-
-    if (totalOrdersElement) {
-
-        totalOrdersElement.textContent =
-            metrics.totalOrders ?? 0;
-
-    }
+    const currency =
+        restaurant.currency ||
+        "AED";
 
 
     // ==================================
-    // TOTAL REVENUE
+    // TODAY'S ORDERS
     // ==================================
 
-    const totalRevenueElement =
-        document.getElementById(
-            "totalRevenue"
-        );
+    setText(
+        "totalOrders",
+        metrics.totalOrders ?? 0
+    );
 
 
-    if (totalRevenueElement) {
+    // ==================================
+    // TODAY'S REVENUE
+    // ==================================
 
-        totalRevenueElement.textContent =
-            `${restaurant.currency || "AED"} ${metrics.totalRevenue ?? 0}`;
-
-    }
+    setText(
+        "totalRevenue",
+        `${currency} ${Number(
+            metrics.totalRevenue ?? 0
+        ).toFixed(2)}`
+    );
 
 
     // ==================================
     // PENDING ORDERS
     // ==================================
 
-    const pendingOrdersElement =
-        document.getElementById(
-            "pendingOrders"
-        );
-
-
-    if (pendingOrdersElement) {
-
-        pendingOrdersElement.textContent =
-            metrics.pendingOrders ?? 0;
-
-    }
+    setText(
+        "pendingOrders",
+        metrics.pendingOrders ?? 0
+    );
 
 
     // ==================================
     // PREPARING ORDERS
     // ==================================
 
-    const preparingOrdersElement =
-        document.getElementById(
-            "preparingOrders"
-        );
-
-
-    if (preparingOrdersElement) {
-
-        preparingOrdersElement.textContent =
-            metrics.preparingOrders ?? 0;
-
-    }
+    setText(
+        "preparingOrders",
+        metrics.preparingOrders ?? 0
+    );
 
 
     // ==================================
     // READY ORDERS
     // ==================================
 
-    const readyOrdersElement =
-        document.getElementById(
-            "readyOrders"
-        );
-
-
-    if (readyOrdersElement) {
-
-        readyOrdersElement.textContent =
-            metrics.readyOrders ?? 0;
-
-    }
+    setText(
+        "readyOrders",
+        metrics.readyOrders ?? 0
+    );
 
 
     // ==================================
     // COMPLETED ORDERS
     // ==================================
 
-    const completedOrdersElement =
-        document.getElementById(
-            "completedOrders"
-        );
-
-
-    if (completedOrdersElement) {
-
-        completedOrdersElement.textContent =
-            metrics.completedOrders ?? 0;
-
-    }
+    setText(
+        "completedOrders",
+        metrics.completedOrders ?? 0
+    );
 
 
     // ==================================
     // REJECTED ORDERS
     // ==================================
 
-    const rejectedOrdersElement =
-        document.getElementById(
-            "rejectedOrders"
-        );
-
-
-    if (rejectedOrdersElement) {
-
-        rejectedOrdersElement.textContent =
-            metrics.rejectedOrders ?? 0;
-
-    }
+    setText(
+        "rejectedOrders",
+        metrics.rejectedOrders ?? 0
+    );
 
 
     // ==================================
     // AVERAGE ORDER VALUE
     // ==================================
 
-    const averageOrderValueElement =
-        document.getElementById(
-            "averageOrderValue"
-        );
-
-
-    if (averageOrderValueElement) {
-
-        averageOrderValueElement.textContent =
-            `${restaurant.currency || "AED"} ${metrics.averageOrderValue ?? 0}`;
-
-    }
+    setText(
+        "averageOrderValue",
+        `${currency} ${Number(
+            metrics.averageOrderValue ?? 0
+        ).toFixed(2)}`
+    );
 
 }
 
