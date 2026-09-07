@@ -607,55 +607,37 @@ document.addEventListener(
     }
 );
 
-
 // ==========================================
-// LOAD DASHBOARD BUSINESS DATA
+// LOAD DASHBOARD DATA
 // ==========================================
 
 async function loadDashboardData(analyticsDays = 7) {
 
     try {
 
-        console.log(
-            "=================================="
-        );
-
-        console.log(
-            "DASHBOARD: Calling Owner Dashboard API..."
-        );
-
-        console.log(
-            "=================================="
-        );
-
-
-        // ==================================
-        // GET SESSION TOKEN
-        // ==================================
-
         const sessionToken =
-            getSessionToken();
+            localStorage.getItem(
+                "qro_session_token"
+            );
 
+
+        // --------------------------------------
+        // SESSION CHECK
+        // --------------------------------------
 
         if (!sessionToken) {
 
             console.error(
-                "DASHBOARD: No session token found."
+                "Dashboard session token not found."
             );
 
             return null;
-
         }
 
 
-        console.log(
-            "DASHBOARD: Session token found."
-        );
-
-
-        // ==================================
-        // CALL n8n OWNER DASHBOARD WEBHOOK
-        // ==================================
+        // --------------------------------------
+        // API REQUEST
+        // --------------------------------------
 
         const response =
             await fetch(
@@ -665,129 +647,107 @@ async function loadDashboardData(analyticsDays = 7) {
                     method: "POST",
 
                     headers: {
-
                         "Content-Type":
                             "application/json"
-
                     },
 
-                    body:
-                        JSON.stringify({
+                    body: JSON.stringify({
 
-                            sessionToken:
-                                sessionToken,
+                        sessionToken:
+                            sessionToken,
 
-                            analyticsDays:
-                                analyticsDays
+                        analyticsDays:
+                            analyticsDays
 
-                        })
+                    })
 
                 }
             );
 
 
-        // ==================================
-        // HTTP STATUS
-        // ==================================
+        // --------------------------------------
+        // HTTP ERROR
+        // --------------------------------------
 
-        console.log(
-            "DASHBOARD API HTTP STATUS:",
-            response.status
-        );
+        if (!response.ok) {
 
-
-        // ==================================
-        // READ RESPONSE
-        // ==================================
-
-        const rawResult =
-            await response.json();
-
-
-        console.log(
-            "DASHBOARD API RAW RESPONSE:",
-            rawResult
-        );
-
-
-        // ==================================
-        // NORMALIZE n8n RESPONSE
-        // ==================================
-
-        const result =
-            Array.isArray(rawResult)
-                ? rawResult[0]
-                : rawResult;
-
-
-        console.log(
-            "DASHBOARD API NORMALIZED RESPONSE:",
-            result
-        );
-
-
-        // ==================================
-        // SUCCESS
-        // ==================================
-
-        if (
-            response.ok &&
-            result &&
-            result.success === true
-        ) {
-
-            console.log(
-                "=================================="
+            throw new Error(
+                `Dashboard API error: ${response.status}`
             );
-
-            console.log(
-                "DASHBOARD: Business data loaded successfully."
-            );
-
-            console.log(
-                "=================================="
-            );
-
-
-            // ==================================
-            // RETURN DATA OBJECT
-            // ==================================
-
-            return result.data || {};
 
         }
 
 
-        // ==================================
-        // API ERROR
-        // ==================================
+        // --------------------------------------
+        // PARSE RESPONSE
+        // --------------------------------------
 
-        console.error(
-            "DASHBOARD API ERROR:",
+        const result =
+            await response.json();
+
+
+        console.log(
+            "Dashboard API Response:",
             result
         );
 
 
-        return null;
+        // --------------------------------------
+        // SUPPORT BOTH RESPONSE FORMATS
+        // --------------------------------------
+        //
+        // Format 1:
+        // {
+        //   success: true,
+        //   client: {...}
+        // }
+        //
+        // Format 2:
+        // {
+        //   success: true,
+        //   data: {
+        //      client: {...}
+        //   }
+        // }
+        //
+        // --------------------------------------
+
+        const dashboardData =
+            result.data ||
+            result;
+
+
+        // --------------------------------------
+        // API SUCCESS CHECK
+        // --------------------------------------
+
+        if (
+            !dashboardData.success
+        ) {
+
+            console.error(
+                "Dashboard API returned failure:",
+                dashboardData
+            );
+
+            return null;
+        }
+
+
+        // --------------------------------------
+        // RETURN ACTUAL DASHBOARD DATA
+        // --------------------------------------
+
+        return dashboardData;
 
     }
-
 
     catch (error) {
 
         console.error(
-            "=================================="
-        );
-
-        console.error(
-            "DASHBOARD API CONNECTION ERROR:",
+            "Failed to load dashboard data:",
             error
         );
-
-        console.error(
-            "=================================="
-        );
-
 
         return null;
 
