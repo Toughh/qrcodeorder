@@ -492,6 +492,15 @@ document.addEventListener(
         );
 
         // ==========================================
+        // UPDATE LIVE ORDER ANALYTICS
+        // ==========================================
+
+        updateLiveOrderAnalysis(
+            dashboardData.liveOrders || [],
+            restaurant
+        );
+
+        // ==========================================
         // UPDATE ORDER ANALYTICS
         // ==========================================
 
@@ -853,6 +862,236 @@ function updateDashboardMetrics(
         ).toFixed(2)}`
     );
 
+}
+
+// ==========================================
+// LIVE ORDER ANALYSIS
+// ==========================================
+
+function updateLiveOrderAnalysis(liveOrders, restaurant) {
+
+    const orders =
+        Array.isArray(liveOrders)
+            ? liveOrders
+            : [];
+
+    const currency =
+        restaurant?.currency ||
+        "AED";
+
+    let pending = 0;
+    let preparing = 0;
+    let ready = 0;
+
+    orders.forEach(order => {
+
+        const status =
+            String(order.status || "")
+                .trim()
+                .toLowerCase();
+
+        if (status === "pending") {
+            pending++;
+        }
+
+        else if (status === "preparing") {
+            preparing++;
+        }
+
+        else if (status === "ready") {
+            ready++;
+        }
+
+    });
+
+    const total =
+        orders.length;
+
+    // ==========================================
+    // UPDATE SUMMARY
+    // ==========================================
+
+    setText(
+        "livePendingOrders",
+        pending
+    );
+
+    setText(
+        "livePreparingOrders",
+        preparing
+    );
+
+    setText(
+        "liveReadyOrders",
+        ready
+    );
+
+    setText(
+        "liveTotalOrders",
+        total
+    );
+
+    // ==========================================
+    // UPDATE ORDER LIST
+    // ==========================================
+
+    const container =
+        document.getElementById(
+            "liveOrdersList"
+        );
+
+    if (!container) return;
+
+    // ==========================================
+    // EMPTY STATE
+    // ==========================================
+
+    if (!orders.length) {
+
+        container.innerHTML = `
+            <div class="live-orders-empty">
+
+                <div class="live-empty-icon">
+                    ✦
+                </div>
+
+                <div class="live-empty-title">
+                    No active orders right now
+                </div>
+
+                <div class="live-empty-text">
+                    New customer orders will appear here
+                    as soon as they are received.
+                </div>
+
+            </div>
+        `;
+
+        return;
+    }
+
+    // ==========================================
+    // RENDER LIVE ORDERS
+    // ==========================================
+
+    container.innerHTML =
+        orders.map(order => {
+
+            const status =
+                String(order.status || "")
+                    .trim()
+                    .toLowerCase();
+
+            const statusLabel =
+                status.charAt(0).toUpperCase() +
+                status.slice(1);
+
+            const orderId =
+                order.orderId ||
+                "Order";
+
+            const customerName =
+                order.customerName ||
+                "Guest Customer";
+
+            const tableNumber =
+                order.tableNumber !== undefined &&
+                    order.tableNumber !== null &&
+                    order.tableNumber !== ""
+                    ? `Table ${order.tableNumber}`
+                    : "Takeaway";
+
+            const branch =
+                order.branchOutlet ||
+                "Main Branch";
+
+            const amount =
+                Number(order.amount) || 0;
+
+            const orderTime =
+                order.orderDate
+                    ? new Date(order.orderDate)
+                        .toLocaleTimeString(
+                            "en-US",
+                            {
+                                hour: "numeric",
+                                minute: "2-digit"
+                            }
+                        )
+                    : "--";
+
+            return `
+                <div class="live-order-item">
+
+                    <div class="live-order-main">
+
+                        <div class="live-order-id">
+                            ${orderId}
+                        </div>
+
+                        <div class="live-order-customer">
+                            ${customerName}
+                        </div>
+
+                    </div>
+
+
+                    <div class="live-order-detail">
+
+                        <span class="live-order-detail-label">
+                            Location
+                        </span>
+
+                        <span class="live-order-detail-value">
+                            ${branch}
+                        </span>
+
+                    </div>
+
+
+                    <div class="live-order-detail">
+
+                        <span class="live-order-detail-label">
+                            Table
+                        </span>
+
+                        <span class="live-order-detail-value">
+                            ${tableNumber}
+                        </span>
+
+                    </div>
+
+
+                    <div class="live-order-detail">
+
+                        <span class="live-order-detail-label">
+                            Amount
+                        </span>
+
+                        <span class="live-order-amount">
+                            ${currency} ${amount.toFixed(2)}
+                        </span>
+
+                    </div>
+
+
+                    <div>
+
+                        <span class="live-order-detail-label">
+                            Status
+                        </span>
+
+                        <span class="live-order-status ${status}">
+                            ${statusLabel}
+                        </span>
+
+                    </div>
+
+                </div>
+            `;
+
+        })
+            .join("");
 }
 
 // ==========================================
