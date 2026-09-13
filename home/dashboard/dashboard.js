@@ -879,6 +879,10 @@ function updateLiveOrderAnalysis(liveOrders, restaurant) {
         restaurant?.currency ||
         "AED";
 
+    // ==========================================
+    // CALCULATE LIVE STATUS COUNTS
+    // ==========================================
+
     let pending = 0;
     let preparing = 0;
     let ready = 0;
@@ -907,6 +911,7 @@ function updateLiveOrderAnalysis(liveOrders, restaurant) {
     const total =
         orders.length;
 
+
     // ==========================================
     // UPDATE SUMMARY
     // ==========================================
@@ -931,8 +936,9 @@ function updateLiveOrderAnalysis(liveOrders, restaurant) {
         total
     );
 
+
     // ==========================================
-    // UPDATE ORDER LIST
+    // ORDER LIST CONTAINER
     // ==========================================
 
     const container =
@@ -941,6 +947,7 @@ function updateLiveOrderAnalysis(liveOrders, restaurant) {
         );
 
     if (!container) return;
+
 
     // ==========================================
     // EMPTY STATE
@@ -970,128 +977,188 @@ function updateLiveOrderAnalysis(liveOrders, restaurant) {
         return;
     }
 
+
+    // ==========================================
+    // SHOW ONLY LATEST 5 ORDERS
+    // ==========================================
+
+    const visibleOrders =
+        orders.slice(0, 5);
+
+
     // ==========================================
     // RENDER LIVE ORDERS
     // ==========================================
 
-    container.innerHTML =
-        orders.map(order => {
+    const orderRows =
+        visibleOrders
+            .map(order => {
 
-            const status =
-                String(order.status || "")
-                    .trim()
-                    .toLowerCase();
+                const status =
+                    String(order.status || "")
+                        .trim()
+                        .toLowerCase();
 
-            const statusLabel =
-                status.charAt(0).toUpperCase() +
-                status.slice(1);
+                const statusLabel =
+                    status.charAt(0).toUpperCase() +
+                    status.slice(1);
 
-            const orderId =
-                order.orderId ||
-                "Order";
+                const orderId =
+                    order.orderId ||
+                    "Order";
 
-            const customerName =
-                order.customerName ||
-                "Guest Customer";
+                const customerName =
+                    order.customerName ||
+                    "Guest Customer";
 
-            const tableNumber =
-                order.tableNumber !== undefined &&
+                const tableNumber =
+                    order.tableNumber !== undefined &&
                     order.tableNumber !== null &&
                     order.tableNumber !== ""
-                    ? `Table ${order.tableNumber}`
-                    : "Takeaway";
+                        ? `Table ${order.tableNumber}`
+                        : "Takeaway";
 
-            const branch =
-                order.branchOutlet ||
-                "Main Branch";
+                const branch =
+                    order.branchOutlet ||
+                    "Main Branch";
 
-            const amount =
-                Number(order.amount) || 0;
+                const amount =
+                    Number(order.amount) || 0;
 
-            const orderTime =
-                order.orderDate
-                    ? new Date(order.orderDate)
-                        .toLocaleTimeString(
-                            "en-US",
-                            {
-                                hour: "numeric",
-                                minute: "2-digit"
-                            }
-                        )
-                    : "--";
+                return `
+                    <div class="live-order-item">
 
-            return `
-                <div class="live-order-item">
+                        <div class="live-order-main">
 
-                    <div class="live-order-main">
+                            <div class="live-order-id">
+                                ${orderId}
+                            </div>
 
-                        <div class="live-order-id">
-                            ${orderId}
+                            <div class="live-order-customer">
+                                ${customerName}
+                            </div>
+
                         </div>
 
-                        <div class="live-order-customer">
-                            ${customerName}
+
+                        <div class="live-order-detail">
+
+                            <span class="live-order-detail-label">
+                                Location
+                            </span>
+
+                            <span class="live-order-detail-value">
+                                ${branch}
+                            </span>
+
+                        </div>
+
+
+                        <div class="live-order-detail">
+
+                            <span class="live-order-detail-label">
+                                Table
+                            </span>
+
+                            <span class="live-order-detail-value">
+                                ${tableNumber}
+                            </span>
+
+                        </div>
+
+
+                        <div class="live-order-detail">
+
+                            <span class="live-order-detail-label">
+                                Amount
+                            </span>
+
+                            <span class="live-order-amount">
+                                ${currency} ${amount.toFixed(2)}
+                            </span>
+
+                        </div>
+
+
+                        <div>
+
+                            <span class="live-order-detail-label">
+                                Status
+                            </span>
+
+                            <span class="live-order-status ${status}">
+                                ${statusLabel}
+                            </span>
+
                         </div>
 
                     </div>
+                `;
 
-
-                    <div class="live-order-detail">
-
-                        <span class="live-order-detail-label">
-                            Location
-                        </span>
-
-                        <span class="live-order-detail-value">
-                            ${branch}
-                        </span>
-
-                    </div>
-
-
-                    <div class="live-order-detail">
-
-                        <span class="live-order-detail-label">
-                            Table
-                        </span>
-
-                        <span class="live-order-detail-value">
-                            ${tableNumber}
-                        </span>
-
-                    </div>
-
-
-                    <div class="live-order-detail">
-
-                        <span class="live-order-detail-label">
-                            Amount
-                        </span>
-
-                        <span class="live-order-amount">
-                            ${currency} ${amount.toFixed(2)}
-                        </span>
-
-                    </div>
-
-
-                    <div>
-
-                        <span class="live-order-detail-label">
-                            Status
-                        </span>
-
-                        <span class="live-order-status ${status}">
-                            ${statusLabel}
-                        </span>
-
-                    </div>
-
-                </div>
-            `;
-
-        })
+            })
             .join("");
+
+
+    // ==========================================
+    // VIEW ALL / PREVIEW FOOTER
+    // ==========================================
+
+    let footerText = "";
+
+    if (total > 5) {
+
+        footerText = `
+            <div class="live-orders-footer">
+
+                <span class="live-orders-count">
+                    Showing <strong>5</strong> of
+                    <strong>${total}</strong>
+                    active orders
+                </span>
+
+                <a
+                    href="../orders/orders.html"
+                    class="live-orders-view-all"
+                >
+                    View All Orders
+                    <span>→</span>
+                </a>
+
+            </div>
+        `;
+
+    } else {
+
+        footerText = `
+            <div class="live-orders-footer">
+
+                <span class="live-orders-count">
+                    Showing all
+                    <strong>${total}</strong>
+                    active order${total === 1 ? "" : "s"}
+                </span>
+
+                <a
+                    href="../orders/orders.html"
+                    class="live-orders-view-all"
+                >
+                    View All Orders
+                    <span>→</span>
+                </a>
+
+            </div>
+        `;
+
+    }
+
+
+    // ==========================================
+    // FINAL RENDER
+    // ==========================================
+
+    container.innerHTML =
+        orderRows +
+        footerText;
 }
 
 // ==========================================
