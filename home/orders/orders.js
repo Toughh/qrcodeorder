@@ -988,17 +988,20 @@ function renderOrders() {
     }
 
 
-    ordersTableBody.innerHTML =
-        "";
+    // ==========================================
+    // CLEAR TABLE
+    // ==========================================
+
+    ordersTableBody.innerHTML = "";
 
 
-    // --------------------------------------
-    // Empty state
-    // --------------------------------------
+    // ==========================================
+    // NO ORDERS AFTER FILTER
+    // ==========================================
 
     if (
-        filteredOrders.length ===
-        0
+        !Array.isArray(filteredOrders) ||
+        filteredOrders.length === 0
     ) {
 
         showEmptyState();
@@ -1010,8 +1013,16 @@ function renderOrders() {
     }
 
 
+    // ==========================================
+    // HIDE EMPTY STATE
+    // ==========================================
+
     hideEmptyState();
 
+
+    // ==========================================
+    // TOTAL PAGES
+    // ==========================================
 
     const totalPages =
         Math.ceil(
@@ -1030,6 +1041,20 @@ function renderOrders() {
 
     }
 
+
+    if (
+        currentPage < 1
+    ) {
+
+        currentPage =
+            1;
+
+    }
+
+
+    // ==========================================
+    // CURRENT PAGE RANGE
+    // ==========================================
 
     const startIndex =
         (
@@ -1055,6 +1080,10 @@ function renderOrders() {
         );
 
 
+    // ==========================================
+    // RENDER ROWS
+    // ==========================================
+
     pageOrders.forEach(
         order => {
 
@@ -1071,10 +1100,13 @@ function renderOrders() {
     );
 
 
+    // ==========================================
+    // UPDATE PAGINATION
+    // ==========================================
+
     updatePagination();
 
 }
-
 
 // ==========================================
 // CREATE ORDER ROW
@@ -2279,6 +2311,9 @@ function showEmptyState() {
 
     if (ordersEmpty) {
 
+        ordersEmpty.hidden =
+            false;
+
         ordersEmpty.style.display =
             "";
 
@@ -2294,18 +2329,19 @@ function showEmptyState() {
 
 }
 
-
 function hideEmptyState() {
 
-    if (ordersEmpty) {
-
-        ordersEmpty.style.display =
-            "none";
-
+    if (!ordersEmpty) {
+        return;
     }
 
-}
+    ordersEmpty.style.display =
+        "none";
 
+    ordersEmpty.hidden =
+        true;
+
+}
 
 // ==========================================
 // ERROR STATE
