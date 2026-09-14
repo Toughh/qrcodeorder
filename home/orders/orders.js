@@ -836,8 +836,8 @@ function applyFilters() {
 
                 if (
                     status &&
-                    order.status !==
-                    status
+                    status !== "all" &&
+                    order.status !== status
                 ) {
 
                     return false;
