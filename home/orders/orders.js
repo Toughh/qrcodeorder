@@ -878,6 +878,18 @@ function applyFilters() {
 
 function matchesDateFilter(order, filter) {
 
+    console.log(
+        "DATE DEBUG:",
+        {
+            filter: filter,
+            orderDate: order.orderDate,
+            parsedDate: new Date(order.orderDate),
+            isValid: !isNaN(
+                new Date(order.orderDate).getTime()
+            )
+        }
+    );
+
     if (!filter || filter === "all") {
         return true;
     }
