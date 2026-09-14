@@ -316,6 +316,16 @@ async function loadOrders() {
                 normalizeOrder
             );
 
+        console.log(
+            "Normalized Orders:",
+            allOrders
+        );
+
+        console.log(
+            "Orders Count:",
+            allOrders.length
+        );
+
 
         // ----------------------------------
         // Sort newest first
@@ -577,10 +587,10 @@ function populateBranchFilter() {
                     .filter(Boolean)
             )
         ]
-        .sort(
-            (a, b) =>
-                a.localeCompare(b)
-        );
+            .sort(
+                (a, b) =>
+                    a.localeCompare(b)
+            );
 
 
     branchFilter.innerHTML = "";
@@ -727,7 +737,7 @@ function applyFilters() {
             statusFilter?.value ||
             ""
         ).trim()
-        .toLowerCase();
+            .toLowerCase();
 
 
     const dateRange =
@@ -735,7 +745,7 @@ function applyFilters() {
             dateFilter?.value ||
             "all"
         ).trim()
-        .toLowerCase();
+            .toLowerCase();
 
 
     filteredOrders =
@@ -792,7 +802,7 @@ function applyFilters() {
                 if (
                     branch &&
                     order.branchOutlet !==
-                        branch
+                    branch
                 ) {
 
                     return false;
@@ -807,7 +817,7 @@ function applyFilters() {
                 if (
                     status &&
                     order.status !==
-                        status
+                    status
                 ) {
 
                     return false;
@@ -1067,7 +1077,7 @@ function renderOrders() {
     const endIndex =
         Math.min(
             startIndex +
-                ordersPerPage,
+            ordersPerPage,
 
             filteredOrders.length
         );
@@ -1135,9 +1145,9 @@ function createOrderRow(
         <div class="order-id-cell">
             <span class="order-id">
                 ${escapeHtml(
-                    order.orderId ||
-                    "—"
-                )}
+        order.orderId ||
+        "—"
+    )}
             </span>
         </div>
     `;
@@ -1174,28 +1184,27 @@ function createOrderRow(
         <div class="customer-cell">
             <div class="customer-avatar">
                 ${escapeHtml(
-                    avatarLetter
-                )}
+        avatarLetter
+    )}
             </div>
 
             <div class="customer-info">
                 <span class="customer-name">
                     ${escapeHtml(
-                        customerName
-                    )}
+        customerName
+    )}
                 </span>
 
-                ${
-                    mobile
-                        ? `
+                ${mobile
+            ? `
                         <span class="customer-mobile">
                             ${escapeHtml(
-                                mobile
-                            )}
+                mobile
+            )}
                         </span>
                         `
-                        : ""
-                }
+            : ""
+        }
             </div>
         </div>
     `;
@@ -1213,9 +1222,9 @@ function createOrderRow(
     branchCell.innerHTML = `
         <span class="branch-name">
             ${escapeHtml(
-                order.branchOutlet ||
-                "—"
-            )}
+        order.branchOutlet ||
+        "—"
+    )}
         </span>
     `;
 
@@ -1231,13 +1240,12 @@ function createOrderRow(
 
     tableCell.innerHTML = `
         <span class="table-number">
-            ${
+            ${order.tableNumber
+            ? `Table ${escapeHtml(
                 order.tableNumber
-                    ? `Table ${escapeHtml(
-                        order.tableNumber
-                    )}`
-                    : "—"
-            }
+            )}`
+            : "—"
+        }
         </span>
     `;
 
@@ -1254,8 +1262,8 @@ function createOrderRow(
     amountCell.innerHTML = `
         <span class="order-amount">
             ${formatCurrency(
-                order.total
-            )}
+        order.total
+    )}
         </span>
     `;
 
@@ -1287,8 +1295,8 @@ function createOrderRow(
     timeCell.innerHTML = `
         <span class="order-time">
             ${formatOrderDate(
-                order.orderDate
-            )}
+        order.orderDate
+    )}
         </span>
     `;
 
@@ -1400,14 +1408,14 @@ function createStatusBadge(
         <span class="
             status-badge
             status-${escapeHtml(
-                normalized ||
-                "unknown"
-            )}
+        normalized ||
+        "unknown"
+    )}
         ">
             <span class="status-dot"></span>
             ${escapeHtml(
-                label
-            )}
+        label
+    )}
         </span>
     `;
 
@@ -1474,7 +1482,7 @@ function updatePagination() {
             ? 0
             : Math.min(
                 currentPage *
-                    ordersPerPage,
+                ordersPerPage,
 
                 total
             );
@@ -1517,7 +1525,7 @@ function updatePagination() {
 
         nextPage.disabled =
             currentPage >=
-                totalPages ||
+            totalPages ||
             total === 0;
 
     }
