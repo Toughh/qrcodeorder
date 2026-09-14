@@ -349,6 +349,16 @@ async function loadOrders() {
             }
         );
 
+        console.log(
+            "ALL ORDERS:",
+            allOrders.length
+        );
+
+        console.log(
+            "DATE FILTER VALUE:",
+            dateFilter?.value
+        );
+
 
         // ----------------------------------
         // Populate branch filter
@@ -369,6 +379,16 @@ async function loadOrders() {
         // ----------------------------------
 
         applyFilters();
+
+        console.log(
+            "FILTERED ORDERS:",
+            filteredOrders.length
+        );
+
+        console.log(
+            "FILTERED DATA:",
+            filteredOrders
+        );
 
 
     } catch (error) {
