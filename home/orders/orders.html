@@ -5,10 +5,7 @@
 
     <meta charset="UTF-8">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>QR Order SaaS — Orders</title>
 
@@ -18,10 +15,7 @@
 
     <script src="../../config/config.js"></script>
 
-    <link
-        rel="stylesheet"
-        href="orders.css"
-    >
+    <link rel="stylesheet" href="orders.css">
 
 </head>
 
@@ -29,1038 +23,963 @@
 <body>
 
 
-<!-- ==========================================
+    <!-- ==========================================
      APPLICATION SHELL
 =========================================== -->
 
-<div class="app-shell">
+    <div class="app-shell">
 
 
-    <!-- ==========================================
+        <!-- ==========================================
          SIDEBAR
     =========================================== -->
 
-    <aside class="sidebar">
+        <!-- ==================================
+     SIDEBAR
+=================================== -->
 
-        <div class="sidebar-brand">
+        <aside class="sidebar">
 
-            <div class="brand-mark">
-                QR
+            <div class="brand">
+
+                <div class="brand-logo">
+                    QR
+                </div>
+
+                <div>
+                    <div class="brand-name">
+                        QR Order
+                    </div>
+
+                    <div class="brand-subtitle">
+                        SaaS
+                    </div>
+                </div>
+
             </div>
 
-            <div class="brand-text">
 
-                <strong>
-                    Restaurant SaaS
-                </strong>
+            <nav class="navigation">
 
-                <span>
-                    Owner Portal
-                </span>
+                <a href="../dashboard/dashboard.html" class="nav-item">
+
+                    <span>📊</span>
+                    Dashboard
+
+                </a>
+
+
+                <a href="../restaurant/restaurant.html" class="nav-item">
+
+                    <span>🏪</span>
+                    Restaurant
+
+                </a>
+
+
+                <a href="../branches/branches.html" class="nav-item">
+
+                    <span>🏢</span>
+                    Branches
+
+                </a>
+
+
+                <a href="../menu/menu.html" class="nav-item">
+
+                    <span>🍽️</span>
+                    Menu
+
+                </a>
+
+
+                <a href="../users/users.html" class="nav-item">
+
+                    <span>👥</span>
+                    Users
+
+                </a>
+
+
+                <a href="#" class="nav-item active">
+
+                    <span>📦</span>
+                    Orders
+
+                </a>
+
+
+                <a href="../reports/reports.html" class="nav-item">
+
+                    <span>📈</span>
+                    Reports
+
+                </a>
+
+
+                <a href="../settings/settings.html" class="nav-item">
+
+                    <span>⚙️</span>
+                    Settings
+
+                </a>
+
+            </nav>
+
+
+            <div class="sidebar-footer">
+
+                <button id="logoutBtn" class="logout-btn">
+
+                    🚪 Logout
+
+                </button>
 
             </div>
 
-        </div>
-
-
-        <!-- ======================================
-             NAVIGATION
-        ======================================= -->
-
-        <nav class="sidebar-nav">
-
-            <a
-                href="../dashboard/dashboard.html"
-                class="nav-item"
-            >
-                <span class="nav-icon">⌂</span>
-                <span>Dashboard</span>
-            </a>
-
-
-            <a
-                href="../restaurant/restaurant.html"
-                class="nav-item"
-            >
-                <span class="nav-icon">▣</span>
-                <span>Restaurant</span>
-            </a>
-
-
-            <a
-                href="../branches/branches.html"
-                class="nav-item"
-            >
-                <span class="nav-icon">⌖</span>
-                <span>Branches</span>
-            </a>
-
-
-            <a
-                href="../menu/menu.html"
-                class="nav-item"
-            >
-                <span class="nav-icon">☷</span>
-                <span>Menu</span>
-            </a>
-
-
-            <a
-                href="../users/users.html"
-                class="nav-item"
-            >
-                <span class="nav-icon">♙</span>
-                <span>Users</span>
-            </a>
-
-
-            <a
-                href="#"
-                class="nav-item active"
-            >
-                <span class="nav-icon">▤</span>
-                <span>Orders</span>
-            </a>
-
-
-            <a
-                href="../reports/reports.html"
-                class="nav-item"
-            >
-                <span class="nav-icon">◫</span>
-                <span>Reports</span>
-            </a>
-
-
-            <a
-                href="../settings/settings.html"
-                class="nav-item"
-            >
-                <span class="nav-icon">⚙</span>
-                <span>Settings</span>
-            </a>
-
-        </nav>
-
-
-        <!-- ======================================
-             SIDEBAR FOOTER
-        ======================================= -->
-
-        <div class="sidebar-footer">
-
-            <div class="sidebar-footer-line"></div>
-
-            <span>
-                QR Restaurant SaaS
-            </span>
-
-            <small>
-                Owner Workspace
-            </small>
-
-        </div>
-
-    </aside>
+        </aside>
 
 
 
-    <!-- ==========================================
+        <!-- ==========================================
          MAIN CONTENT
     =========================================== -->
 
-    <main class="main-content">
+        <main class="main-content">
 
 
-        <!-- ======================================
+            <!-- ======================================
              TOPBAR
         ======================================= -->
 
-        <header class="topbar">
+            <header class="topbar">
 
-            <div class="topbar-left">
+                <div class="topbar-left">
 
-                <button
-                    type="button"
-                    class="mobile-menu-button"
-                    id="mobileMenuButton"
-                >
-                    ☰
-                </button>
+                    <button type="button" class="mobile-menu-button" id="mobileMenuButton">
+                        ☰
+                    </button>
 
-                <div>
+                    <div>
 
-                    <span class="topbar-eyebrow">
-                        OWNER PORTAL
-                    </span>
+                        <span class="topbar-eyebrow">
+                            OWNER PORTAL
+                        </span>
 
-                    <h1>
-                        Orders
-                    </h1>
+                        <h1>
+                            Orders
+                        </h1>
+
+                    </div>
 
                 </div>
 
-            </div>
 
+                <div class="topbar-right">
 
-            <div class="topbar-right">
+                    <div class="topbar-live">
 
-                <div class="topbar-live">
+                        <span class="topbar-live-dot"></span>
 
-                    <span class="topbar-live-dot"></span>
+                        <span>
+                            System Live
+                        </span>
 
-                    <span>
-                        System Live
-                    </span>
+                    </div>
+
+                    <div class="topbar-user" id="topbarUser">
+                        Owner
+                    </div>
 
                 </div>
 
-                <div
-                    class="topbar-user"
-                    id="topbarUser"
-                >
-                    Owner
-                </div>
-
-            </div>
-
-        </header>
+            </header>
 
 
 
-        <!-- ======================================
+            <!-- ======================================
              PAGE CONTENT
         ======================================= -->
 
-        <div class="page-container">
+            <div class="page-container">
 
 
-            <!-- ==================================
+                <!-- ==================================
                  PAGE INTRO
             =================================== -->
 
-            <section class="page-intro">
+                <section class="page-intro">
 
-                <div>
+                    <div>
 
-                    <span class="page-eyebrow">
-                        ORDER MANAGEMENT
-                    </span>
-
-                    <h2>
-                        Customer Orders
-                    </h2>
-
-                    <p>
-                        Monitor, manage and track customer orders
-                        across your restaurant.
-                    </p>
-
-                </div>
-
-
-                <div class="orders-live-badge">
-
-                    <span class="orders-live-dot"></span>
-
-                    <span>
-                        Live Operations
-                    </span>
-
-                </div>
-
-            </section>
-
-
-
-            <!-- ==================================
-                 ORDER SUMMARY
-            =================================== -->
-
-            <section class="order-summary-grid">
-
-
-                <!-- TOTAL -->
-
-                <div class="order-summary-card">
-
-                    <div class="summary-card-top">
-
-                        <span class="summary-label">
-                            TOTAL ORDERS
+                        <span class="page-eyebrow">
+                            ORDER MANAGEMENT
                         </span>
 
-                        <span class="summary-icon total">
-                            ▤
-                        </span>
-
-                    </div>
-
-                    <div class="summary-value">
-                        <strong id="totalOrders">
-                            0
-                        </strong>
-                    </div>
-
-                    <div class="summary-footer">
-                        Orders in selected period
-                    </div>
-
-                </div>
-
-
-
-                <!-- PENDING -->
-
-                <div class="order-summary-card">
-
-                    <div class="summary-card-top">
-
-                        <span class="summary-label">
-                            PENDING
-                        </span>
-
-                        <span class="summary-icon pending">
-                            ◷
-                        </span>
-
-                    </div>
-
-                    <div class="summary-value">
-                        <strong id="pendingOrders">
-                            0
-                        </strong>
-                    </div>
-
-                    <div class="summary-footer">
-                        Awaiting confirmation
-                    </div>
-
-                </div>
-
-
-
-                <!-- PREPARING -->
-
-                <div class="order-summary-card">
-
-                    <div class="summary-card-top">
-
-                        <span class="summary-label">
-                            PREPARING
-                        </span>
-
-                        <span class="summary-icon preparing">
-                            ◉
-                        </span>
-
-                    </div>
-
-                    <div class="summary-value">
-                        <strong id="preparingOrders">
-                            0
-                        </strong>
-                    </div>
-
-                    <div class="summary-footer">
-                        Currently in kitchen
-                    </div>
-
-                </div>
-
-
-
-                <!-- READY -->
-
-                <div class="order-summary-card">
-
-                    <div class="summary-card-top">
-
-                        <span class="summary-label">
-                            READY
-                        </span>
-
-                        <span class="summary-icon ready">
-                            ✓
-                        </span>
-
-                    </div>
-
-                    <div class="summary-value">
-                        <strong id="readyOrders">
-                            0
-                        </strong>
-
-                    </div>
-
-                    <div class="summary-footer">
-                        Ready for customer
-                    </div>
-
-                </div>
-
-
-
-                <!-- COMPLETED -->
-
-                <div class="order-summary-card">
-
-                    <div class="summary-card-top">
-
-                        <span class="summary-label">
-                            COMPLETED
-                        </span>
-
-                        <span class="summary-icon completed">
-                            ✓
-                        </span>
-
-                    </div>
-
-                    <div class="summary-value">
-
-                        <strong id="completedOrders">
-                            0
-                        </strong>
-
-                    </div>
-
-                    <div class="summary-footer">
-                        Successfully completed
-                    </div>
-
-                </div>
-
-            </section>
-
-
-
-            <!-- ==================================
-                 ORDERS MANAGEMENT
-            =================================== -->
-
-            <section class="orders-section">
-
-                <div class="orders-card">
-
-
-                    <!-- ==================================
-                         ORDERS HEADER
-                    =================================== -->
-
-                    <div class="orders-card-header">
-
-                        <div>
-
-                            <span class="section-eyebrow">
-                                ORDER MANAGEMENT
-                            </span>
-
-                            <h2>
-                                All Orders
-                            </h2>
-
-                            <p>
-                                Review and manage customer orders
-                                from your restaurant.
-                            </p>
-
-                        </div>
-
-
-                        <div class="orders-header-status">
-
-                            <span class="header-status-dot"></span>
-
-                            <span>
-                                Monitoring
-                            </span>
-
-                        </div>
-
-                    </div>
-
-
-
-                    <!-- ==================================
-                         FILTER TOOLBAR
-                    =================================== -->
-
-                    <div class="orders-toolbar">
-
-
-                        <!-- SEARCH -->
-
-                        <div class="order-search">
-
-                            <span class="search-icon">
-                                ⌕
-                            </span>
-
-                            <input
-                                type="search"
-                                id="orderSearch"
-                                placeholder="Search order, customer or table..."
-                                autocomplete="off"
-                            >
-
-                        </div>
-
-
-
-                        <!-- BRANCH -->
-
-                        <div class="filter-control">
-
-                            <label for="branchFilter">
-                                Branch
-                            </label>
-
-                            <select id="branchFilter">
-
-                                <option value="all">
-                                    All Branches
-                                </option>
-
-                            </select>
-
-                        </div>
-
-
-
-                        <!-- STATUS -->
-
-                        <div class="filter-control">
-
-                            <label for="statusFilter">
-                                Status
-                            </label>
-
-                            <select id="statusFilter">
-
-                                <option value="all">
-                                    All Statuses
-                                </option>
-
-                                <option value="pending">
-                                    Pending
-                                </option>
-
-                                <option value="preparing">
-                                    Preparing
-                                </option>
-
-                                <option value="ready">
-                                    Ready
-                                </option>
-
-                                <option value="completed">
-                                    Completed
-                                </option>
-
-                                <option value="rejected">
-                                    Rejected
-                                </option>
-
-                            </select>
-
-                        </div>
-
-
-
-                        <!-- DATE -->
-
-                        <div class="filter-control">
-
-                            <label for="dateFilter">
-                                Period
-                            </label>
-
-                            <select id="dateFilter">
-
-                                <option value="today">
-                                    Today
-                                </option>
-
-                                <option value="7">
-                                    Last 7 Days
-                                </option>
-
-                                <option value="14">
-                                    Last 14 Days
-                                </option>
-
-                                <option value="30">
-                                    Last 30 Days
-                                </option>
-
-                                <option value="all">
-                                    All Time
-                                </option>
-
-                            </select>
-
-                        </div>
-
-
-
-                        <!-- RESET -->
-
-                        <button
-                            type="button"
-                            class="reset-filter-button"
-                            id="resetFilters"
-                        >
-                            Reset
-                        </button>
-
-                    </div>
-
-
-
-                    <!-- ==================================
-                         TABLE
-                    =================================== -->
-
-                    <div class="orders-table-wrapper">
-
-                        <table class="orders-table">
-
-                            <thead>
-
-                                <tr>
-
-                                    <th>
-                                        Order
-                                    </th>
-
-                                    <th>
-                                        Customer
-                                    </th>
-
-                                    <th>
-                                        Branch
-                                    </th>
-
-                                    <th>
-                                        Table
-                                    </th>
-
-                                    <th>
-                                        Amount
-                                    </th>
-
-                                    <th>
-                                        Status
-                                    </th>
-
-                                    <th>
-                                        Time
-                                    </th>
-
-                                    <th>
-                                        Action
-                                    </th>
-
-                                </tr>
-
-                            </thead>
-
-
-                            <tbody id="ordersTableBody">
-
-                                <!-- Orders will be rendered here -->
-
-                                <tr>
-
-                                    <td
-                                        colspan="8"
-                                        class="orders-loading"
-                                    >
-
-                                        <div class="orders-loading-icon">
-                                            ◌
-                                        </div>
-
-                                        <span>
-                                            Loading orders...
-                                        </span>
-
-                                    </td>
-
-                                </tr>
-
-                            </tbody>
-
-                        </table>
-
-                    </div>
-
-
-
-                    <!-- ==================================
-                         EMPTY STATE
-                    =================================== -->
-
-                    <div
-                        class="orders-empty"
-                        id="ordersEmpty"
-                        style="display:none;"
-                    >
-
-                        <div class="orders-empty-icon">
-                            ✦
-                        </div>
-
-                        <h3>
-                            No orders found
-                        </h3>
+                        <h2>
+                            Customer Orders
+                        </h2>
 
                         <p>
-                            No customer orders match your
-                            current filters.
+                            Monitor, manage and track customer orders
+                            across your restaurant.
                         </p>
 
                     </div>
 
 
+                    <div class="orders-live-badge">
 
-                    <!-- ==================================
+                        <span class="orders-live-dot"></span>
+
+                        <span>
+                            Live Operations
+                        </span>
+
+                    </div>
+
+                </section>
+
+
+
+                <!-- ==================================
+                 ORDER SUMMARY
+            =================================== -->
+
+                <section class="order-summary-grid">
+
+
+                    <!-- TOTAL -->
+
+                    <div class="order-summary-card">
+
+                        <div class="summary-card-top">
+
+                            <span class="summary-label">
+                                TOTAL ORDERS
+                            </span>
+
+                            <span class="summary-icon total">
+                                ▤
+                            </span>
+
+                        </div>
+
+                        <div class="summary-value">
+                            <strong id="totalOrders">
+                                0
+                            </strong>
+                        </div>
+
+                        <div class="summary-footer">
+                            Orders in selected period
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- PENDING -->
+
+                    <div class="order-summary-card">
+
+                        <div class="summary-card-top">
+
+                            <span class="summary-label">
+                                PENDING
+                            </span>
+
+                            <span class="summary-icon pending">
+                                ◷
+                            </span>
+
+                        </div>
+
+                        <div class="summary-value">
+                            <strong id="pendingOrders">
+                                0
+                            </strong>
+                        </div>
+
+                        <div class="summary-footer">
+                            Awaiting confirmation
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- PREPARING -->
+
+                    <div class="order-summary-card">
+
+                        <div class="summary-card-top">
+
+                            <span class="summary-label">
+                                PREPARING
+                            </span>
+
+                            <span class="summary-icon preparing">
+                                ◉
+                            </span>
+
+                        </div>
+
+                        <div class="summary-value">
+                            <strong id="preparingOrders">
+                                0
+                            </strong>
+                        </div>
+
+                        <div class="summary-footer">
+                            Currently in kitchen
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- READY -->
+
+                    <div class="order-summary-card">
+
+                        <div class="summary-card-top">
+
+                            <span class="summary-label">
+                                READY
+                            </span>
+
+                            <span class="summary-icon ready">
+                                ✓
+                            </span>
+
+                        </div>
+
+                        <div class="summary-value">
+                            <strong id="readyOrders">
+                                0
+                            </strong>
+
+                        </div>
+
+                        <div class="summary-footer">
+                            Ready for customer
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- COMPLETED -->
+
+                    <div class="order-summary-card">
+
+                        <div class="summary-card-top">
+
+                            <span class="summary-label">
+                                COMPLETED
+                            </span>
+
+                            <span class="summary-icon completed">
+                                ✓
+                            </span>
+
+                        </div>
+
+                        <div class="summary-value">
+
+                            <strong id="completedOrders">
+                                0
+                            </strong>
+
+                        </div>
+
+                        <div class="summary-footer">
+                            Successfully completed
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+
+                <!-- ==================================
+                 ORDERS MANAGEMENT
+            =================================== -->
+
+                <section class="orders-section">
+
+                    <div class="orders-card">
+
+
+                        <!-- ==================================
+                         ORDERS HEADER
+                    =================================== -->
+
+                        <div class="orders-card-header">
+
+                            <div>
+
+                                <span class="section-eyebrow">
+                                    ORDER MANAGEMENT
+                                </span>
+
+                                <h2>
+                                    All Orders
+                                </h2>
+
+                                <p>
+                                    Review and manage customer orders
+                                    from your restaurant.
+                                </p>
+
+                            </div>
+
+
+                            <div class="orders-header-status">
+
+                                <span class="header-status-dot"></span>
+
+                                <span>
+                                    Monitoring
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+
+                        <!-- ==================================
+                         FILTER TOOLBAR
+                    =================================== -->
+
+                        <div class="orders-toolbar">
+
+
+                            <!-- SEARCH -->
+
+                            <div class="order-search">
+
+                                <span class="search-icon">
+                                    ⌕
+                                </span>
+
+                                <input type="search" id="orderSearch" placeholder="Search order, customer or table..."
+                                    autocomplete="off">
+
+                            </div>
+
+
+
+                            <!-- BRANCH -->
+
+                            <div class="filter-control">
+
+                                <label for="branchFilter">
+                                    Branch
+                                </label>
+
+                                <select id="branchFilter">
+
+                                    <option value="all">
+                                        All Branches
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+
+
+                            <!-- STATUS -->
+
+                            <div class="filter-control">
+
+                                <label for="statusFilter">
+                                    Status
+                                </label>
+
+                                <select id="statusFilter">
+
+                                    <option value="all">
+                                        All Statuses
+                                    </option>
+
+                                    <option value="pending">
+                                        Pending
+                                    </option>
+
+                                    <option value="preparing">
+                                        Preparing
+                                    </option>
+
+                                    <option value="ready">
+                                        Ready
+                                    </option>
+
+                                    <option value="completed">
+                                        Completed
+                                    </option>
+
+                                    <option value="rejected">
+                                        Rejected
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+
+
+                            <!-- DATE -->
+
+                            <div class="filter-control">
+
+                                <label for="dateFilter">
+                                    Period
+                                </label>
+
+                                <select id="dateFilter">
+
+                                    <option value="today">
+                                        Today
+                                    </option>
+
+                                    <option value="7">
+                                        Last 7 Days
+                                    </option>
+
+                                    <option value="14">
+                                        Last 14 Days
+                                    </option>
+
+                                    <option value="30">
+                                        Last 30 Days
+                                    </option>
+
+                                    <option value="all">
+                                        All Time
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+
+
+                            <!-- RESET -->
+
+                            <button type="button" class="reset-filter-button" id="resetFilters">
+                                Reset
+                            </button>
+
+                        </div>
+
+
+
+                        <!-- ==================================
+                         TABLE
+                    =================================== -->
+
+                        <div class="orders-table-wrapper">
+
+                            <table class="orders-table">
+
+                                <thead>
+
+                                    <tr>
+
+                                        <th>
+                                            Order
+                                        </th>
+
+                                        <th>
+                                            Customer
+                                        </th>
+
+                                        <th>
+                                            Branch
+                                        </th>
+
+                                        <th>
+                                            Table
+                                        </th>
+
+                                        <th>
+                                            Amount
+                                        </th>
+
+                                        <th>
+                                            Status
+                                        </th>
+
+                                        <th>
+                                            Time
+                                        </th>
+
+                                        <th>
+                                            Action
+                                        </th>
+
+                                    </tr>
+
+                                </thead>
+
+
+                                <tbody id="ordersTableBody">
+
+                                    <!-- Orders will be rendered here -->
+
+                                    <tr>
+
+                                        <td colspan="8" class="orders-loading">
+
+                                            <div class="orders-loading-icon">
+                                                ◌
+                                            </div>
+
+                                            <span>
+                                                Loading orders...
+                                            </span>
+
+                                        </td>
+
+                                    </tr>
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+
+
+                        <!-- ==================================
+                         EMPTY STATE
+                    =================================== -->
+
+                        <div class="orders-empty" id="ordersEmpty" style="display:none;">
+
+                            <div class="orders-empty-icon">
+                                ✦
+                            </div>
+
+                            <h3>
+                                No orders found
+                            </h3>
+
+                            <p>
+                                No customer orders match your
+                                current filters.
+                            </p>
+
+                        </div>
+
+
+
+                        <!-- ==================================
                          TABLE FOOTER
                     =================================== -->
 
-                    <div class="orders-card-footer">
+                        <div class="orders-card-footer">
 
 
-                        <div class="orders-result-count">
+                            <div class="orders-result-count">
 
-                            Showing
+                                Showing
 
-                            <strong id="ordersFrom">
-                                0
-                            </strong>
+                                <strong id="ordersFrom">
+                                    0
+                                </strong>
 
-                            –
+                                –
 
-                            <strong id="ordersTo">
-                                0
-                            </strong>
+                                <strong id="ordersTo">
+                                    0
+                                </strong>
 
-                            of
+                                of
 
-                            <strong id="ordersTotal">
-                                0
-                            </strong>
+                                <strong id="ordersTotal">
+                                    0
+                                </strong>
 
-                            orders
-
-                        </div>
-
-
-                        <div class="pagination">
-
-                            <button
-                                type="button"
-                                class="pagination-button"
-                                id="previousPage"
-                                disabled
-                            >
-                                ‹
-                            </button>
-
-
-                            <div
-                                class="pagination-pages"
-                                id="paginationPages"
-                            >
-
-                                <!-- Pages rendered by JS -->
+                                orders
 
                             </div>
 
 
-                            <button
-                                type="button"
-                                class="pagination-button"
-                                id="nextPage"
-                                disabled
-                            >
-                                ›
-                            </button>
+                            <div class="pagination">
+
+                                <button type="button" class="pagination-button" id="previousPage" disabled>
+                                    ‹
+                                </button>
+
+
+                                <div class="pagination-pages" id="paginationPages">
+
+                                    <!-- Pages rendered by JS -->
+
+                                </div>
+
+
+                                <button type="button" class="pagination-button" id="nextPage" disabled>
+                                    ›
+                                </button>
+
+                            </div>
 
                         </div>
 
                     </div>
 
-                </div>
-
-            </section>
+                </section>
 
 
 
-            <!-- ==================================
+                <!-- ==================================
                  ORDER DETAILS MODAL
             =================================== -->
 
-            <div
-                class="order-modal-overlay"
-                id="orderModal"
-                style="display:none;"
-            >
+                <div class="order-modal-overlay" id="orderModal" style="display:none;">
 
-                <div class="order-modal">
+                    <div class="order-modal">
 
 
-                    <!-- MODAL HEADER -->
+                        <!-- MODAL HEADER -->
 
-                    <div class="order-modal-header">
+                        <div class="order-modal-header">
 
-                        <div>
+                            <div>
 
-                            <span class="modal-eyebrow">
-                                ORDER DETAILS
+                                <span class="modal-eyebrow">
+                                    ORDER DETAILS
+                                </span>
+
+                                <h2 id="modalOrderId">
+                                    Order
+                                </h2>
+
+                            </div>
+
+
+                            <button type="button" class="modal-close" id="closeOrderModal">
+                                ×
+                            </button>
+
+                        </div>
+
+
+
+                        <!-- MODAL STATUS -->
+
+                        <div class="modal-status-row">
+
+                            <span class="modal-status-label">
+                                Current Status
                             </span>
 
-                            <h2 id="modalOrderId">
-                                Order
-                            </h2>
-
-                        </div>
-
-
-                        <button
-                            type="button"
-                            class="modal-close"
-                            id="closeOrderModal"
-                        >
-                            ×
-                        </button>
-
-                    </div>
-
-
-
-                    <!-- MODAL STATUS -->
-
-                    <div class="modal-status-row">
-
-                        <span class="modal-status-label">
-                            Current Status
-                        </span>
-
-                        <span
-                            class="modal-order-status"
-                            id="modalOrderStatus"
-                        >
-                            —
-                        </span>
-
-                    </div>
-
-
-
-                    <!-- CUSTOMER -->
-
-                    <div class="modal-section">
-
-                        <div class="modal-section-title">
-                            Customer Information
-                        </div>
-
-
-                        <div class="modal-info-grid">
-
-                            <div class="modal-info-item">
-
-                                <span>
-                                    Customer
-                                </span>
-
-                                <strong id="modalCustomer">
-                                    —
-                                </strong>
-
-                            </div>
-
-
-                            <div class="modal-info-item">
-
-                                <span>
-                                    Mobile
-                                </span>
-
-                                <strong id="modalMobile">
-                                    —
-                                </strong>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-
-
-                    <!-- ORDER INFORMATION -->
-
-                    <div class="modal-section">
-
-                        <div class="modal-section-title">
-                            Order Information
-                        </div>
-
-
-                        <div class="modal-info-grid">
-
-                            <div class="modal-info-item">
-
-                                <span>
-                                    Branch
-                                </span>
-
-                                <strong id="modalBranch">
-                                    —
-                                </strong>
-
-                            </div>
-
-
-                            <div class="modal-info-item">
-
-                                <span>
-                                    Table
-                                </span>
-
-                                <strong id="modalTable">
-                                    —
-                                </strong>
-
-                            </div>
-
-
-                            <div class="modal-info-item">
-
-                                <span>
-                                    Order Time
-                                </span>
-
-                                <strong id="modalOrderTime">
-                                    —
-                                </strong>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-
-
-                    <!-- ITEMS -->
-
-                    <div class="modal-section">
-
-                        <div class="modal-section-title">
-                            Ordered Items
-                        </div>
-
-
-                        <div
-                            class="modal-items"
-                            id="modalItems"
-                        >
-                            —
-                        </div>
-
-                    </div>
-
-
-
-                    <!-- REQUEST -->
-
-                    <div
-                        class="modal-section"
-                        id="modalRequestSection"
-                    >
-
-                        <div class="modal-section-title">
-                            Special Request
-                        </div>
-
-
-                        <div
-                            class="modal-request"
-                            id="modalRequest"
-                        >
-                            —
-                        </div>
-
-                    </div>
-
-
-
-                    <!-- BILL -->
-
-                    <div class="modal-section modal-billing">
-
-                        <div class="modal-section-title">
-                            Payment Summary
-                        </div>
-
-
-                        <div class="billing-row">
-
-                            <span>
-                                Subtotal
+                            <span class="modal-order-status" id="modalOrderStatus">
+                                —
                             </span>
 
-                            <strong id="modalSubtotal">
-                                AED 0.00
-                            </strong>
+                        </div>
+
+
+
+                        <!-- CUSTOMER -->
+
+                        <div class="modal-section">
+
+                            <div class="modal-section-title">
+                                Customer Information
+                            </div>
+
+
+                            <div class="modal-info-grid">
+
+                                <div class="modal-info-item">
+
+                                    <span>
+                                        Customer
+                                    </span>
+
+                                    <strong id="modalCustomer">
+                                        —
+                                    </strong>
+
+                                </div>
+
+
+                                <div class="modal-info-item">
+
+                                    <span>
+                                        Mobile
+                                    </span>
+
+                                    <strong id="modalMobile">
+                                        —
+                                    </strong>
+
+                                </div>
+
+                            </div>
 
                         </div>
 
 
-                        <div class="billing-row">
 
-                            <span>
-                                Tax
-                            </span>
+                        <!-- ORDER INFORMATION -->
 
-                            <strong id="modalTax">
-                                AED 0.00
-                            </strong>
+                        <div class="modal-section">
+
+                            <div class="modal-section-title">
+                                Order Information
+                            </div>
+
+
+                            <div class="modal-info-grid">
+
+                                <div class="modal-info-item">
+
+                                    <span>
+                                        Branch
+                                    </span>
+
+                                    <strong id="modalBranch">
+                                        —
+                                    </strong>
+
+                                </div>
+
+
+                                <div class="modal-info-item">
+
+                                    <span>
+                                        Table
+                                    </span>
+
+                                    <strong id="modalTable">
+                                        —
+                                    </strong>
+
+                                </div>
+
+
+                                <div class="modal-info-item">
+
+                                    <span>
+                                        Order Time
+                                    </span>
+
+                                    <strong id="modalOrderTime">
+                                        —
+                                    </strong>
+
+                                </div>
+
+                            </div>
 
                         </div>
 
 
-                        <div class="billing-total">
 
-                            <span>
-                                Total
-                            </span>
+                        <!-- ITEMS -->
 
-                            <strong id="modalTotal">
-                                AED 0.00
-                            </strong>
+                        <div class="modal-section">
+
+                            <div class="modal-section-title">
+                                Ordered Items
+                            </div>
+
+
+                            <div class="modal-items" id="modalItems">
+                                —
+                            </div>
 
                         </div>
 
-                    </div>
+
+
+                        <!-- REQUEST -->
+
+                        <div class="modal-section" id="modalRequestSection">
+
+                            <div class="modal-section-title">
+                                Special Request
+                            </div>
+
+
+                            <div class="modal-request" id="modalRequest">
+                                —
+                            </div>
+
+                        </div>
 
 
 
-                    <!-- MODAL ACTIONS -->
+                        <!-- BILL -->
 
-                    <div class="order-modal-actions">
+                        <div class="modal-section modal-billing">
 
-                        <button
-                            type="button"
-                            class="modal-secondary-button"
-                            id="modalCloseButton"
-                        >
-                            Close
-                        </button>
+                            <div class="modal-section-title">
+                                Payment Summary
+                            </div>
+
+
+                            <div class="billing-row">
+
+                                <span>
+                                    Subtotal
+                                </span>
+
+                                <strong id="modalSubtotal">
+                                    AED 0.00
+                                </strong>
+
+                            </div>
+
+
+                            <div class="billing-row">
+
+                                <span>
+                                    Tax
+                                </span>
+
+                                <strong id="modalTax">
+                                    AED 0.00
+                                </strong>
+
+                            </div>
+
+
+                            <div class="billing-total">
+
+                                <span>
+                                    Total
+                                </span>
+
+                                <strong id="modalTotal">
+                                    AED 0.00
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+
+
+                        <!-- MODAL ACTIONS -->
+
+                        <div class="order-modal-actions">
+
+                            <button type="button" class="modal-secondary-button" id="modalCloseButton">
+                                Close
+                            </button>
+
+                        </div>
 
                     </div>
 
@@ -1068,21 +987,19 @@
 
             </div>
 
-        </div>
+        </main>
 
-    </main>
-
-</div>
+    </div>
 
 
 
-<!-- ==========================================
+    <!-- ==========================================
      AUTHENTICATION
 =========================================== -->
 
-<script src="../../auth.js"></script>
+    <script src="../../auth.js"></script>
 
-<script src="orders.js"></script>
+    <script src="orders.js"></script>
 
 
 </body>
