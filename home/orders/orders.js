@@ -876,108 +876,101 @@ function applyFilters() {
 // DATE FILTER
 // ==========================================
 
-function matchesDateFilter(
-    orderDate,
-    filter
-) {
+function matchesDateFilter(order, filter) {
 
-    if (
-        !orderDate ||
-        filter === "all"
-    ) {
-
+    if (!filter || filter === "all") {
         return true;
-
     }
 
+    const orderDate =
+        new Date(order.orderDate);
 
-    const orderTime =
-        new Date(
-            orderDate
-        ).getTime();
-
-
-    if (
-        Number.isNaN(
-            orderTime
-        )
-    ) {
-
+    if (isNaN(orderDate.getTime())) {
         return false;
-
     }
 
-
+    // Get today's date in Dubai
     const now =
         new Date();
 
-
-    // --------------------------------------
-    // Dubai business timezone handling
-    // --------------------------------------
-
     const todayDubai =
-        getDubaiDateKey(
-            now
-        );
+        new Intl.DateTimeFormat(
+            "en-CA",
+            {
+                timeZone: "Asia/Dubai",
+                year: "numeric",
+                month: "2-digit",
+                day: "2-digit"
+            }
+        ).format(now);
 
     const orderDubai =
-        getDubaiDateKey(
-            new Date(
-                orderDate
-            )
-        );
+        new Intl.DateTimeFormat(
+            "en-CA",
+            {
+                timeZone: "Asia/Dubai",
+                year: "numeric",
+                month: "2-digit",
+                day: "2-digit"
+            }
+        ).format(orderDate);
 
+    // ==========================================
+    // TODAY
+    // ==========================================
 
-    if (
-        filter === "today"
-    ) {
-
-        return (
-            todayDubai ===
-            orderDubai
-        );
-
+    if (filter === "today") {
+        return orderDubai === todayDubai;
     }
 
+    // ==========================================
+    // ROLLING DATE FILTERS
+    // ==========================================
 
-    // --------------------------------------
-    // Rolling day ranges
-    // --------------------------------------
+    const today =
+        new Date();
 
-    const days =
-        Number(
-            filter
+    const startDate =
+        new Date();
+
+    if (filter === "7") {
+        startDate.setDate(
+            today.getDate() - 6
         );
+    }
 
+    else if (filter === "14") {
+        startDate.setDate(
+            today.getDate() - 13
+        );
+    }
 
-    if (
-        !Number.isFinite(days)
-    ) {
+    else if (filter === "30") {
+        startDate.setDate(
+            today.getDate() - 29
+        );
+    }
 
+    else {
         return true;
-
     }
 
+    // Compare using timestamps
+    // so the complete selected period is included.
 
-    const cutoff =
-        Date.now() -
-        (
-            days *
-            24 *
-            60 *
-            60 *
-            1000
-        );
-
-
-    return (
-        orderTime >=
-        cutoff
+    startDate.setHours(
+        0, 0, 0, 0
     );
 
-}
+    today.setHours(
+        23, 59, 59, 999
+    );
 
+    return (
+        orderDate >= startDate &&
+        orderDate <= today
+    );
+}
 
 // ==========================================
 // DUBAI DATE KEY
