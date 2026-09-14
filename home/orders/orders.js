@@ -851,7 +851,7 @@ function applyFilters() {
 
                 if (
                     !matchesDateFilter(
-                        order.orderDate,
+                        order,
                         dateRange
                     )
                 ) {
@@ -859,8 +859,6 @@ function applyFilters() {
                     return false;
 
                 }
-
-
                 return true;
 
             }
