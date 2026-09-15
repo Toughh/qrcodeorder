@@ -164,6 +164,97 @@ document.addEventListener(
 );
 
 
+// ==========================================
+// TOPBAR OWNER
+// ==========================================
+
+function updateOrdersTopbarOwner() {
+
+    let sessionData = null;
+
+    try {
+
+        const storedSession =
+            localStorage.getItem(
+                SESSION_DATA_KEY
+            );
+
+        if (storedSession) {
+
+            sessionData =
+                JSON.parse(
+                    storedSession
+                );
+
+        }
+
+    } catch (error) {
+
+        console.warn(
+            "Unable to read session data:",
+            error
+        );
+
+    }
+
+
+    const ownerName =
+        sessionData?.ownerName ||
+        sessionData?.OwnerName ||
+        sessionData?.name ||
+        sessionData?.Name ||
+        "Owner";
+
+
+    const ownerRole =
+        sessionData?.role ||
+        sessionData?.Role ||
+        "Owner";
+
+
+    const topbarUserName =
+        document.getElementById(
+            "topbarUserName"
+        );
+
+    if (topbarUserName) {
+
+        topbarUserName.textContent =
+            ownerName;
+
+    }
+
+
+    const topbarUserRole =
+        document.getElementById(
+            "topbarUserRole"
+        );
+
+    if (topbarUserRole) {
+
+        topbarUserRole.textContent =
+            ownerRole;
+
+    }
+
+
+    const topbarUserAvatar =
+        document.getElementById(
+            "topbarUserAvatar"
+        );
+
+    if (topbarUserAvatar) {
+
+        topbarUserAvatar.textContent =
+            ownerName
+                .charAt(0)
+                .toUpperCase();
+
+    }
+
+}
+
+
 async function initializeOrdersPage() {
 
     try {
@@ -183,6 +274,7 @@ async function initializeOrdersPage() {
             if (authenticated === false) {
                 return;
             }
+            updateOrdersTopbarOwner();
 
         }
 
@@ -2387,12 +2479,12 @@ function showOrdersError() {
 
         const title =
             ordersEmpty.querySelector(
-                "h3"
+                ".orders-empty-title"
             );
 
         const message =
             ordersEmpty.querySelector(
-                "p"
+                ".orders-empty-text"
             );
 
 

@@ -187,8 +187,25 @@
 
                     </div>
 
-                    <div class="topbar-user" id="topbarUser">
-                        Owner
+
+                    <div class="topbar-owner">
+
+                        <div class="topbar-owner-avatar" id="topbarUserAvatar">
+                            O
+                        </div>
+
+                        <div class="topbar-owner-info">
+
+                            <div class="topbar-owner-name" id="topbarUserName">
+                                Owner
+                            </div>
+
+                            <div class="topbar-owner-role" id="topbarUserRole">
+                                Owner
+                            </div>
+
+                        </div>
+
                     </div>
 
                 </div>
@@ -656,24 +673,19 @@
 
 
 
-                        <!-- ==================================
-                         EMPTY STATE
-                    =================================== -->
-
                         <div class="orders-empty" id="ordersEmpty" style="display:none;">
 
                             <div class="orders-empty-icon">
                                 ✦
                             </div>
 
-                            <h3>
-                                No orders found
-                            </h3>
+                            <div class="orders-empty-title">
+                                No active orders right now
+                            </div>
 
-                            <p>
-                                No customer orders match your
-                                current filters.
-                            </p>
+                            <div class="orders-empty-text">
+                                New customer orders will appear here as soon as they are received.
+                            </div>
 
                         </div>
 
@@ -743,7 +755,7 @@
                  ORDER DETAILS MODAL
             =================================== -->
 
-                <div class="order-modal-overlay" id="orderModal" style="display:none;">
+                <div class="order-modal-overlay" id="orderModal">
 
                     <div class="order-modal">
 
