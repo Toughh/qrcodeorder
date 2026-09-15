@@ -2107,13 +2107,15 @@ function openOrderModal(
     // Show modal
     // --------------------------------------
 
-    orderModal.classList.add(
-        "open"
-    );
+    orderModal.style.display = "flex";
 
-    document.body.classList.add(
-        "modal-open"
-    );
+orderModal.classList.add(
+    "open"
+);
+
+document.body.classList.add(
+    "modal-open"
+);
 
 }
 
@@ -2217,6 +2219,9 @@ function closeOrderDetails() {
     orderModal.classList.remove(
         "open"
     );
+
+    orderModal.style.display =
+        "none";
 
 
     document.body.classList.remove(
