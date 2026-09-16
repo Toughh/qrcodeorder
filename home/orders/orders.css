@@ -1212,6 +1212,28 @@ body {
         #fbfdff;
 }
 
+/* =========================================================
+   TABLE BODY
+   DASHBOARD LIVE ORDER STYLE
+   ========================================================= */
+
+.orders-table tbody tr {
+
+    background:
+        #ffffff;
+
+    transition:
+        background 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+
+.orders-table tbody tr:hover {
+
+    background:
+        #fbfdff;
+}
+
 
 /* =========================================================
    TABLE CELLS
@@ -1220,7 +1242,7 @@ body {
 .orders-table td {
 
     padding:
-        13px 16px;
+        15px 17px;
 
     color:
         #475569;
@@ -1256,13 +1278,13 @@ body {
 .orders-table td:first-child {
 
     color:
-        #172033;
+        #0f172a;
 
     font-size:
-        10px;
+        13px;
 
     font-weight:
-        750;
+        700;
 
     white-space:
         nowrap;
@@ -1293,13 +1315,13 @@ body {
 .orders-table td:nth-child(3) {
 
     color:
-        #64748b;
+        #334155;
 
     font-size:
-        10px;
+        12px;
 
     font-weight:
-        550;
+        600;
 }
 
 
@@ -1310,13 +1332,13 @@ body {
 .orders-table td:nth-child(4) {
 
     color:
-        #64748b;
+        #334155;
 
     font-size:
-        10px;
+        12px;
 
     font-weight:
-        550;
+        600;
 
     white-space:
         nowrap;
@@ -1330,13 +1352,13 @@ body {
 .orders-table td:nth-child(5) {
 
     color:
-        #172033;
+        #0f172a;
 
     font-size:
-        10px;
+        13px;
 
     font-weight:
-        750;
+        800;
 
     white-space:
         nowrap;
@@ -1355,159 +1377,6 @@ body {
 
 
 /* =========================================================
-   STATUS BADGES
-   ========================================================= */
-
-.orders-table .status-badge,
-.orders-table .order-status,
-.orders-table .status {
-
-    display:
-        inline-flex;
-
-    align-items:
-        center;
-
-    gap:
-        6px;
-
-    min-height:
-        25px;
-
-    padding:
-        5px 10px;
-
-    border-radius:
-        999px;
-
-    font-size:
-        9px;
-
-    font-weight:
-        750;
-
-    line-height:
-        1;
-
-    white-space:
-        nowrap;
-}
-
-
-/* =========================================================
-   STATUS DOT
-   ========================================================= */
-
-.orders-table .status-badge::before,
-.orders-table .order-status::before,
-.orders-table .status::before {
-
-    content:
-        "";
-
-    width:
-        5px;
-
-    height:
-        5px;
-
-    flex:
-        0 0 5px;
-
-    border-radius:
-        50%;
-
-    background:
-        currentColor;
-}
-
-
-/* =========================================================
-   PENDING
-   ========================================================= */
-
-.orders-table .pending {
-
-    color:
-        #b8892d;
-
-    background:
-        #fff9e8;
-
-    border:
-        1px solid #f1dfaa;
-}
-
-
-/* =========================================================
-   PREPARING
-   ========================================================= */
-
-.orders-table .preparing {
-
-    color:
-        #2563eb;
-
-    background:
-        #eff6ff;
-
-    border:
-        1px solid #bfdbfe;
-}
-
-
-/* =========================================================
-   READY
-   ========================================================= */
-
-.orders-table .ready {
-
-    color:
-        #15803d;
-
-    background:
-        #f0fdf4;
-
-    border:
-        1px solid #bbf7d0;
-}
-
-
-/* =========================================================
-   COMPLETED
-   ========================================================= */
-
-.orders-table .completed {
-
-    color:
-        #475569;
-
-    background:
-        #f8fafc;
-
-    border:
-        1px solid #e2e8f0;
-}
-
-
-/* =========================================================
-   REJECTED
-   ========================================================= */
-
-.orders-table .rejected {
-
-    color:
-        #dc2626;
-
-    background:
-        #fef2f2;
-
-    border:
-        1px solid #fecaca;
-}
-
-
-/* =========================================================
    TIME
    ========================================================= */
 
@@ -1517,7 +1386,7 @@ body {
         #64748b;
 
     font-size:
-        10px;
+        11px;
 
     font-weight:
         500;
@@ -1536,7 +1405,6 @@ body {
     white-space:
         nowrap;
 }
-
 
 /* =========================================================
    ACTION BUTTON
@@ -1628,121 +1496,65 @@ body {
         11px;
 }
 
-
 /* =========================================================
    EMPTY STATE
-   DASHBOARD LIVE ORDER ANALYSIS STYLE
+   DASHBOARD-STYLE EMPTY PANEL
    ========================================================= */
 
-.orders-table .orders-empty {
+.orders-empty {
+    width: 100%;
+    min-height: 260px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 24px;
+    box-sizing: border-box;
+    text-align: center;
 
-    display:
-        flex;
-
-    flex-direction:
-        column;
-
-    align-items:
-        center;
-
-    justify-content:
-        center;
-
-    min-height:
-        220px;
-
-    padding:
-        34px 24px;
-
-    text-align:
-        center;
-
-    border:
-        1px dashed #dbe2ea;
-
-    border-radius:
-        14px;
-
-    background:
-        #fcfdff;
+    border: 1px dashed #dbe2ea;
+    border-radius: 14px;
+    background: #fcfdff;
 }
-
 
 .orders-empty-icon {
+    width: 46px;
+    height: 46px;
 
-    width:
-        42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
-    height:
-        42px;
+    margin-bottom: 15px;
 
-    display:
-        flex;
+    border: 1px solid #eee6d5;
+    border-radius: 50%;
 
-    align-items:
-        center;
+    background: #f8f5ed;
+    color: var(--gold);
 
-    justify-content:
-        center;
-
-    margin-bottom:
-        14px;
-
-    border:
-        1px solid #eee6d5;
-
-    border-radius:
-        50%;
-
-    background:
-        #f8f5ed;
-
-    color:
-        var(--gold);
-
-    font-size:
-        17px;
-
-    line-height:
-        1;
+    font-size: 18px;
+    line-height: 1;
 }
-
 
 .orders-empty-title {
+    margin: 0;
 
-    color:
-        #334155;
-
-    font-size:
-        14px;
-
-    font-weight:
-        750;
-
-    line-height:
-        1.4;
+    color: #334155;
+    font-size: 14px;
+    font-weight: 750;
+    line-height: 1.4;
 }
 
-
 .orders-empty-text {
+    max-width: 440px;
+    margin: 8px auto 0;
 
-    max-width:
-        420px;
-
-    margin-top:
-        7px;
-
-    color:
-        #94a3b8;
-
-    font-size:
-        11px;
-
-    font-weight:
-        500;
-
-    line-height:
-        1.6;
+    color: #94a3b8;
+    font-size: 11px;
+    font-weight: 500;
+    line-height: 1.6;
+    text-align: center;
 }
 
 
@@ -1954,25 +1766,59 @@ body {
 
 .order-modal {
 
+    position: relative;
+
     width: 100%;
 
-    max-width: 650px;
+    max-width: 680px;
 
     max-height:
         calc(100vh - 48px);
 
     overflow-y: auto;
 
-    background: #ffffff;
+    background:
+        linear-gradient(
+            145deg,
+            #ffffff 0%,
+            #fbfdff 55%,
+            #f8fafc 100%
+        );
 
     border:
-        1px solid rgba(255, 255, 255, 0.5);
+        1px solid #e2e8f0;
 
-    border-radius: 18px;
+    border-radius: 20px;
 
-    box-shadow: var(--shadow-lg);
+    box-shadow:
+        0 28px 70px rgba(15, 23, 42, 0.18),
+        0 8px 24px rgba(15, 23, 42, 0.08);
 
     scrollbar-width: thin;
+}
+
+
+.order-modal::before {
+
+    content: "";
+
+    position: absolute;
+
+    top: 0;
+
+    left: 0;
+
+    right: 0;
+
+    height: 3px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #b8892d,
+            #d4af37,
+            #b8892d
+        );
 }
 
 
@@ -1991,71 +1837,90 @@ body {
     gap: 20px;
 
     padding:
-        23px 24px 18px;
+        25px 26px 20px;
 
     border-bottom:
-        1px solid var(--border-soft);
+        1px solid #eef2f7;
 }
 
 .modal-eyebrow {
 
     display: block;
 
-    margin-bottom: 5px;
+    margin-bottom: 6px;
 
-    color: #a4864a;
+    color: #b8892d;
 
-    font-size: 8px;
+    font-size: 9px;
 
     font-weight: 800;
 
-    letter-spacing: 1.2px;
+    letter-spacing: 0.12em;
+
+    text-transform: uppercase;
 }
 
 .order-modal-header h2 {
 
-    color: #263449;
+    margin: 0;
 
-    font-size: 19px;
+    color: #0f172a;
+
+    font-size: 20px;
 
     font-weight: 750;
+
+    line-height: 1.25;
 }
 
 .modal-close {
 
-    width: 31px;
-    height: 31px;
+    width: 34px;
+
+    height: 34px;
 
     display: flex;
 
     align-items: center;
+
     justify-content: center;
 
-    border:
-        1px solid #e4e8ed;
+    flex: 0 0 auto;
 
-    border-radius: 8px;
+    border:
+        1px solid #e2e8f0;
+
+    border-radius: 9px;
 
     background: #ffffff;
 
-    color: #758296;
+    color: #64748b;
 
-    font-size: 19px;
+    font-size: 18px;
 
     cursor: pointer;
 
     transition:
+        border-color 0.2s ease,
+        color 0.2s ease,
         background 0.2s ease,
-        color 0.2s ease;
+        box-shadow 0.2s ease;
 }
 
 .modal-close:hover {
 
-    background: #f7f8fa;
+    border-color:
+        #d6bd73;
 
-    color: #374457;
+    color:
+        #b8892d;
+
+    background:
+        #fffdf7;
+
+    box-shadow:
+        0 4px 12px rgba(15, 23, 42, 0.06);
 }
-
 
 /* =========================================================
    MODAL STATUS
@@ -2159,15 +2024,28 @@ body {
     min-width: 0;
 
     padding:
-        12px;
+        13px;
 
     border:
-        1px solid #edf0f3;
+        1px solid #e5e7eb;
 
-    border-radius: 9px;
+    border-radius: 11px;
 
     background:
-        #fafbfc;
+        #ffffff;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.modal-info-item:hover {
+
+    border-color:
+        #d6bd73;
+
+    box-shadow:
+        0 5px 14px rgba(15, 23, 42, 0.04);
 }
 
 .modal-info-item span {
@@ -2208,23 +2086,27 @@ body {
 .modal-items {
 
     padding:
-        12px 13px;
+        14px 15px;
 
     border:
-        1px solid #edf0f3;
+        1px solid #e5e7eb;
 
-    border-radius: 9px;
+    border-radius: 11px;
 
     background:
-        #fafbfc;
+        #ffffff;
 
-    color: #59677a;
+    color:
+        #475569;
 
-    font-size: 10px;
+    font-size:
+        11px;
 
-    line-height: 1.8;
+    line-height:
+        1.75;
 
-    white-space: pre-line;
+    white-space:
+        pre-line;
 }
 
 
@@ -2266,13 +2148,35 @@ body {
 .billing-row,
 .billing-total {
 
-    display: flex;
+    margin-top:
+        9px;
 
-    align-items: center;
+    padding:
+        14px 0 0;
 
-    justify-content: space-between;
+    border-top:
+        1px solid #dbe2ea;
 
-    gap: 20px;
+    color:
+        #0f172a;
+
+    font-size:
+        12px;
+
+    font-weight:
+        800;
+}
+
+.billing-total strong {
+
+    color:
+        #b8892d;
+
+    font-size:
+        16px;
+
+    font-weight:
+        800;
 }
 
 .billing-row {
