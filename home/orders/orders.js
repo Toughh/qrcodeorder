@@ -168,7 +168,7 @@ document.addEventListener(
 // TOPBAR OWNER
 // ==========================================
 
-function updateOrdersTopbarOwner() {
+function updateOrdersTopbarOwner(ownerNameFromResponse = null) {
 
     let sessionData = null;
 
@@ -188,6 +188,8 @@ function updateOrdersTopbarOwner() {
 
         }
 
+        console.log("ORDERS SESSION DATA:", sessionData);
+
     } catch (error) {
 
         console.warn(
@@ -199,6 +201,7 @@ function updateOrdersTopbarOwner() {
 
 
     const ownerName =
+        ownerNameFromResponse ||
         sessionData?.ownerName ||
         sessionData?.OwnerName ||
         sessionData?.name ||
@@ -274,8 +277,6 @@ async function initializeOrdersPage() {
             if (authenticated === false) {
                 return;
             }
-            updateOrdersTopbarOwner();
-
         }
 
         // ----------------------------------
@@ -389,6 +390,8 @@ async function loadOrders() {
                 data?.message ||
                 "Unable to load orders."
             );
+
+            updateOrdersTopbarOwner(data.ownerName);
 
         }
 
@@ -2109,13 +2112,13 @@ function openOrderModal(
 
     orderModal.style.display = "flex";
 
-orderModal.classList.add(
-    "open"
-);
+    orderModal.classList.add(
+        "open"
+    );
 
-document.body.classList.add(
-    "modal-open"
-);
+    document.body.classList.add(
+        "modal-open"
+    );
 
 }
 
