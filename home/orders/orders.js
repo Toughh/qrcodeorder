@@ -390,10 +390,14 @@ async function loadOrders() {
                 data?.message ||
                 "Unable to load orders."
             );
-
-            updateOrdersTopbarOwner(data.ownerName);
-
         }
+
+
+        // ----------------------------------
+        // Owner Name
+        // ----------------------------------
+
+        updateOrdersTopbarOwner(data.ownerName);
 
 
         allOrders =
