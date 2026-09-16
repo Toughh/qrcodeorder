@@ -344,13 +344,15 @@ body {
 
 .main-content {
 
-    flex: 1;
-
-    min-width: 0;
-
     margin-left: 270px;
 
-    min-height: 100vh;
+     width:
+         calc(100% - 270px);
+
+     min-height: 100vh;
+
+     padding:
+         34px 42px;
 }
 
 

@@ -240,13 +240,15 @@ body {
    ========================================================= */
 
 .main {
-    margin-left: 250px;
+    margin-left: 270px;
 
-    width: calc(100% - 250px);
+     width:
+         calc(100% - 270px);
 
-    min-height: 100vh;
+     min-height: 100vh;
 
-    padding: 0 32px 40px;
+     padding:
+         34px 42px;
 }
 
 
@@ -255,42 +257,44 @@ body {
    ========================================================= */
 
 .topbar {
-    min-height: 90px;
 
-    display: flex;
+     display: flex;
 
-    align-items: center;
+     align-items: center;
 
-    justify-content: space-between;
+     justify-content: space-between;
 
-    border-bottom: 1px solid #e5e7eb;
+     margin-bottom: 30px;
 
-    margin-bottom: 28px;
-}
+ }
 
 
-.page-label {
-    font-size: 11px;
+ .page-label {
 
-    font-weight: 700;
+     font-size: 11px;
 
-    letter-spacing: 1.2px;
+     font-weight: 800;
 
-    color: #6b7280;
+     letter-spacing: 2px;
 
-    margin-bottom: 5px;
-}
+     color: #6366f1;
+
+     margin-bottom: 6px;
+
+ }
 
 
-.topbar h1 {
-    font-size: 28px;
+ .topbar h1 {
 
-    line-height: 1.2;
+     font-size: 30px;
 
-    font-weight: 700;
+     line-height: 1.2;
 
-    color: #111827;
-}
+     letter-spacing: -1px;
+
+     color: #0f172a;
+
+ }
 
 
 /* =========================================================

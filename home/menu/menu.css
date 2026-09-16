@@ -248,13 +248,15 @@ select {
    ========================================================= */
 
 .main-content {
-    margin-left: 250px;
+    margin-left: 270px;
 
-    width: calc(100% - 250px);
+     width:
+         calc(100% - 270px);
 
-    min-height: 100vh;
+     min-height: 100vh;
 
-    padding: 0 32px 40px;
+     padding:
+         34px 42px;
 }
 
 
