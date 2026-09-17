@@ -1,676 +1,1224 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
     <meta charset="UTF-8">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Reports | Restaurant SaaS</title>
+    <title>QR Order SaaS — Reports</title>
 
     <link rel="stylesheet" href="reports.css">
 
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
+
 
 <body>
 
-    <!-- ==========================================
-         SIDEBAR
-    =========================================== -->
-
-    <aside class="sidebar">
-
-        <div class="sidebar-brand">
-            <div class="brand-mark">R</div>
-
-            <div class="brand-text">
-                <div class="brand-title">Restaurant SaaS</div>
-                <div class="brand-subtitle">Owner Portal</div>
-            </div>
-        </div>
-
-        <nav class="sidebar-nav">
-
-            <a href="../dashboard/dashboard.html" class="nav-item">
-                <span class="nav-icon">⌂</span>
-                <span>Dashboard</span>
-            </a>
-
-            <a href="../restaurant/restaurant.html" class="nav-item">
-                <span class="nav-icon">▣</span>
-                <span>Restaurant</span>
-            </a>
-
-            <a href="../menu/menu.html" class="nav-item">
-                <span class="nav-icon">☷</span>
-                <span>Menu</span>
-            </a>
-
-            <a href="../reports/reports.html" class="nav-item active">
-                <span class="nav-icon">◫</span>
-                <span>Reports</span>
-            </a>
-
-        </nav>
-
-        <div class="sidebar-footer">
-            <div class="sidebar-footer-line"></div>
-            <div class="sidebar-footer-text">
-                Restaurant Management Platform
-            </div>
-        </div>
-
-    </aside>
+    <div class="app">
 
 
-    <!-- ==========================================
-         MAIN
-    =========================================== -->
+        <!-- ==================================
+             SIDEBAR
+        =================================== -->
 
-    <main class="main-content">
+        <aside class="sidebar">
 
-        <!-- ======================================
-             TOP BAR
-        ======================================= -->
 
-        <header class="topbar">
+            <!-- BRAND -->
 
-            <div>
-                <h1>Reports</h1>
-                <p>Restaurant performance intelligence</p>
-            </div>
+            <div class="brand">
 
-            <div class="owner-profile">
-
-                <div class="owner-avatar" id="ownerAvatar">
-                    O
+                <div class="brand-logo">
+                    QR
                 </div>
 
-                <div class="owner-info">
-                    <div class="owner-name" id="ownerName">
-                        Owner
+                <div>
+
+                    <div class="brand-name">
+                        QR Order
                     </div>
 
-                    <div class="owner-role">
-                        Restaurant Owner
+                    <div class="brand-subtitle">
+                        SaaS
                     </div>
+
                 </div>
 
             </div>
 
-        </header>
+
+            <!-- NAVIGATION -->
+
+            <nav class="navigation">
 
 
-        <!-- ======================================
-             REPORT CONTROLS
-        ======================================= -->
+                <a href="../dashboard/dashboard.html" class="nav-item">
 
-        <section class="report-controls">
+                    <span>📊</span>
 
-            <div class="control-group">
+                    Dashboard
 
-                <label for="dateRange">
-                    Reporting Period
-                </label>
-
-                <select id="dateRange">
-                    <option value="7">Last 7 Days</option>
-                    <option value="14">Last 14 Days</option>
-                    <option value="30" selected>Last 30 Days</option>
-                    <option value="90">Last 90 Days</option>
-                </select>
-
-            </div>
+                </a>
 
 
-            <div class="control-group">
+                <a href="../restaurant/restaurant.html" class="nav-item">
 
-                <label for="branchFilter">
-                    Branch
-                </label>
+                    <span>🏪</span>
 
-                <select id="branchFilter">
-                    <option value="">All Branches</option>
-                </select>
+                    Restaurant
 
-            </div>
+                </a>
 
 
-            <div class="control-actions">
+                <a href="../branches/branches.html" class="nav-item">
+
+                    <span>🏢</span>
+
+                    Branches
+
+                </a>
+
+
+                <a href="../menu/menu.html" class="nav-item">
+
+                    <span>🍽️</span>
+
+                    Menu
+
+                </a>
+
+
+                <a href="../users/users.html" class="nav-item">
+
+                    <span>👥</span>
+
+                    Users
+
+                </a>
+
+
+                <a href="../orders/orders.html" class="nav-item">
+
+                    <span>📦</span>
+
+                    Orders
+
+                </a>
+
+
+                <a href="#" class="nav-item active">
+
+                    <span>📈</span>
+
+                    Reports
+
+                </a>
+
+
+                <a href="../settings/settings.html" class="nav-item">
+
+                    <span>⚙️</span>
+
+                    Settings
+
+                </a>
+
+
+            </nav>
+
+
+            <!-- SIDEBAR FOOTER -->
+
+            <div class="sidebar-footer">
 
                 <button
-                    type="button"
-                    id="refreshReport"
-                    class="btn-secondary">
-                    ↻ Refresh
-                </button>
+                    id="logoutBtn"
+                    class="logout-btn">
 
-                <button
-                    type="button"
-                    id="exportReport"
-                    class="btn-primary">
-                    ↓ Export Report
+                    🚪 Logout
+
                 </button>
 
             </div>
 
-        </section>
+
+        </aside>
 
 
-        <!-- ======================================
-             LOADING
-        ======================================= -->
 
-        <div id="loadingState" class="loading-state">
+        <!-- ==================================
+             MAIN
+        =================================== -->
 
-            <div class="loading-spinner"></div>
-
-            <div>
-                Loading report data...
-            </div>
-
-        </div>
-
-
-        <!-- ======================================
-             ERROR
-        ======================================= -->
-
-        <div id="errorState" class="error-state hidden">
-
-            <div class="error-icon">!</div>
-
-            <div>
-                <div class="error-title">
-                    Unable to load reports
-                </div>
-
-                <div
-                    class="error-message"
-                    id="errorMessage">
-                    Something went wrong.
-                </div>
-            </div>
-
-            <button
-                type="button"
-                id="retryReport">
-                Retry
-            </button>
-
-        </div>
-
-
-        <!-- ======================================
-             REPORT CONTENT
-        ======================================= -->
-
-        <div id="reportContent" class="report-content hidden">
+        <main class="main">
 
 
             <!-- ==================================
-                 EXECUTIVE SUMMARY
+                 TOP BAR
             =================================== -->
 
-            <section class="report-section">
+            <header class="topbar">
 
-                <div class="section-heading">
 
-                    <div>
-                        <span class="section-eyebrow">
-                            EXECUTIVE SUMMARY
-                        </span>
+                <div>
 
-                        <h2>Business Overview</h2>
+                    <div class="page-label">
+                        OWNER PORTAL
                     </div>
+
+
+                    <h1>
+                        Reports
+                    </h1>
+
+                </div>
+
+
+                <!-- USER AREA -->
+
+                <div class="user-area">
+
 
                     <div
-                        class="period-label"
-                        id="periodLabel">
-                        Last 30 Days
+                        class="user-avatar"
+                        id="userAvatar">
+
+                        A
+
                     </div>
+
+
+                    <div class="user-info">
+
+
+                        <strong id="userName">
+
+                            Loading...
+
+                        </strong>
+
+
+                        <span id="userRole">
+
+                            Owner
+
+                        </span>
+
+
+                    </div>
+
 
                 </div>
 
 
-                <div class="kpi-grid">
+            </header>
 
 
-                    <!-- TOTAL ORDERS -->
 
-                    <div class="kpi-card">
+            <!-- ==================================
+                 REPORT HEADER
+            =================================== -->
 
-                        <div class="kpi-header">
-
-                            <span class="kpi-label">
-                                Total Orders
-                            </span>
-
-                            <div class="kpi-icon orders-icon">
-                                ◫
-                            </div>
-
-                        </div>
-
-                        <div
-                            class="kpi-value"
-                            id="totalOrders">
-                            0
-                        </div>
-
-                        <div class="kpi-footer">
-
-                            <span
-                                class="kpi-change"
-                                id="ordersChange">
-                                —
-                            </span>
-
-                            <span class="kpi-period">
-                                vs previous period
-                            </span>
-
-                        </div>
-
-                    </div>
+            <section class="reports-intro">
 
 
-                    <!-- TOTAL REVENUE -->
+                <div>
 
-                    <div class="kpi-card">
-
-                        <div class="kpi-header">
-
-                            <span class="kpi-label">
-                                Total Revenue
-                            </span>
-
-                            <div class="kpi-icon revenue-icon">
-                                ◇
-                            </div>
-
-                        </div>
-
-                        <div
-                            class="kpi-value"
-                            id="totalRevenue">
-                            AED 0
-                        </div>
-
-                        <div class="kpi-footer">
-
-                            <span
-                                class="kpi-change"
-                                id="revenueChange">
-                                —
-                            </span>
-
-                            <span class="kpi-period">
-                                vs previous period
-                            </span>
-
-                        </div>
-
-                    </div>
+                    <span class="eyebrow">
+                        BUSINESS INTELLIGENCE
+                    </span>
 
 
-                    <!-- AVERAGE ORDER -->
-
-                    <div class="kpi-card">
-
-                        <div class="kpi-header">
-
-                            <span class="kpi-label">
-                                Average Order Value
-                            </span>
-
-                            <div class="kpi-icon average-icon">
-                                ◈
-                            </div>
-
-                        </div>
-
-                        <div
-                            class="kpi-value"
-                            id="averageOrderValue">
-                            AED 0
-                        </div>
-
-                        <div class="kpi-footer">
-
-                            <span
-                                class="kpi-change"
-                                id="averageChange">
-                                —
-                            </span>
-
-                            <span class="kpi-period">
-                                vs previous period
-                            </span>
-
-                        </div>
-
-                    </div>
+                    <h2>
+                        Restaurant Performance Intelligence
+                    </h2>
 
 
-                    <!-- CUSTOMERS -->
-
-                    <div class="kpi-card">
-
-                        <div class="kpi-header">
-
-                            <span class="kpi-label">
-                                Customers
-                            </span>
-
-                            <div class="kpi-icon customer-icon">
-                                ◎
-                            </div>
-
-                        </div>
-
-                        <div
-                            class="kpi-value"
-                            id="totalCustomers">
-                            0
-                        </div>
-
-                        <div class="kpi-footer">
-
-                            <span
-                                class="kpi-change"
-                                id="customersChange">
-                                —
-                            </span>
-
-                            <span class="kpi-period">
-                                vs previous period
-                            </span>
-
-                        </div>
-
-                    </div>
+                    <p>
+                        Analyze orders, revenue, customers,
+                        menu performance and branch activity
+                        across your selected reporting period.
+                    </p>
 
                 </div>
+
 
             </section>
 
 
+
             <!-- ==================================
-                 ORDERS & REVENUE
+                 REPORT CONTROLS
             =================================== -->
 
-            <section class="report-section">
+            <section class="reports-controls-card">
 
-                <div class="section-heading">
 
-                    <div>
-                        <span class="section-eyebrow">
-                            PERFORMANCE
-                        </span>
+                <div class="report-control">
 
-                        <h2>Orders & Revenue Performance</h2>
-                    </div>
 
-                    <div class="chart-switcher">
+                    <label for="dateRange">
+                        REPORTING PERIOD
+                    </label>
 
-                        <button
-                            type="button"
-                            class="chart-toggle active"
-                            data-chart="orders">
-                            Orders
-                        </button>
 
-                        <button
-                            type="button"
-                            class="chart-toggle"
-                            data-chart="revenue">
-                            Revenue
-                        </button>
+                    <select id="dateRange">
 
-                    </div>
+                        <option value="7">
+                            Last 7 Days
+                        </option>
+
+
+                        <option value="14">
+                            Last 14 Days
+                        </option>
+
+
+                        <option value="30" selected>
+                            Last 30 Days
+                        </option>
+
+
+                        <option value="90">
+                            Last 90 Days
+                        </option>
+
+                    </select>
+
 
                 </div>
 
 
-                <div class="chart-card large-chart">
 
-                    <div class="chart-summary">
+                <div class="report-control">
+
+
+                    <label for="branchFilter">
+                        BRANCH
+                    </label>
+
+
+                    <select id="branchFilter">
+
+                        <option value="">
+                            All Branches
+                        </option>
+
+                    </select>
+
+
+                </div>
+
+
+
+                <div class="report-control-actions">
+
+
+                    <button
+                        type="button"
+                        id="refreshReport"
+                        class="report-secondary-btn">
+
+                        ↻ Refresh
+
+                    </button>
+
+
+                    <button
+                        type="button"
+                        id="exportReport"
+                        class="report-primary-btn">
+
+                        ↓ Export Report
+
+                    </button>
+
+
+                </div>
+
+
+            </section>
+
+
+
+            <!-- ==================================
+                 LOADING STATE
+            =================================== -->
+
+            <section
+                id="loadingState"
+                class="reports-loading">
+
+
+                <div class="reports-spinner"></div>
+
+
+                <div>
+
+                    Loading report data...
+
+                </div>
+
+
+            </section>
+
+
+
+            <!-- ==================================
+                 ERROR STATE
+            =================================== -->
+
+            <section
+                id="errorState"
+                class="reports-error hidden">
+
+
+                <div class="reports-error-icon">
+                    !
+                </div>
+
+
+                <div class="reports-error-content">
+
+
+                    <strong>
+                        Unable to load reports
+                    </strong>
+
+
+                    <span id="errorMessage">
+                        Something went wrong.
+                    </span>
+
+
+                </div>
+
+
+                <button
+                    type="button"
+                    id="retryReport">
+
+                    Retry
+
+                </button>
+
+
+            </section>
+
+
+
+            <!-- ==================================
+                 REPORT CONTENT
+            =================================== -->
+
+            <div
+                id="reportContent"
+                class="report-content hidden">
+
+
+
+                <!-- ==================================
+                     EXECUTIVE SUMMARY
+                =================================== -->
+
+                <section class="report-section">
+
+
+                    <div class="section-header">
+
 
                         <div>
-                            <span
-                                class="chart-summary-label"
-                                id="chartMetricLabel">
-                                Total Orders
+
+                            <span class="eyebrow">
+                                EXECUTIVE SUMMARY
                             </span>
 
-                            <strong
-                                id="chartMetricValue">
-                                0
-                            </strong>
+
+                            <h2>
+                                Business Overview
+                            </h2>
+
+
+                            <p>
+                                Key performance indicators
+                                for the selected reporting period.
+                            </p>
+
                         </div>
 
-                        <div
-                            id="chartDateLabel"
-                            class="chart-date-label">
+
+                        <span
+                            id="periodLabel"
+                            class="period-label">
+
                             Last 30 Days
-                        </div>
 
-                    </div>
-
-                    <div class="chart-wrapper">
-                        <canvas id="performanceChart"></canvas>
-                    </div>
-
-                </div>
-
-            </section>
-
-
-            <!-- ==================================
-                 ORDER PERFORMANCE
-            =================================== -->
-
-            <section class="report-section">
-
-                <div class="section-heading">
-
-                    <div>
-                        <span class="section-eyebrow">
-                            ORDER PERFORMANCE
                         </span>
 
-                        <h2>Order Activity</h2>
-                    </div>
-
-                </div>
-
-
-                <div class="two-column-grid">
-
-
-                    <!-- ORDERS BY DAY -->
-
-                    <div class="panel-card">
-
-                        <div class="panel-header">
-
-                            <div>
-                                <h3>Orders by Day</h3>
-                                <p>Daily order volume</p>
-                            </div>
-
-                        </div>
-
-                        <div
-                            class="daily-orders-list"
-                            id="dailyOrdersList">
-                        </div>
 
                     </div>
 
 
-                    <!-- ORDER STATUS -->
 
-                    <div class="panel-card">
+                    <!-- KPI GRID -->
 
-                        <div class="panel-header">
+                    <div class="reports-kpi-grid">
 
-                            <div>
-                                <h3>Order Status</h3>
-                                <p>Current period distribution</p>
+
+                        <!-- TOTAL ORDERS -->
+
+                        <div class="report-kpi-card">
+
+
+                            <div class="report-kpi-top">
+
+
+                                <div>
+
+                                    <span class="report-kpi-label">
+                                        Total Orders
+                                    </span>
+
+
+                                    <strong
+                                        id="totalOrders"
+                                        class="report-kpi-value">
+
+                                        0
+
+                                    </strong>
+
+                                </div>
+
+
+                                <div class="report-kpi-icon orders">
+                                    📦
+                                </div>
+
+
                             </div>
+
+
+                            <div class="report-kpi-footer">
+
+
+                                <strong
+                                    id="ordersChange"
+                                    class="kpi-change neutral">
+
+                                    —
+
+                                </strong>
+
+
+                                <span>
+                                    vs previous period
+                                </span>
+
+
+                            </div>
+
 
                         </div>
 
-                        <div class="status-layout">
 
-                            <div class="status-chart-wrapper">
-                                <canvas id="statusChart"></canvas>
+
+                        <!-- TOTAL REVENUE -->
+
+                        <div class="report-kpi-card">
+
+
+                            <div class="report-kpi-top">
+
+
+                                <div>
+
+                                    <span class="report-kpi-label">
+                                        Total Revenue
+                                    </span>
+
+
+                                    <strong
+                                        id="totalRevenue"
+                                        class="report-kpi-value">
+
+                                        AED 0
+
+                                    </strong>
+
+                                </div>
+
+
+                                <div class="report-kpi-icon revenue">
+                                    💰
+                                </div>
+
+
                             </div>
+
+
+                            <div class="report-kpi-footer">
+
+
+                                <strong
+                                    id="revenueChange"
+                                    class="kpi-change neutral">
+
+                                    —
+
+                                </strong>
+
+
+                                <span>
+                                    vs previous period
+                                </span>
+
+
+                            </div>
+
+
+                        </div>
+
+
+
+                        <!-- AVERAGE ORDER -->
+
+                        <div class="report-kpi-card">
+
+
+                            <div class="report-kpi-top">
+
+
+                                <div>
+
+                                    <span class="report-kpi-label">
+                                        Average Order Value
+                                    </span>
+
+
+                                    <strong
+                                        id="averageOrderValue"
+                                        class="report-kpi-value">
+
+                                        AED 0
+
+                                    </strong>
+
+                                </div>
+
+
+                                <div class="report-kpi-icon average">
+                                    🧾
+                                </div>
+
+
+                            </div>
+
+
+                            <div class="report-kpi-footer">
+
+
+                                <strong
+                                    id="averageChange"
+                                    class="kpi-change neutral">
+
+                                    —
+
+                                </strong>
+
+
+                                <span>
+                                    vs previous period
+                                </span>
+
+
+                            </div>
+
+
+                        </div>
+
+
+
+                        <!-- CUSTOMERS -->
+
+                        <div class="report-kpi-card">
+
+
+                            <div class="report-kpi-top">
+
+
+                                <div>
+
+                                    <span class="report-kpi-label">
+                                        Customers
+                                    </span>
+
+
+                                    <strong
+                                        id="totalCustomers"
+                                        class="report-kpi-value">
+
+                                        0
+
+                                    </strong>
+
+                                </div>
+
+
+                                <div class="report-kpi-icon customers">
+                                    👥
+                                </div>
+
+
+                            </div>
+
+
+                            <div class="report-kpi-footer">
+
+
+                                <strong
+                                    id="customersChange"
+                                    class="kpi-change neutral">
+
+                                    —
+
+                                </strong>
+
+
+                                <span>
+                                    vs previous period
+                                </span>
+
+
+                            </div>
+
+
+                        </div>
+
+
+                    </div>
+
+
+                </section>
+
+
+
+                <!-- ==================================
+                     ORDERS & REVENUE PERFORMANCE
+                =================================== -->
+
+                <section class="report-section">
+
+
+                    <div class="section-header">
+
+
+                        <div>
+
+                            <span class="eyebrow">
+                                PERFORMANCE
+                            </span>
+
+
+                            <h2>
+                                Orders & Revenue Performance
+                            </h2>
+
+
+                            <p>
+                                Track your restaurant's performance
+                                throughout the selected period.
+                            </p>
+
+                        </div>
+
+
+                        <!-- CHART TOGGLE -->
+
+                        <div class="chart-toggle">
+
+
+                            <button
+                                type="button"
+                                class="chart-toggle-btn active"
+                                data-chart="orders">
+
+                                Orders
+
+                            </button>
+
+
+                            <button
+                                type="button"
+                                class="chart-toggle-btn"
+                                data-chart="revenue">
+
+                                Revenue
+
+                            </button>
+
+
+                        </div>
+
+
+                    </div>
+
+
+
+                    <!-- PERFORMANCE CARD -->
+
+                    <div class="reports-chart-card">
+
+
+                        <div class="reports-chart-header">
+
+
+                            <div>
+
+
+                                <span
+                                    id="chartMetricLabel"
+                                    class="chart-metric-label">
+
+                                    Total Orders
+
+                                </span>
+
+
+                                <strong
+                                    id="chartMetricValue"
+                                    class="chart-metric-value">
+
+                                    0
+
+                                </strong>
+
+
+                            </div>
+
+
+                            <span
+                                id="chartDateLabel"
+                                class="chart-date-label">
+
+                                Last 30 Days
+
+                            </span>
+
+
+                        </div>
+
+
+
+                        <div class="reports-chart-wrapper">
+
+                            <canvas
+                                id="performanceChart">
+                            </canvas>
+
+                        </div>
+
+
+                    </div>
+
+
+                </section>
+
+
+
+                <!-- ==================================
+                     ORDER PERFORMANCE
+                =================================== -->
+
+                <section class="report-section">
+
+
+                    <div class="section-header">
+
+
+                        <div>
+
+                            <span class="eyebrow">
+                                ORDER PERFORMANCE
+                            </span>
+
+
+                            <h2>
+                                Order Activity
+                            </h2>
+
+
+                            <p>
+                                Understand daily volume and
+                                order status distribution.
+                            </p>
+
+                        </div>
+
+
+                    </div>
+
+
+
+                    <div class="reports-two-column">
+
+
+
+                        <!-- ORDERS BY DAY -->
+
+                        <div class="reports-panel-card">
+
+
+                            <div class="panel-heading">
+
+
+                                <div>
+
+                                    <span class="panel-eyebrow">
+                                        ACTIVITY
+                                    </span>
+
+
+                                    <h3>
+                                        Orders by Day
+                                    </h3>
+
+
+                                    <p>
+                                        Daily order volume
+                                    </p>
+
+                                </div>
+
+
+                            </div>
+
 
                             <div
-                                class="status-legend"
-                                id="statusLegend">
+                                id="dailyOrdersList"
+                                class="daily-orders-list">
+
                             </div>
+
 
                         </div>
 
-                    </div>
-
-                </div>
-
-            </section>
 
 
-            <!-- ==================================
-                 MENU PERFORMANCE
-            =================================== -->
+                        <!-- ORDER STATUS -->
 
-            <section class="report-section">
-
-                <div class="section-heading">
-
-                    <div>
-                        <span class="section-eyebrow">
-                            MENU PERFORMANCE
-                        </span>
-
-                        <h2>Top Performing Items</h2>
-                    </div>
-
-                </div>
+                        <div class="reports-panel-card">
 
 
-                <div class="two-column-grid">
+                            <div class="panel-heading">
 
 
-                    <!-- TOP SELLING -->
+                                <div>
 
-                    <div class="panel-card">
+                                    <span class="panel-eyebrow">
+                                        ORDER MIX
+                                    </span>
 
-                        <div class="panel-header">
 
-                            <div>
-                                <h3>Top Selling Items</h3>
-                                <p>Based on order quantity</p>
+                                    <h3>
+                                        Order Status
+                                    </h3>
+
+
+                                    <p>
+                                        Distribution by order status
+                                    </p>
+
+                                </div>
+
+
                             </div>
 
+
+
+                            <div class="status-content">
+
+
+                                <div class="status-chart-container">
+
+                                    <canvas
+                                        id="statusChart">
+                                    </canvas>
+
+                                </div>
+
+
+                                <div
+                                    id="statusLegend"
+                                    class="status-legend">
+
+                                </div>
+
+
+                            </div>
+
+
                         </div>
+
+
+                    </div>
+
+
+                </section>
+
+
+
+                <!-- ==================================
+                     MENU PERFORMANCE
+                =================================== -->
+
+                <section class="report-section">
+
+
+                    <div class="section-header">
+
+
+                        <div>
+
+                            <span class="eyebrow">
+                                MENU PERFORMANCE
+                            </span>
+
+
+                            <h2>
+                                Top Performing Items
+                            </h2>
+
+
+                            <p>
+                                Identify the menu items driving
+                                customer demand and revenue.
+                            </p>
+
+                        </div>
+
+
+                    </div>
+
+
+
+                    <div class="reports-two-column">
+
+
+
+                        <!-- TOP SELLING ITEMS -->
+
+                        <div class="reports-panel-card">
+
+
+                            <div class="panel-heading">
+
+
+                                <div>
+
+                                    <span class="panel-eyebrow">
+                                        SALES VOLUME
+                                    </span>
+
+
+                                    <h3>
+                                        Top Selling Items
+                                    </h3>
+
+
+                                    <p>
+                                        Ranked by quantity sold
+                                    </p>
+
+                                </div>
+
+
+                            </div>
+
+
+                            <div
+                                id="topSellingItems"
+                                class="item-ranking-list">
+
+                            </div>
+
+
+                        </div>
+
+
+
+                        <!-- REVENUE BY ITEM -->
+
+                        <div class="reports-panel-card">
+
+
+                            <div class="panel-heading">
+
+
+                                <div>
+
+                                    <span class="panel-eyebrow">
+                                        REVENUE
+                                    </span>
+
+
+                                    <h3>
+                                        Revenue by Item
+                                    </h3>
+
+
+                                    <p>
+                                        Estimated menu contribution
+                                    </p>
+
+                                </div>
+
+
+                            </div>
+
+
+                            <div
+                                id="revenueItems"
+                                class="item-ranking-list">
+
+                            </div>
+
+
+                        </div>
+
+
+                    </div>
+
+
+                </section>
+
+
+
+                <!-- ==================================
+                     BRANCH PERFORMANCE
+                =================================== -->
+
+                <section class="report-section">
+
+
+                    <div class="section-header">
+
+
+                        <div>
+
+                            <span class="eyebrow">
+                                BRANCH PERFORMANCE
+                            </span>
+
+
+                            <h2>
+                                Branch Comparison
+                            </h2>
+
+
+                            <p>
+                                Compare orders, revenue and
+                                average order value across branches.
+                            </p>
+
+                        </div>
+
+
+                    </div>
+
+
+
+                    <!-- BRANCH TABLE -->
+
+                    <div class="reports-table-card">
+
+
+                        <div class="reports-table-wrapper">
+
+
+                            <table class="reports-table">
+
+
+                                <thead>
+
+                                    <tr>
+
+                                        <th>
+                                            Branch
+                                        </th>
+
+                                        <th>
+                                            Orders
+                                        </th>
+
+                                        <th>
+                                            Revenue
+                                        </th>
+
+                                        <th>
+                                            Avg. Order
+                                        </th>
+
+                                    </tr>
+
+                                </thead>
+
+
+                                <tbody
+                                    id="branchTableBody">
+
+                                </tbody>
+
+
+                            </table>
+
+
+                        </div>
+
 
                         <div
-                            class="item-ranking-list"
-                            id="topSellingItems">
-                        </div>
+                            id="branchEmptyState"
+                            class="table-empty hidden">
 
-                    </div>
-
-
-                    <!-- REVENUE -->
-
-                    <div class="panel-card">
-
-                        <div class="panel-header">
-
-                            <div>
-                                <h3>Revenue by Item</h3>
-                                <p>Estimated menu contribution</p>
-                            </div>
+                            No branch data available
+                            for this period.
 
                         </div>
 
-                        <div
-                            class="item-ranking-list"
-                            id="revenueItems">
-                        </div>
 
                     </div>
 
-                </div>
 
-            </section>
-
-
-            <!-- ==================================
-                 BRANCH PERFORMANCE
-            =================================== -->
-
-            <section class="report-section">
-
-                <div class="section-heading">
-
-                    <div>
-                        <span class="section-eyebrow">
-                            BRANCH PERFORMANCE
-                        </span>
-
-                        <h2>Branch Comparison</h2>
-                    </div>
-
-                </div>
+                </section>
 
 
-                <div class="table-card">
 
-                    <div class="table-wrapper">
-
-                        <table>
-
-                            <thead>
-
-                                <tr>
-                                    <th>Branch</th>
-                                    <th>Orders</th>
-                                    <th>Revenue</th>
-                                    <th>Avg. Order</th>
-                                </tr>
-
-                            </thead>
-
-                            <tbody id="branchTableBody">
-                            </tbody>
-
-                        </table>
-
-                    </div>
-
-                    <div
-                        id="branchEmptyState"
-                        class="table-empty hidden">
-                        No branch data available for this period.
-                    </div>
-
-                </div>
-
-            </section>
+            </div>
 
 
-        </div>
+        </main>
 
-    </main>
 
+    </div>
+
+
+
+    <!-- ==================================
+         JAVASCRIPT
+    =================================== -->
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+    <script src="../../config/config.js"></script>
+
+    <script src="../../auth.js"></script>
 
     <script src="reports.js"></script>
 
+
 </body>
+
 </html>

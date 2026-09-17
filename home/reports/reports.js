@@ -1,14 +1,14 @@
-// ==========================================
-// QR RESTAURANT SAAS
-// PREMIUM OWNER REPORTS
-// ==========================================
+/* ==========================================
+   QR ORDER SAAS
+   PREMIUM OWNER REPORTS
+   ========================================== */
 
 
-// ==========================================
-// CONFIGURATION
-// ==========================================
+/* ==========================================
+   CONFIGURATION
+   ========================================== */
 
-const N8N_REPORTS_WEBHOOK =
+const REPORTS_WEBHOOK =
     `${N8N_BASE_URL}/owner-reports`;
 
 const SESSION_TOKEN_KEY =
@@ -18,24 +18,45 @@ const SESSION_DATA_KEY =
     "qro_session_data";
 
 
-// ==========================================
-// STATE
-// ==========================================
+/* ==========================================
+   STATE
+   ========================================== */
 
 let reportData = null;
-
 let performanceChart = null;
 let statusChart = null;
 
-let activeChart = "orders";
+let selectedChart =
+    "orders";
 
-let selectedDateRange = "30";
-let selectedBranchId = "";
+let currentCurrency =
+    "AED";
+
+let currentDateRange =
+    "30";
+
+let currentBranchId =
+    "";
 
 
-// ==========================================
-// DOM
-// ==========================================
+/* ==========================================
+   DOM
+   ========================================== */
+
+const dateRange =
+    document.getElementById("dateRange");
+
+const branchFilter =
+    document.getElementById("branchFilter");
+
+const refreshReport =
+    document.getElementById("refreshReport");
+
+const exportReport =
+    document.getElementById("exportReport");
+
+const retryReport =
+    document.getElementById("retryReport");
 
 const loadingState =
     document.getElementById("loadingState");
@@ -49,136 +70,173 @@ const errorMessage =
 const reportContent =
     document.getElementById("reportContent");
 
-const dateRangeSelect =
-    document.getElementById("dateRange");
+const userName =
+    document.getElementById("userName");
 
-const branchFilter =
-    document.getElementById("branchFilter");
+const userRole =
+    document.getElementById("userRole");
 
-const ownerNameElement =
-    document.getElementById("ownerName");
-
-const ownerAvatar =
-    document.getElementById("ownerAvatar");
+const userAvatar =
+    document.getElementById("userAvatar");
 
 
-// ==========================================
-// INITIALIZE
-// ==========================================
+/* ==========================================
+   INITIALIZATION
+   ========================================== */
 
 document.addEventListener(
     "DOMContentLoaded",
-    initializeReports
+    () => {
+
+        initializeReports();
+
+    }
 );
 
 
+/* ==========================================
+   INITIALIZE REPORTS
+   ========================================== */
+
 async function initializeReports() {
 
-    const sessionToken =
-        localStorage.getItem(
-            SESSION_TOKEN_KEY
+    try {
+
+        loadStoredUser();
+
+        bindEvents();
+
+        currentDateRange =
+            dateRange?.value || "30";
+
+        await loadReports();
+
+    } catch (error) {
+
+        console.error(
+            "Reports initialization failed:",
+            error
         );
 
-    if (!sessionToken) {
+        showError(
+            "Unable to initialize reports."
+        );
 
-        redirectToLogin();
-
-        return;
     }
-
-
-    loadOwnerInformation();
-
-    bindEvents();
-
-    await loadReports();
 
 }
 
 
-// ==========================================
-// EVENTS
-// ==========================================
+/* ==========================================
+   EVENTS
+   ========================================== */
 
 function bindEvents() {
 
-    dateRangeSelect.addEventListener(
-        "change",
-        async () => {
+    if (dateRange) {
 
-            selectedDateRange =
-                dateRangeSelect.value;
+        dateRange.addEventListener(
+            "change",
+            async () => {
 
-            selectedBranchId =
-                branchFilter.value;
+                currentDateRange =
+                    dateRange.value || "30";
 
-            await loadReports();
+                await loadReports();
 
-        }
-    );
-
-
-    branchFilter.addEventListener(
-        "change",
-        async () => {
-
-            selectedBranchId =
-                branchFilter.value;
-
-            await loadReports();
-
-        }
-    );
-
-
-    document
-        .getElementById("refreshReport")
-        .addEventListener(
-            "click",
-            loadReports
+            }
         );
 
+    }
 
-    document
-        .getElementById("retryReport")
-        .addEventListener(
-            "click",
-            loadReports
+
+    if (branchFilter) {
+
+        branchFilter.addEventListener(
+            "change",
+            async () => {
+
+                currentBranchId =
+                    branchFilter.value || "";
+
+                await loadReports();
+
+            }
         );
 
+    }
 
-    document
-        .getElementById("exportReport")
-        .addEventListener(
+
+    if (refreshReport) {
+
+        refreshReport.addEventListener(
             "click",
-            exportReport
+            async () => {
+
+                await loadReports();
+
+            }
         );
 
+    }
+
+
+    if (retryReport) {
+
+        retryReport.addEventListener(
+            "click",
+            async () => {
+
+                await loadReports();
+
+            }
+        );
+
+    }
+
+
+    if (exportReport) {
+
+        exportReport.addEventListener(
+            "click",
+            exportReportsCSV
+        );
+
+    }
+
 
     document
-        .querySelectorAll(".chart-toggle")
+        .querySelectorAll(
+            ".chart-toggle-btn"
+        )
         .forEach(button => {
 
             button.addEventListener(
                 "click",
                 () => {
 
+                    const chartType =
+                        button.dataset.chart;
+
+                    if (!chartType) {
+                        return;
+                    }
+
+                    selectedChart =
+                        chartType;
+
                     document
                         .querySelectorAll(
-                            ".chart-toggle"
+                            ".chart-toggle-btn"
                         )
-                        .forEach(item =>
-                            item.classList.remove(
-                                "active"
-                            )
-                        );
+                        .forEach(btn => {
 
-                    button.classList.add(
-                        "active"
-                    );
+                            btn.classList.toggle(
+                                "active",
+                                btn === button
+                            );
 
-                    activeChart =
-                        button.dataset.chart;
+                        });
 
                     renderPerformanceChart();
 
@@ -190,84 +248,81 @@ function bindEvents() {
 }
 
 
-// ==========================================
-// OWNER INFORMATION
-// ==========================================
+/* ==========================================
+   STORED USER
+   ========================================== */
 
-function loadOwnerInformation() {
+function loadStoredUser() {
 
     try {
 
-        const sessionData =
-            JSON.parse(
-                localStorage.getItem(
-                    SESSION_DATA_KEY
-                ) || "{}"
+        const raw =
+            localStorage.getItem(
+                SESSION_DATA_KEY
             );
 
+        if (!raw) {
+            return;
+        }
+
+        const session =
+            JSON.parse(raw);
 
         const ownerName =
-            sessionData.ownerName ||
-            sessionData.OwnerName ||
-            sessionData.name ||
-            sessionData.Name ||
+            session?.ownerName ||
+            session?.OwnerName ||
+            session?.client?.ownerName ||
+            session?.client?.OwnerName ||
+            session?.name ||
+            session?.Name ||
+            "";
+
+        const role =
+            session?.role ||
+            session?.Role ||
             "Owner";
 
+        if (
+            ownerName &&
+            userName
+        ) {
 
-        ownerNameElement.textContent =
-            ownerName;
+            userName.textContent =
+                ownerName;
 
+            if (userAvatar) {
 
-        ownerAvatar.textContent =
-            getInitials(ownerName);
+                userAvatar.textContent =
+                    getInitial(
+                        ownerName
+                    );
 
+            }
+
+        }
+
+        if (userRole) {
+
+            userRole.textContent =
+                role;
+
+        }
 
     } catch (error) {
 
-        ownerNameElement.textContent =
-            "Owner";
-
-        ownerAvatar.textContent =
-            "O";
+        console.warn(
+            "Unable to read stored session data:",
+            error
+        );
 
     }
 
 }
 
 
-function getInitials(name) {
-
-    const parts =
-        String(name)
-            .trim()
-            .split(/\s+/)
-            .filter(Boolean);
-
-
-    if (!parts.length) {
-        return "O";
-    }
-
-
-    if (parts.length === 1) {
-        return parts[0]
-            .substring(0, 1)
-            .toUpperCase();
-    }
-
-
-    return (
-        parts[0].substring(0, 1) +
-        parts[parts.length - 1]
-            .substring(0, 1)
-    ).toUpperCase();
-
-}
-
-
-// ==========================================
-// LOAD REPORTS
-// ==========================================
+/* ==========================================
+   LOAD REPORTS
+   ========================================== */
 
 async function loadReports() {
 
@@ -276,12 +331,14 @@ async function loadReports() {
             SESSION_TOKEN_KEY
         );
 
-
     if (!sessionToken) {
 
-        redirectToLogin();
+        showError(
+            "Your session has expired. Please sign in again."
+        );
 
         return;
+
     }
 
 
@@ -292,7 +349,7 @@ async function loadReports() {
 
         const response =
             await fetch(
-                N8N_REPORTS_WEBHOOK,
+                REPORTS_WEBHOOK,
                 {
                     method: "POST",
 
@@ -304,9 +361,9 @@ async function loadReports() {
                     body: JSON.stringify({
                         sessionToken,
                         dateRange:
-                            selectedDateRange,
+                            currentDateRange,
                         branchId:
-                            selectedBranchId
+                            currentBranchId
                     })
                 }
             );
@@ -315,7 +372,7 @@ async function loadReports() {
         if (!response.ok) {
 
             throw new Error(
-                `HTTP ${response.status}`
+                `Request failed with status ${response.status}.`
             );
 
         }
@@ -325,44 +382,83 @@ async function loadReports() {
             await response.json();
 
 
+        console.log(
+            "Owner Reports response:",
+            data
+        );
+
+
         if (
             !data ||
             data.success !== true
         ) {
 
-            handleReportError(
-                data?.message ||
-                "Unable to load report data."
+            handleReportsError(
+                data
             );
 
             return;
+
         }
 
 
-        reportData = data;
+        if (
+            data.code !==
+            "REPORTS_DATA_READY"
+        ) {
+
+            handleReportsError(
+                data
+            );
+
+            return;
+
+        }
 
 
-        populateBranches(
+        reportData =
+            data;
+
+
+        currentCurrency =
+            data.restaurant?.currency ||
+            "AED";
+
+
+        currentDateRange =
+            String(
+                data.reportDateRange?.days ||
+                currentDateRange ||
+                "30"
+            );
+
+
+        populateBranchFilter(
             data.branches || []
         );
 
 
-        renderReports(data);
+        renderReports();
 
 
-        showReportContent();
+        hideError();
 
+        hideLoading();
+
+        reportContent
+            ?.classList.remove(
+                "hidden"
+            );
 
     } catch (error) {
 
         console.error(
-            "Reports load error:",
+            "Reports request failed:",
             error
         );
 
-
-        handleReportError(
-            "Unable to connect to the reporting service."
+        showError(
+            "Unable to load report data. Please try again."
         );
 
     }
@@ -370,120 +466,153 @@ async function loadReports() {
 }
 
 
-// ==========================================
-// BRANCHES
-// ==========================================
+/* ==========================================
+   REPORTS ERROR
+   ========================================== */
 
-function populateBranches(branches) {
+function handleReportsError(
+    data
+) {
 
-    const currentValue =
-        selectedBranchId;
+    const code =
+        data?.code || "";
 
-
-    branchFilter.innerHTML =
-        `<option value="">All Branches</option>`;
-
-
-    branches.forEach(branch => {
-
-        if (!branch.branchId) {
-            return;
-        }
-
-
-        const option =
-            document.createElement(
-                "option"
-            );
-
-
-        option.value =
-            branch.branchId;
-
-
-        option.textContent =
-            branch.branchName ||
-            branch.branchId;
-
-
-        branchFilter.appendChild(
-            option
-        );
-
-    });
-
-
-    branchFilter.value =
-        currentValue;
+    const message =
+        data?.message ||
+        "Unable to load report data.";
 
 
     if (
-        branchFilter.value !==
-        currentValue
+        code ===
+            "INVALID_SESSION" ||
+        code ===
+            "SESSION_TOKEN_MISSING"
     ) {
 
-        selectedBranchId = "";
+        showError(
+            "Your session is invalid or expired. Please sign in again."
+        );
+
+        return;
+
+    }
+
+
+    showError(
+        message
+    );
+
+}
+
+
+/* ==========================================
+   RENDER REPORTS
+   ========================================== */
+
+function renderReports() {
+
+    renderExecutiveSummary();
+
+    renderPeriodInformation();
+
+    renderPerformanceChart();
+
+    renderDailyOrders();
+
+    renderStatusChart();
+
+    renderMenuPerformance();
+
+    renderBranchPerformance();
+
+    updateOwnerInformation();
+
+}
+
+
+/* ==========================================
+   OWNER INFORMATION
+   ========================================== */
+
+function updateOwnerInformation() {
+
+    const ownerNameValue =
+        reportData?.client?.ownerName ||
+        reportData?.client?.OwnerName ||
+        "";
+
+    const role =
+        reportData?.role ||
+        "Owner";
+
+
+    if (
+        ownerNameValue &&
+        userName
+    ) {
+
+        userName.textContent =
+            ownerNameValue;
+
+        if (userAvatar) {
+
+            userAvatar.textContent =
+                getInitial(
+                    ownerNameValue
+                );
+
+        }
+
+    }
+
+
+    if (userRole) {
+
+        userRole.textContent =
+            role;
 
     }
 
 }
 
 
-// ==========================================
-// RENDER ALL REPORTS
-// ==========================================
+/* ==========================================
+   EXECUTIVE SUMMARY
+   ========================================== */
 
-function renderReports(data) {
+function renderExecutiveSummary() {
 
-    const reports =
-        data.reports || {};
-
-
-    renderExecutiveSummary(
-        reports.executiveSummary || {}
-    );
+    const summary =
+        reportData?.reports
+            ?.executiveSummary ||
+        {};
 
 
-    renderPerformanceChart();
+    const totalOrders =
+        Number(
+            summary.totalOrders || 0
+        );
 
+    const totalRevenue =
+        Number(
+            summary.totalRevenue || 0
+        );
 
-    renderDailyOrders(
-        reports.performance?.daily || []
-    );
+    const averageOrderValue =
+        Number(
+            summary.averageOrderValue || 0
+        );
 
+    const customers =
+        Number(
+            summary.customers || 0
+        );
 
-    renderStatus(
-        reports.orderPerformance?.statuses || []
-    );
-
-
-    renderMenuPerformance(
-        reports.menuPerformance || {}
-    );
-
-
-    renderBranchPerformance(
-        reports.branchPerformance || []
-    );
-
-
-    updatePeriodLabels(
-        data.reportDateRange || {}
-    );
-
-}
-
-
-// ==========================================
-// EXECUTIVE SUMMARY
-// ==========================================
-
-function renderExecutiveSummary(summary) {
 
     setText(
         "totalOrders",
         formatNumber(
-            summary.totalOrders || 0
+            totalOrders
         )
     );
 
@@ -491,7 +620,7 @@ function renderExecutiveSummary(summary) {
     setText(
         "totalRevenue",
         formatCurrency(
-            summary.totalRevenue || 0
+            totalRevenue
         )
     );
 
@@ -499,7 +628,7 @@ function renderExecutiveSummary(summary) {
     setText(
         "averageOrderValue",
         formatCurrency(
-            summary.averageOrderValue || 0
+            averageOrderValue
         )
     );
 
@@ -507,7 +636,7 @@ function renderExecutiveSummary(summary) {
     setText(
         "totalCustomers",
         formatNumber(
-            summary.customers || 0
+            customers
         )
     );
 
@@ -517,18 +646,15 @@ function renderExecutiveSummary(summary) {
         summary.changes?.orders
     );
 
-
     renderChange(
         "revenueChange",
         summary.changes?.revenue
     );
 
-
     renderChange(
         "averageChange",
         summary.changes?.averageOrderValue
     );
-
 
     renderChange(
         "customersChange",
@@ -538,122 +664,123 @@ function renderExecutiveSummary(summary) {
 }
 
 
-// ==========================================
-// CHANGE INDICATOR
-// ==========================================
+/* ==========================================
+   PERIOD INFORMATION
+   ========================================== */
 
-function renderChange(
-    elementId,
-    value
-) {
+function renderPeriodInformation() {
 
-    const element =
-        document.getElementById(
-            elementId
+    const range =
+        reportData?.reportDateRange ||
+        {};
+
+    const days =
+        Number(
+            range.days ||
+            currentDateRange ||
+            30
+        );
+
+    const label =
+        getDateRangeLabel(
+            days
         );
 
 
-    if (
-        value === undefined ||
-        value === null ||
-        Number.isNaN(Number(value))
-    ) {
+    setText(
+        "periodLabel",
+        label
+    );
 
-        element.textContent = "—";
-
-        element.className =
-            "kpi-change neutral";
-
-        return;
-
-    }
+    setText(
+        "chartDateLabel",
+        label
+    );
 
 
-    const numericValue =
-        Number(value);
+    if (dateRange) {
 
-
-    if (
-        numericValue === 0
-    ) {
-
-        element.textContent =
-            "0.0%";
-
-        element.className =
-            "kpi-change neutral";
-
-        return;
+        dateRange.value =
+            String(days);
 
     }
-
-
-    const arrow =
-        numericValue > 0
-            ? "↑"
-            : "↓";
-
-
-    element.textContent =
-        `${arrow} ${Math.abs(numericValue).toFixed(1)}%`;
-
-
-    element.className =
-        `kpi-change ${
-            numericValue > 0
-                ? "positive"
-                : "negative"
-        }`;
 
 }
 
 
-// ==========================================
-// PERFORMANCE CHART
-// ==========================================
+/* ==========================================
+   PERFORMANCE CHART
+   ========================================== */
 
 function renderPerformanceChart() {
 
-    if (!reportData) {
+    if (
+        typeof Chart ===
+        "undefined"
+    ) {
+
+        console.warn(
+            "Chart.js is not available."
+        );
+
+        return;
+
+    }
+
+
+    const canvas =
+        document.getElementById(
+            "performanceChart"
+        );
+
+    if (!canvas) {
         return;
     }
 
 
+    const performance =
+        reportData?.reports
+            ?.performance || {};
+
+
     const daily =
-        reportData
-            .reports
-            ?.performance
-            ?.daily || [];
+        Array.isArray(
+            performance.daily
+        )
+            ? performance.daily
+            : [];
 
 
     const labels =
         daily.map(
             item =>
-                formatShortDate(
+                formatChartDate(
                     item.date
                 )
         );
 
 
     const values =
-        daily.map(item => {
+        daily.map(
+            item => {
 
-            if (
-                activeChart ===
-                "revenue"
-            ) {
+                if (
+                    selectedChart ===
+                    "revenue"
+                ) {
+
+                    return Number(
+                        item.revenue || 0
+                    );
+
+                }
 
                 return Number(
-                    item.revenue || 0
+                    item.orders || 0
                 );
 
             }
-
-            return Number(
-                item.orders || 0
-            );
-
-        });
+        );
 
 
     const total =
@@ -664,37 +791,54 @@ function renderPerformanceChart() {
         );
 
 
-    setText(
-        "chartMetricLabel",
-        activeChart === "revenue"
-            ? "Total Revenue"
-            : "Total Orders"
-    );
+    if (
+        selectedChart ===
+        "revenue"
+    ) {
 
+        setText(
+            "chartMetricLabel",
+            "Total Revenue"
+        );
 
-    setText(
-        "chartMetricValue",
-        activeChart === "revenue"
-            ? formatCurrency(total)
-            : formatNumber(total)
-    );
+        setText(
+            "chartMetricValue",
+            formatCurrency(
+                total
+            )
+        );
+
+    } else {
+
+        setText(
+            "chartMetricLabel",
+            "Total Orders"
+        );
+
+        setText(
+            "chartMetricValue",
+            formatNumber(
+                total
+            )
+        );
+
+    }
 
 
     if (performanceChart) {
 
         performanceChart.destroy();
 
+        performanceChart =
+            null;
+
     }
 
 
-    const canvas =
-        document.getElementById(
-            "performanceChart"
-        );
-
-
     const context =
-        canvas.getContext("2d");
+        canvas.getContext(
+            "2d"
+        );
 
 
     performanceChart =
@@ -704,13 +848,12 @@ function renderPerformanceChart() {
                 type: "line",
 
                 data: {
-
                     labels,
 
                     datasets: [
                         {
                             label:
-                                activeChart ===
+                                selectedChart ===
                                 "revenue"
                                     ? "Revenue"
                                     : "Orders",
@@ -718,10 +861,10 @@ function renderPerformanceChart() {
                             data: values,
 
                             borderColor:
-                                "#6366f1",
+                                "#172033",
 
                             backgroundColor:
-                                "rgba(99,102,241,0.08)",
+                                "rgba(23, 32, 51, 0.07)",
 
                             borderWidth: 2,
 
@@ -729,19 +872,26 @@ function renderPerformanceChart() {
 
                             tension: 0.4,
 
-                            pointRadius: 3,
+                            pointRadius:
+                                daily.length <=
+                                14
+                                    ? 3
+                                    : 0,
 
                             pointHoverRadius: 5,
 
                             pointBackgroundColor:
-                                "#6366f1"
+                                "#b8892d",
+
+                            pointBorderColor:
+                                "#ffffff",
+
+                            pointBorderWidth: 2
                         }
                     ]
-
                 },
 
                 options: {
-
                     responsive: true,
 
                     maintainAspectRatio:
@@ -749,6 +899,7 @@ function renderPerformanceChart() {
 
                     interaction: {
                         intersect: false,
+
                         mode: "index"
                     },
 
@@ -761,17 +912,23 @@ function renderPerformanceChart() {
                         tooltip: {
 
                             backgroundColor:
-                                "#111827",
+                                "#172033",
 
-                            padding: 11,
+                            titleColor:
+                                "#ffffff",
 
-                            titleFont: {
-                                size: 11
-                            },
+                            bodyColor:
+                                "#e2e8f0",
 
-                            bodyFont: {
-                                size: 11
-                            },
+                            borderColor:
+                                "rgba(212, 175, 55, 0.35)",
+
+                            borderWidth: 1,
+
+                            padding: 12,
+
+                            displayColors:
+                                false,
 
                             callbacks: {
 
@@ -779,12 +936,31 @@ function renderPerformanceChart() {
                                     context => {
 
                                         const value =
-                                            context.parsed.y;
+                                            Number(
+                                                context.raw ||
+                                                0
+                                            );
 
-                                        return activeChart ===
+                                        if (
+                                            selectedChart ===
                                             "revenue"
-                                            ? ` Revenue: ${formatCurrency(value)}`
-                                            : ` Orders: ${formatNumber(value)}`;
+                                        ) {
+
+                                            return (
+                                                "Revenue: " +
+                                                formatCurrency(
+                                                    value
+                                                )
+                                            );
+
+                                        }
+
+                                        return (
+                                            "Orders: " +
+                                            formatNumber(
+                                                value
+                                            )
+                                        );
 
                                     }
 
@@ -803,11 +979,16 @@ function renderPerformanceChart() {
                             },
 
                             ticks: {
-                                color: "#9ca3af",
+
+                                color:
+                                    "#8992a2",
+
                                 font: {
                                     size: 10
                                 },
-                                maxRotation: 0
+
+                                maxTicksLimit:
+                                    10
                             }
 
                         },
@@ -817,172 +998,181 @@ function renderPerformanceChart() {
                             beginAtZero: true,
 
                             grid: {
+
                                 color:
-                                    "#eef0f4"
+                                    "rgba(23, 32, 51, 0.06)"
                             },
 
                             ticks: {
 
                                 color:
-                                    "#9ca3af",
+                                    "#8992a2",
 
                                 font: {
                                     size: 10
                                 },
 
+                                precision: 0,
+
                                 callback:
-                                    value =>
-                                        activeChart ===
-                                        "revenue"
-                                            ? `AED ${formatCompact(value)}`
-                                            : value
+                                    value => {
+
+                                        if (
+                                            selectedChart ===
+                                            "revenue"
+                                        ) {
+
+                                            return formatCompactCurrency(
+                                                value
+                                            );
+
+                                        }
+
+                                        return formatCompactNumber(
+                                            value
+                                        );
+
+                                    }
 
                             }
 
                         }
 
                     }
-
                 }
-
             }
         );
 
 }
 
 
-// ==========================================
-// DAILY ORDERS
-// ==========================================
+/* ==========================================
+   DAILY ORDERS
+   ========================================== */
 
-function renderDailyOrders(daily) {
+function renderDailyOrders() {
 
     const container =
         document.getElementById(
             "dailyOrdersList"
         );
 
+    if (!container) {
+        return;
+    }
 
-    container.innerHTML = "";
+
+    const daily =
+        reportData?.reports
+            ?.performance
+            ?.daily;
 
 
-    if (!daily.length) {
+    if (
+        !Array.isArray(daily) ||
+        daily.length === 0
+    ) {
 
         container.innerHTML =
-            `<div class="empty-state">
-                No order activity available.
-            </div>`;
+            createEmptyState(
+                "📊",
+                "No order activity",
+                "There are no orders available for the selected reporting period."
+            );
 
         return;
 
     }
 
 
-    const maxOrders =
-        Math.max(
-            ...daily.map(
-                item =>
+    const normalized =
+        daily.map(
+            item => ({
+                date:
+                    item.date,
+
+                orders:
                     Number(
                         item.orders || 0
                     )
+            })
+        );
+
+
+    const maxOrders =
+        Math.max(
+            ...normalized.map(
+                item =>
+                    item.orders
             ),
             1
         );
 
 
-    daily.forEach(item => {
+    container.innerHTML =
+        normalized
+            .map(
+                item => {
 
-        const orders =
-            Number(
-                item.orders || 0
-            );
-
-
-        const percentage =
-            Math.max(
-                0,
-                Math.min(
-                    100,
-                    (orders / maxOrders) * 100
-                )
-            );
-
-
-        const row =
-            document.createElement(
-                "div"
-            );
+                    const percentage =
+                        Math.max(
+                            0,
+                            Math.min(
+                                100,
+                                (
+                                    item.orders /
+                                    maxOrders
+                                ) *
+                                100
+                            )
+                        );
 
 
-        row.className =
-            "daily-row";
+                    return `
+                        <div class="daily-order-row">
 
+                            <span class="daily-order-date">
+                                ${escapeHTML(
+                                    formatReadableDate(
+                                        item.date
+                                    )
+                                )}
+                            </span>
 
-        row.innerHTML = `
-            <span class="daily-date">
-                ${formatShortDate(item.date)}
-            </span>
+                            <div class="daily-order-track">
+                                <div
+                                    class="daily-order-fill"
+                                    style="width:${percentage}%"
+                                ></div>
+                            </div>
 
-            <div class="daily-bar-container">
-                <div
-                    class="daily-bar"
-                    style="width:${percentage}%">
-                </div>
-            </div>
+                            <strong class="daily-order-value">
+                                ${formatNumber(
+                                    item.orders
+                                )}
+                            </strong>
 
-            <span class="daily-count">
-                ${formatNumber(orders)}
-            </span>
-        `;
+                        </div>
+                    `;
 
-
-        container.appendChild(row);
-
-    });
+                }
+            )
+            .join("");
 
 }
 
 
-// ==========================================
-// STATUS CHART
-// ==========================================
+/* ==========================================
+   STATUS CHART
+   ========================================== */
 
-function renderStatus(statuses) {
+function renderStatusChart() {
 
-    const normalized =
-        statuses.map(item => ({
-            status:
-                item.status ||
-                "Unknown",
-
-            count:
-                Number(
-                    item.count || 0
-                ),
-
-            percentage:
-                Number(
-                    item.percentage || 0
-                )
-        }))
-        .filter(
-            item =>
-                item.count > 0
-        );
-
-
-    const total =
-        normalized.reduce(
-            (sum, item) =>
-                sum + item.count,
-            0
-        );
-
-
-    if (statusChart) {
-
-        statusChart.destroy();
-
+    if (
+        typeof Chart ===
+        "undefined"
+    ) {
+        return;
     }
 
 
@@ -991,41 +1181,138 @@ function renderStatus(statuses) {
             "statusChart"
         );
 
+    const legend =
+        document.getElementById(
+            "statusLegend"
+        );
+
+
+    if (!canvas) {
+        return;
+    }
+
+
+    const statuses =
+        reportData?.reports
+            ?.orderPerformance
+            ?.statuses;
+
+
+    const normalized =
+        Array.isArray(statuses)
+            ? statuses
+            : [];
+
+
+    const statusData =
+        normalized
+            .map(
+                item => ({
+                    status:
+                        item.status ||
+                        "Unknown",
+
+                    count:
+                        Number(
+                            item.count ||
+                            item.orders ||
+                            0
+                        )
+                })
+            )
+            .filter(
+                item =>
+                    item.count > 0
+            );
+
+
+    if (
+        statusChart
+    ) {
+
+        statusChart.destroy();
+
+        statusChart =
+            null;
+
+    }
+
+
+    if (
+        statusData.length === 0
+    ) {
+
+        if (legend) {
+
+            legend.innerHTML =
+                createEmptyState(
+                    "📦",
+                    "No order statuses",
+                    "No order status data is available for this period."
+                );
+
+        }
+
+        return;
+
+    }
+
+
+    const labels =
+        statusData.map(
+            item =>
+                formatStatus(
+                    item.status
+                )
+        );
+
+
+    const values =
+        statusData.map(
+            item =>
+                item.count
+        );
+
+
+    const colors =
+        statusData.map(
+            item =>
+                getStatusColor(
+                    item.status
+                )
+        );
+
+
+    const context =
+        canvas.getContext(
+            "2d"
+        );
+
 
     statusChart =
         new Chart(
-            canvas,
+            context,
             {
                 type: "doughnut",
 
                 data: {
 
-                    labels:
-                        normalized.map(
-                            item =>
-                                item.status
-                        ),
+                    labels,
 
                     datasets: [
                         {
                             data:
-                                normalized.map(
-                                    item =>
-                                        item.count
-                                ),
+                                values,
 
-                            backgroundColor: [
-                                "#6366f1",
-                                "#818cf8",
-                                "#a5b4fc",
-                                "#f59e0b",
-                                "#ef4444",
-                                "#9ca3af"
-                            ],
+                            backgroundColor:
+                                colors,
 
-                            borderWidth: 0,
+                            borderColor:
+                                "#ffffff",
 
-                            hoverOffset: 4
+                            borderWidth: 3,
+
+                            hoverOffset: 5
                         }
                     ]
 
@@ -1038,12 +1325,42 @@ function renderStatus(statuses) {
                     maintainAspectRatio:
                         false,
 
-                    cutout: "72%",
+                    cutout:
+                        "68%",
 
                     plugins: {
 
                         legend: {
                             display: false
+                        },
+
+                        tooltip: {
+
+                            backgroundColor:
+                                "#172033",
+
+                            padding: 11,
+
+                            displayColors:
+                                true,
+
+                            callbacks: {
+
+                                label:
+                                    context => {
+
+                                        return (
+                                            " " +
+                                            formatNumber(
+                                                context.raw
+                                            ) +
+                                            " orders"
+                                        );
+
+                                    }
+
+                            }
+
                         }
 
                     }
@@ -1054,506 +1371,916 @@ function renderStatus(statuses) {
         );
 
 
-    const legend =
-        document.getElementById(
-            "statusLegend"
-        );
+    if (legend) {
 
+        const total =
+            values.reduce(
+                (sum, value) =>
+                    sum + value,
+                0
+            );
 
-    legend.innerHTML = "";
-
-
-    if (!normalized.length) {
 
         legend.innerHTML =
-            `<div class="empty-state">
-                No status data available.
-            </div>`;
+            statusData
+                .map(
+                    item => {
 
-        return;
+                        const percentage =
+                            total > 0
+                                ? (
+                                    item.count /
+                                    total
+                                ) *
+                                100
+                                : 0;
+
+
+                        return `
+                            <div class="status-legend-item">
+
+                                <span class="status-legend-name">
+
+                                    <span
+                                        class="status-legend-dot"
+                                        style="background:${getStatusColor(
+                                            item.status
+                                        )}"
+                                    ></span>
+
+                                    ${escapeHTML(
+                                        formatStatus(
+                                            item.status
+                                        )
+                                    )}
+
+                                </span>
+
+                                <span class="status-legend-value">
+
+                                    ${formatNumber(
+                                        item.count
+                                    )}
+                                    <small style="
+                                        color:#94a3b8;
+                                        font-weight:500;
+                                        margin-left:4px;
+                                    ">
+                                        ${percentage.toFixed(
+                                            0
+                                        )}%
+                                    </small>
+
+                                </span>
+
+                            </div>
+                        `;
+
+                    }
+                )
+                .join("");
 
     }
-
-
-    normalized.forEach(
-        (item, index) => {
-
-            const percentage =
-                total > 0
-                    ? (
-                        item.count /
-                        total *
-                        100
-                    )
-                    : 0;
-
-
-            const row =
-                document.createElement(
-                    "div"
-                );
-
-
-            row.className =
-                "status-item";
-
-
-            row.innerHTML = `
-
-                <div class="status-name">
-
-                    <span
-                        class="status-dot"
-                        style="
-                            background:
-                            ${getStatusColor(index)};
-                        ">
-                    </span>
-
-                    ${escapeHtml(
-                        item.status
-                    )}
-
-                </div>
-
-                <span class="status-value">
-                    ${percentage.toFixed(1)}%
-                </span>
-
-            `;
-
-
-            legend.appendChild(row);
-
-        }
-    );
 
 }
 
 
-// ==========================================
-// MENU PERFORMANCE
-// ==========================================
+/* ==========================================
+   MENU PERFORMANCE
+   ========================================== */
 
-function renderMenuPerformance(menuPerformance) {
+function renderMenuPerformance() {
+
+    const topSellingContainer =
+        document.getElementById(
+            "topSellingItems"
+        );
+
+    const revenueContainer =
+        document.getElementById(
+            "revenueItems"
+        );
+
+
+    const menuPerformance =
+        reportData?.reports
+            ?.menuPerformance ||
+        {};
+
 
     const topSelling =
-        menuPerformance.topSellingItems ||
-        [];
+        Array.isArray(
+            menuPerformance.topSellingItems
+        )
+            ? menuPerformance.topSellingItems
+            : [];
 
 
-    renderItemList(
-        "topSellingItems",
-        topSelling,
-        "quantity"
-    );
+    const revenueItems =
+        Array.isArray(
+            menuPerformance.revenueItems
+        )
+            ? menuPerformance.revenueItems
+            : [];
 
 
-    renderItemList(
-        "revenueItems",
-        [...topSelling].sort(
-            (a, b) =>
-                Number(
-                    b.revenue || 0
-                ) -
-                Number(
-                    a.revenue || 0
-                )
-        ),
-        "revenue"
-    );
+    if (
+        topSellingContainer
+    ) {
+
+        renderItemRanking(
+            topSellingContainer,
+            topSelling,
+            "quantity"
+        );
+
+    }
+
+
+    if (
+        revenueContainer
+    ) {
+
+        renderItemRanking(
+            revenueContainer,
+            revenueItems,
+            "revenue"
+        );
+
+    }
 
 }
 
 
-function renderItemList(
-    elementId,
+/* ==========================================
+   ITEM RANKING
+   ========================================== */
+
+function renderItemRanking(
+    container,
     items,
-    valueType
+    metric
 ) {
 
-    const container =
-        document.getElementById(
-            elementId
-        );
-
-
-    container.innerHTML = "";
-
-
-    if (!items.length) {
+    if (
+        !Array.isArray(items) ||
+        items.length === 0
+    ) {
 
         container.innerHTML =
-            `<div class="empty-state">
-                No menu performance data available.
-            </div>`;
+            createEmptyState(
+                "🍽️",
+                "No menu data",
+                "No menu performance data is available for this period."
+            );
 
         return;
 
     }
 
 
-    items
-        .slice(0, 5)
-        .forEach(
-            (item, index) => {
+    container.innerHTML =
+        items
+            .slice(0, 10)
+            .map(
+                (item, index) => {
 
-                const quantity =
-                    Number(
-                        item.quantity ||
-                        item.orders ||
-                        0
-                    );
-
-
-                const revenue =
-                    Number(
-                        item.revenue ||
-                        0
-                    );
+                    const name =
+                        item.itemName ||
+                        item.ItemName ||
+                        item.name ||
+                        "Unknown Item";
 
 
-                const row =
-                    document.createElement(
-                        "div"
-                    );
+                    const quantity =
+                        Number(
+                            item.quantity ||
+                            item.qty ||
+                            item.units ||
+                            0
+                        );
 
 
-                row.className =
-                    "item-row";
+                    const revenue =
+                        Number(
+                            item.revenue ||
+                            item.totalRevenue ||
+                            0
+                        );
 
 
-                row.innerHTML = `
+                    let value =
+                        "";
 
-                    <div class="item-rank">
-                        ${index + 1}
-                    </div>
+                    let meta =
+                        "";
 
-                    <div class="item-info">
 
-                        <div class="item-name">
-                            ${escapeHtml(
-                                item.itemName ||
-                                item.name ||
-                                "Unknown Item"
-                            )}
+                    if (
+                        metric ===
+                        "revenue"
+                    ) {
+
+                        value =
+                            formatCurrency(
+                                revenue
+                            );
+
+                        meta =
+                            `${formatNumber(
+                                quantity
+                            )} sold`;
+
+                    } else {
+
+                        value =
+                            formatNumber(
+                                quantity
+                            );
+
+                        meta =
+                            "units sold";
+
+                    }
+
+
+                    return `
+                        <div class="item-ranking-row">
+
+                            <div class="item-ranking-position">
+                                ${index + 1}
+                            </div>
+
+                            <div class="item-ranking-info">
+
+                                <span
+                                    class="item-ranking-name"
+                                    title="${escapeAttribute(
+                                        name
+                                    )}"
+                                >
+                                    ${escapeHTML(
+                                        name
+                                    )}
+                                </span>
+
+                                <span class="item-ranking-meta">
+                                    ${escapeHTML(
+                                        meta
+                                    )}
+                                </span>
+
+                            </div>
+
+                            <strong class="item-ranking-value">
+                                ${escapeHTML(
+                                    value
+                                )}
+                            </strong>
+
                         </div>
+                    `;
 
-                        <div class="item-meta">
-                            ${formatNumber(quantity)}
-                            sold
-                        </div>
-
-                    </div>
-
-                    <div class="item-value">
-
-                        ${
-                            valueType ===
-                            "revenue"
-                                ? formatCurrency(
-                                    revenue
-                                )
-                                : formatNumber(
-                                    quantity
-                                )
-                        }
-
-                    </div>
-
-                `;
-
-
-                container.appendChild(
-                    row
-                );
-
-            }
-        );
+                }
+            )
+            .join("");
 
 }
 
 
-// ==========================================
-// BRANCH PERFORMANCE
-// ==========================================
+/* ==========================================
+   BRANCH PERFORMANCE
+   ========================================== */
 
-function renderBranchPerformance(
-    branches
-) {
+function renderBranchPerformance() {
 
     const tbody =
         document.getElementById(
             "branchTableBody"
         );
 
-
-    const empty =
+    const emptyState =
         document.getElementById(
             "branchEmptyState"
         );
 
 
-    tbody.innerHTML = "";
+    if (!tbody) {
+        return;
+    }
 
 
-    if (!branches.length) {
+    const branchPerformance =
+        reportData?.reports
+            ?.branchPerformance;
 
-        empty.classList.remove(
+
+    const branches =
+        Array.isArray(
+            branchPerformance
+        )
+            ? branchPerformance
+            : [];
+
+
+    if (
+        branches.length === 0
+    ) {
+
+        tbody.innerHTML =
+            "";
+
+        if (emptyState) {
+
+            emptyState.classList.remove(
+                "hidden"
+            );
+
+        }
+
+        return;
+
+    }
+
+
+    if (emptyState) {
+
+        emptyState.classList.add(
             "hidden"
         );
 
-        return;
-
     }
 
 
-    empty.classList.add(
-        "hidden"
-    );
+    tbody.innerHTML =
+        branches
+            .map(
+                branch => {
 
-
-    branches.forEach(branch => {
-
-        const orders =
-            Number(
-                branch.orders || 0
-            );
-
-
-        const revenue =
-            Number(
-                branch.revenue || 0
-            );
-
-
-        const average =
-            Number(
-                branch.averageOrderValue ||
-                branch.avgOrderValue ||
-                (
-                    orders > 0
-                        ? revenue / orders
-                        : 0
-                )
-            );
-
-
-        const row =
-            document.createElement(
-                "tr"
-            );
-
-
-        row.innerHTML = `
-
-            <td>
-
-                <span class="branch-name">
-                    ${escapeHtml(
+                    const name =
                         branch.branchName ||
-                        branch.name ||
-                        "Unknown Branch"
-                    )}
-                </span>
+                        branch.BranchName ||
+                        "Unknown Branch";
 
-                ${
-                    branch.city
-                        ? `
-                            <span class="branch-city">
-                                ${escapeHtml(
-                                    branch.city
+
+                    const orders =
+                        Number(
+                            branch.orders ||
+                            branch.totalOrders ||
+                            0
+                        );
+
+
+                    const revenue =
+                        Number(
+                            branch.revenue ||
+                            branch.totalRevenue ||
+                            0
+                        );
+
+
+                    const average =
+                        Number(
+                            branch.averageOrderValue ||
+                            branch.average ||
+                            (
+                                orders > 0
+                                    ? revenue /
+                                      orders
+                                    : 0
+                            )
+                        );
+
+
+                    return `
+                        <tr>
+
+                            <td>
+                                ${escapeHTML(
+                                    name
                                 )}
-                            </span>
-                          `
-                        : ""
+                            </td>
+
+                            <td>
+                                ${formatNumber(
+                                    orders
+                                )}
+                            </td>
+
+                            <td>
+                                ${formatCurrency(
+                                    revenue
+                                )}
+                            </td>
+
+                            <td>
+                                ${formatCurrency(
+                                    average
+                                )}
+                            </td>
+
+                        </tr>
+                    `;
+
                 }
+            )
+            .join("");
 
-            </td>
+}
 
-            <td>
-                ${formatNumber(orders)}
-            </td>
 
-            <td>
-                ${formatCurrency(revenue)}
-            </td>
+/* ==========================================
+   BRANCH FILTER
+   ========================================== */
 
-            <td>
-                ${formatCurrency(average)}
-            </td>
+function populateBranchFilter(
+    branches
+) {
 
+    if (!branchFilter) {
+        return;
+    }
+
+
+    const previousValue =
+        currentBranchId ||
+        branchFilter.value ||
+        "";
+
+
+    branchFilter.innerHTML =
+        `
+            <option value="">
+                All Branches
+            </option>
         `;
 
 
-        tbody.appendChild(row);
-
-    });
-
-}
-
-
-// ==========================================
-// PERIOD LABELS
-// ==========================================
-
-function updatePeriodLabels(
-    dateRange
-) {
-
-    const days =
-        Number(
-            dateRange.days ||
-            selectedDateRange ||
-            30
-        );
-
-
-    const label =
-        `Last ${days} Days`;
-
-
-    setText(
-        "periodLabel",
-        label
-    );
-
-
-    setText(
-        "chartDateLabel",
-        label
-    );
-
-}
-
-
-// ==========================================
-// EXPORT
-// ==========================================
-
-function exportReport() {
-
-    if (!reportData) {
+    if (
+        !Array.isArray(branches)
+    ) {
         return;
     }
 
 
-    const reports =
-        reportData.reports || {};
+    branches
+        .forEach(
+            branch => {
+
+                const branchId =
+                    branch.branchId ||
+                    branch.BranchId ||
+                    branch.BranchID ||
+                    "";
 
 
-    const summary =
-        reports.executiveSummary || {};
+                const branchName =
+                    branch.branchName ||
+                    branch.BranchName ||
+                    branch.BranchOutlet ||
+                    branch.name ||
+                    "Branch";
+
+
+                if (!branchId) {
+                    return;
+                }
+
+
+                const option =
+                    document.createElement(
+                        "option"
+                    );
+
+                option.value =
+                    branchId;
+
+                option.textContent =
+                    branchName;
+
+
+                branchFilter.appendChild(
+                    option
+                );
+
+            }
+        );
+
+
+    const exists =
+        Array.from(
+            branchFilter.options
+        ).some(
+            option =>
+                option.value ===
+                previousValue
+        );
+
+
+    if (exists) {
+
+        branchFilter.value =
+            previousValue;
+
+        currentBranchId =
+            previousValue;
+
+    } else {
+
+        branchFilter.value =
+            "";
+
+        currentBranchId =
+            "";
+
+    }
+
+}
+
+
+/* ==========================================
+   CHANGE RENDERING
+   ========================================== */
+
+function renderChange(
+    elementId,
+    value
+) {
+
+    const element =
+        document.getElementById(
+            elementId
+        );
+
+    if (!element) {
+        return;
+    }
+
+
+    const numeric =
+        Number(value);
+
+
+    element.classList.remove(
+        "positive",
+        "negative",
+        "neutral"
+    );
+
+
+    if (
+        !Number.isFinite(
+            numeric
+        )
+    ) {
+
+        element.textContent =
+            "—";
+
+        element.classList.add(
+            "neutral"
+        );
+
+        return;
+
+    }
+
+
+    if (numeric > 0) {
+
+        element.textContent =
+            `↑ ${formatPercentage(
+                numeric
+            )}`;
+
+        element.classList.add(
+            "positive"
+        );
+
+        return;
+
+    }
+
+
+    if (numeric < 0) {
+
+        element.textContent =
+            `↓ ${formatPercentage(
+                Math.abs(
+                    numeric
+                )
+            )}`;
+
+        element.classList.add(
+            "negative"
+        );
+
+        return;
+
+    }
+
+
+    element.textContent =
+        "0%";
+
+    element.classList.add(
+        "neutral"
+    );
+
+}
+
+
+/* ==========================================
+   LOADING STATE
+   ========================================== */
+
+function showLoading() {
+
+    loadingState
+        ?.classList.remove(
+            "hidden"
+        );
+
+    errorState
+        ?.classList.add(
+            "hidden"
+        );
+
+    reportContent
+        ?.classList.add(
+            "hidden"
+        );
+
+}
+
+
+function hideLoading() {
+
+    loadingState
+        ?.classList.add(
+            "hidden"
+        );
+
+}
+
+
+/* ==========================================
+   ERROR STATE
+   ========================================== */
+
+function showError(
+    message
+) {
+
+    hideLoading();
+
+
+    if (errorMessage) {
+
+        errorMessage.textContent =
+            message;
+
+    }
+
+
+    errorState
+        ?.classList.remove(
+            "hidden"
+        );
+
+    reportContent
+        ?.classList.add(
+            "hidden"
+        );
+
+}
+
+
+function hideError() {
+
+    errorState
+        ?.classList.add(
+            "hidden"
+        );
+
+}
+
+
+/* ==========================================
+   EMPTY STATE
+   ========================================== */
+
+function createEmptyState(
+    icon,
+    title,
+    message
+) {
+
+    return `
+        <div class="reports-empty-state">
+
+            <div class="reports-empty-icon">
+                ${icon}
+            </div>
+
+            <div class="reports-empty-title">
+                ${escapeHTML(
+                    title
+                )}
+            </div>
+
+            <div class="reports-empty-text">
+                ${escapeHTML(
+                    message
+                )}
+            </div>
+
+        </div>
+    `;
+
+}
+
+
+/* ==========================================
+   CSV EXPORT
+   ========================================== */
+
+function exportReportsCSV() {
+
+    if (!reportData) {
+
+        showError(
+            "There is no report data available to export."
+        );
+
+        return;
+
+    }
 
 
     const rows = [];
 
 
-    rows.push([
-        "QR Restaurant SaaS Report"
-    ]);
+    const summary =
+        reportData.reports
+            ?.executiveSummary ||
+        {};
 
+
+    rows.push([
+        "QR Order SaaS Report"
+    ]);
 
     rows.push([
         "Reporting Period",
-        `Last ${selectedDateRange} Days`
+        getDateRangeLabel(
+            reportData.reportDateRange
+                ?.days || currentDateRange
+        )
     ]);
 
-
     rows.push([]);
-
 
     rows.push([
         "Executive Summary"
     ]);
-
 
     rows.push([
         "Metric",
         "Value"
     ]);
 
-
     rows.push([
         "Total Orders",
         summary.totalOrders || 0
     ]);
 
-
     rows.push([
         "Total Revenue",
-        summary.totalRevenue || 0
+        formatCurrency(
+            summary.totalRevenue || 0
+        )
     ]);
-
 
     rows.push([
         "Average Order Value",
-        summary.averageOrderValue || 0
+        formatCurrency(
+            summary.averageOrderValue || 0
+        )
     ]);
-
 
     rows.push([
         "Customers",
         summary.customers || 0
     ]);
 
-
     rows.push([]);
 
+    rows.push([
+        "Daily Performance"
+    ]);
+
+    rows.push([
+        "Date",
+        "Orders",
+        "Revenue"
+    ]);
+
+
+    const daily =
+        reportData.reports
+            ?.performance
+            ?.daily || [];
+
+
+    daily.forEach(
+        item => {
+
+            rows.push([
+                item.date || "",
+                Number(
+                    item.orders || 0
+                ),
+                formatCurrencyValue(
+                    item.revenue || 0
+                )
+            ]);
+
+        }
+    );
+
+
+    rows.push([]);
 
     rows.push([
         "Branch Performance"
     ]);
 
-
     rows.push([
         "Branch",
         "Orders",
         "Revenue",
-        "Average Order"
+        "Average Order Value"
     ]);
 
 
-    (
-        reports.branchPerformance ||
-        []
-    ).forEach(branch => {
-
-        const orders =
-            Number(
-                branch.orders || 0
-            );
+    const branches =
+        reportData.reports
+            ?.branchPerformance || [];
 
 
-        const revenue =
-            Number(
-                branch.revenue || 0
-            );
+    branches.forEach(
+        branch => {
+
+            const orders =
+                Number(
+                    branch.orders ||
+                    branch.totalOrders ||
+                    0
+                );
+
+            const revenue =
+                Number(
+                    branch.revenue ||
+                    branch.totalRevenue ||
+                    0
+                );
+
+            const average =
+                orders > 0
+                    ? revenue / orders
+                    : 0;
 
 
-        rows.push([
-            branch.branchName ||
-                branch.name ||
-                "",
+            rows.push([
+                branch.branchName ||
+                    branch.BranchName ||
+                    "",
+                orders,
+                formatCurrencyValue(
+                    revenue
+                ),
+                formatCurrencyValue(
+                    average
+                )
+            ]);
 
-            orders,
-
-            revenue,
-
-            orders > 0
-                ? revenue / orders
-                : 0
-        ]);
-
-    });
+        }
+    );
 
 
     const csv =
         rows
-            .map(row =>
-                row
-                    .map(csvEscape)
-                    .join(",")
+            .map(
+                row =>
+                    row
+                        .map(
+                            value =>
+                                csvEscape(
+                                    value
+                                )
+                        )
+                        .join(",")
             )
             .join("\n");
 
@@ -1569,146 +2296,283 @@ function exportReport() {
 
 
     const url =
-        URL.createObjectURL(blob);
+        URL.createObjectURL(
+            blob
+        );
 
 
     const link =
-        document.createElement("a");
+        document.createElement(
+            "a"
+        );
 
-
-    link.href = url;
-
+    link.href =
+        url;
 
     link.download =
-        `restaurant-report-${selectedDateRange}-days.csv`;
+        `QR-Order-Reports-${getFileDate()}.csv`;
 
 
     document.body.appendChild(
         link
     );
 
-
     link.click();
-
 
     document.body.removeChild(
         link
     );
 
 
-    URL.revokeObjectURL(url);
-
-}
-
-
-// ==========================================
-// CSV ESCAPE
-// ==========================================
-
-function csvEscape(value) {
-
-    const text =
-        String(
-            value ?? ""
-        );
-
-
-    if (
-        text.includes(",") ||
-        text.includes('"') ||
-        text.includes("\n")
-    ) {
-
-        return `"${text.replace(
-            /"/g,
-            '""'
-        )}"`;
-
-    }
-
-
-    return text;
-
-}
-
-
-// ==========================================
-// FORMATTERS
-// ==========================================
-
-function formatNumber(value) {
-
-    return Number(
-        value || 0
-    ).toLocaleString(
-        "en-US"
+    URL.revokeObjectURL(
+        url
     );
 
 }
 
 
-function formatCurrency(value) {
+/* ==========================================
+   FORMATTING
+   ========================================== */
 
-    return `AED ${Number(
-        value || 0
-    ).toLocaleString(
-        "en-US",
-        {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2
-        }
-    )}`;
+function formatCurrency(
+    value
+) {
 
-}
-
-
-function formatCompact(value) {
-
-    const number =
+    const numeric =
         Number(value || 0);
 
 
-    if (number >= 1000000) {
+    try {
 
-        return (
-            number / 1000000
-        ).toFixed(1) + "M";
+        return new Intl.NumberFormat(
+            "en-AE",
+            {
+                style: "currency",
+
+                currency:
+                    currentCurrency,
+
+                maximumFractionDigits:
+                    2
+            }
+        ).format(
+            numeric
+        );
+
+    } catch (error) {
+
+        return `${currentCurrency} ${numeric.toFixed(2)}`;
 
     }
-
-
-    if (number >= 1000) {
-
-        return (
-            number / 1000
-        ).toFixed(1) + "K";
-
-    }
-
-
-    return number.toFixed(0);
 
 }
 
 
-function formatShortDate(value) {
+function formatCurrencyValue(
+    value
+) {
 
-    if (!value) {
+    return Number(
+        value || 0
+    ).toFixed(2);
+
+}
+
+
+function formatNumber(
+    value
+) {
+
+    const numeric =
+        Number(value || 0);
+
+
+    return new Intl.NumberFormat(
+        "en-US"
+    ).format(
+        numeric
+    );
+
+}
+
+
+function formatPercentage(
+    value
+) {
+
+    const numeric =
+        Number(value || 0);
+
+
+    return `${numeric.toFixed(
+        1
+    )}%`;
+
+}
+
+
+function formatCompactNumber(
+    value
+) {
+
+    const numeric =
+        Number(value || 0);
+
+
+    if (
+        Math.abs(
+            numeric
+        ) >= 1000000
+    ) {
+
+        return (
+            (
+                numeric /
+                1000000
+            ).toFixed(1) +
+            "M"
+        );
+
+    }
+
+
+    if (
+        Math.abs(
+            numeric
+        ) >= 1000
+    ) {
+
+        return (
+            (
+                numeric /
+                1000
+            ).toFixed(1) +
+            "K"
+        );
+
+    }
+
+
+    return formatNumber(
+        numeric
+    );
+
+}
+
+
+function formatCompactCurrency(
+    value
+) {
+
+    const numeric =
+        Number(value || 0);
+
+
+    if (
+        Math.abs(
+            numeric
+        ) >= 1000000
+    ) {
+
+        return (
+            currentCurrency +
+            " " +
+            (
+                numeric /
+                1000000
+            ).toFixed(1) +
+            "M"
+        );
+
+    }
+
+
+    if (
+        Math.abs(
+            numeric
+        ) >= 1000
+    ) {
+
+        return (
+            currentCurrency +
+            " " +
+            (
+                numeric /
+                1000
+            ).toFixed(1) +
+            "K"
+        );
+
+    }
+
+
+    return (
+        currentCurrency +
+        " " +
+        numeric.toFixed(0)
+    );
+
+}
+
+
+/* ==========================================
+   DATE FORMATTING
+   ========================================== */
+
+function formatChartDate(
+    dateValue
+) {
+
+    if (!dateValue) {
         return "";
     }
 
 
     const date =
-        new Date(value);
+        parseDateValue(
+            dateValue
+        );
 
 
-    if (
-        Number.isNaN(
-            date.getTime()
-        )
-    ) {
+    if (!date) {
+        return String(
+            dateValue
+        );
+    }
 
-        return String(value);
+
+    return date.toLocaleDateString(
+        "en-US",
+        {
+            month: "short",
+            day: "numeric"
+        }
+    );
+
+}
+
+
+function formatReadableDate(
+    dateValue
+) {
+
+    if (!dateValue) {
+        return "Unknown";
+    }
+
+
+    const date =
+        parseDateValue(
+            dateValue
+        );
+
+
+    if (!date) {
+
+        return String(
+            dateValue
+        );
 
     }
 
@@ -1724,34 +2588,307 @@ function formatShortDate(value) {
 }
 
 
-// ==========================================
-// STATUS COLORS
-// ==========================================
+function parseDateValue(
+    value
+) {
 
-function getStatusColor(index) {
+    if (
+        value instanceof Date
+    ) {
 
-    const colors = [
-        "#6366f1",
-        "#818cf8",
-        "#a5b4fc",
-        "#f59e0b",
-        "#ef4444",
-        "#9ca3af"
-    ];
+        return isNaN(
+            value.getTime()
+        )
+            ? null
+            : value;
+
+    }
 
 
-    return colors[
-        index % colors.length
-    ];
+    const date =
+        new Date(
+            value
+        );
+
+
+    return isNaN(
+        date.getTime()
+    )
+        ? null
+        : date;
 
 }
 
 
-// ==========================================
-// SAFE TEXT
-// ==========================================
+function getDateRangeLabel(
+    days
+) {
 
-function escapeHtml(value) {
+    const numeric =
+        Number(days);
+
+
+    switch (numeric) {
+
+        case 7:
+            return "Last 7 Days";
+
+        case 14:
+            return "Last 14 Days";
+
+        case 30:
+            return "Last 30 Days";
+
+        case 90:
+            return "Last 90 Days";
+
+        default:
+            return `Last ${numeric} Days`;
+
+    }
+
+}
+
+
+function getFileDate() {
+
+    const date =
+        new Date();
+
+
+    return [
+        date.getFullYear(),
+
+        String(
+            date.getMonth() + 1
+        ).padStart(
+            2,
+            "0"
+        ),
+
+        String(
+            date.getDate()
+        ).padStart(
+            2,
+            "0"
+        )
+    ].join("-");
+
+}
+
+
+/* ==========================================
+   STATUS HELPERS
+   ========================================== */
+
+function formatStatus(
+    status
+) {
+
+    if (!status) {
+        return "Unknown";
+    }
+
+
+    return String(
+        status
+    )
+        .trim()
+        .replace(
+            /[_-]+/g,
+            " "
+        )
+        .replace(
+            /\b\w/g,
+            char =>
+                char.toUpperCase()
+        );
+
+}
+
+
+function getStatusColor(
+    status
+) {
+
+    const normalized =
+        String(
+            status || ""
+        )
+            .trim()
+            .toLowerCase();
+
+
+    if (
+        normalized.includes(
+            "pending"
+        )
+    ) {
+
+        return "#c9a65d";
+
+    }
+
+
+    if (
+        normalized.includes(
+            "accept"
+        )
+    ) {
+
+        return "#526a55";
+
+    }
+
+
+    if (
+        normalized.includes(
+            "ready"
+        )
+    ) {
+
+        return "#3f7d58";
+
+    }
+
+
+    if (
+        normalized.includes(
+            "prepar"
+        )
+    ) {
+
+        return "#526b8f";
+
+    }
+
+
+    if (
+        normalized.includes(
+            "reject"
+        )
+    ) {
+
+        return "#bd6464";
+
+    }
+
+
+    if (
+        normalized.includes(
+            "cancel"
+        )
+    ) {
+
+        return "#9a6570";
+
+    }
+
+
+    if (
+        normalized.includes(
+            "complete"
+        ) ||
+        normalized.includes(
+            "deliver"
+        )
+    ) {
+
+        return "#567a65";
+
+    }
+
+
+    return "#7a8496";
+
+}
+
+
+/* ==========================================
+   GENERAL HELPERS
+   ========================================== */
+
+function setText(
+    elementId,
+    value
+) {
+
+    const element =
+        document.getElementById(
+            elementId
+        );
+
+    if (element) {
+
+        element.textContent =
+            value;
+
+    }
+
+}
+
+
+function getInitial(
+    name
+) {
+
+    if (!name) {
+        return "A";
+    }
+
+
+    return String(
+        name
+    )
+        .trim()
+        .charAt(0)
+        .toUpperCase();
+
+}
+
+
+function csvEscape(
+    value
+) {
+
+    if (
+        value === null ||
+        value === undefined
+    ) {
+
+        return "";
+
+    }
+
+
+    const stringValue =
+        String(
+            value
+        );
+
+
+    if (
+        /[",\n]/.test(
+            stringValue
+        )
+    ) {
+
+        return `"${stringValue.replace(
+            /"/g,
+            '""'
+        )}"`;
+
+    }
+
+
+    return stringValue;
+
+}
+
+
+function escapeHTML(
+    value
+) {
 
     return String(
         value ?? ""
@@ -1780,97 +2917,12 @@ function escapeHtml(value) {
 }
 
 
-// ==========================================
-// DOM HELPER
-// ==========================================
-
-function setText(
-    id,
+function escapeAttribute(
     value
 ) {
 
-    const element =
-        document.getElementById(id);
-
-
-    if (element) {
-
-        element.textContent =
-            value;
-
-    }
-
-}
-
-
-// ==========================================
-// UI STATE
-// ==========================================
-
-function showLoading() {
-
-    loadingState.classList.remove(
-        "hidden"
+    return escapeHTML(
+        value
     );
-
-    reportContent.classList.add(
-        "hidden"
-    );
-
-    errorState.classList.add(
-        "hidden"
-    );
-
-}
-
-
-function showReportContent() {
-
-    loadingState.classList.add(
-        "hidden"
-    );
-
-    errorState.classList.add(
-        "hidden"
-    );
-
-    reportContent.classList.remove(
-        "hidden"
-    );
-
-}
-
-
-function handleReportError(
-    message
-) {
-
-    loadingState.classList.add(
-        "hidden"
-    );
-
-    reportContent.classList.add(
-        "hidden"
-    );
-
-    errorState.classList.remove(
-        "hidden"
-    );
-
-
-    errorMessage.textContent =
-        message;
-
-}
-
-
-// ==========================================
-// LOGIN REDIRECT
-// ==========================================
-
-function redirectToLogin() {
-
-    window.location.href =
-        "../login/login.html";
 
 }
