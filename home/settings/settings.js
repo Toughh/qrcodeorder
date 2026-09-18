@@ -14,6 +14,9 @@ const SETTINGS_GET_WEBHOOK =
 const SETTINGS_UPDATE_WEBHOOK =
     `${N8N_BASE_URL}/owner-settings-update`;
 
+const SETTINGS_DEACTIVATE_WEBHOOK =
+    `${N8N_BASE_URL}/owner-restaurant-deactivate`;
+
 const SESSION_TOKEN_KEY =
     "qro_session_token";
 
@@ -133,7 +136,7 @@ function activateSection(section) {
             panel.classList.toggle(
                 "active",
                 panel.id ===
-                    `section-${section}`
+                `section-${section}`
             );
 
         });
@@ -159,7 +162,7 @@ function initializeEvents() {
             () => {
 
                 window.location.href =
-                    "../login/forgot-password.html";
+                    "../../login/reset-credentials/forgot-password.html";
 
             }
         );
@@ -207,6 +210,39 @@ function initializeEvents() {
                     $("kitchenEnabled")
                         .checked = value;
 
+                }
+
+            }
+        );
+
+    $("deactivateRestaurantBtn")
+        ?.addEventListener(
+            "click",
+            openDeactivateModal
+        );
+
+    $("cancelDeactivate")
+        ?.addEventListener(
+            "click",
+            closeDeactivateModal
+        );
+
+    $("confirmDeactivate")
+        ?.addEventListener(
+            "click",
+            deactivateRestaurant
+        );
+
+    $("deactivateModal")
+        ?.addEventListener(
+            "click",
+            event => {
+
+                if (
+                    event.target.id ===
+                    "deactivateModal"
+                ) {
+                    closeDeactivateModal();
                 }
 
             }
@@ -357,6 +393,25 @@ function populateSettings(data) {
         restaurant.status ||
         "Active";
 
+    const deactivateButton =
+        $("deactivateRestaurantBtn");
+
+    if (deactivateButton) {
+
+        const isActive =
+            String(status).toLowerCase() ===
+            "active";
+
+        deactivateButton.disabled =
+            !isActive;
+
+        deactivateButton.textContent =
+            isActive
+                ? "Deactivate Restaurant"
+                : "Restaurant Deactivated";
+
+    }
+
     setText(
         "restaurantStatus",
         status
@@ -375,7 +430,7 @@ function populateSettings(data) {
         statusDot.classList.toggle(
             "inactive",
             String(status).toLowerCase() !==
-                "active"
+            "active"
         );
 
     }
@@ -958,5 +1013,231 @@ function handleLogout() {
     );
 
     redirectToLogin();
+
+}
+
+// ==========================================
+// DEACTIVATION MODAL
+// ==========================================
+
+function openDeactivateModal() {
+
+    const modal =
+        $("deactivateModal");
+
+    if (!modal) {
+        return;
+    }
+
+    const input =
+        $("deactivateConfirmation");
+
+    const error =
+        $("deactivateError");
+
+    if (input) {
+        input.value = "";
+    }
+
+    if (error) {
+        error.textContent = "";
+    }
+
+    modal.classList.add("active");
+
+    modal.setAttribute(
+        "aria-hidden",
+        "false"
+    );
+
+    setTimeout(() => {
+
+        input?.focus();
+
+    }, 100);
+}
+
+
+function closeDeactivateModal() {
+
+    const modal =
+        $("deactivateModal");
+
+    if (!modal) {
+        return;
+    }
+
+    modal.classList.remove("active");
+
+    modal.setAttribute(
+        "aria-hidden",
+        "true"
+    );
+}
+
+
+// ==========================================
+// DEACTIVATE RESTAURANT
+// ==========================================
+
+async function deactivateRestaurant() {
+
+    const sessionToken =
+        getSessionToken();
+
+    if (!sessionToken) {
+
+        redirectToLogin();
+
+        return;
+    }
+
+
+    const input =
+        $("deactivateConfirmation");
+
+    const error =
+        $("deactivateError");
+
+    const button =
+        $("confirmDeactivate");
+
+    const confirmation =
+        String(
+            input?.value || ""
+        )
+            .trim()
+            .toUpperCase();
+
+
+    if (
+        confirmation !==
+        "DEACTIVATE"
+    ) {
+
+        if (error) {
+
+            error.textContent =
+                "Please type DEACTIVATE exactly to continue.";
+
+        }
+
+        input?.focus();
+
+        return;
+    }
+
+
+    if (button) {
+
+        button.disabled = true;
+
+        button.textContent =
+            "Deactivating...";
+
+    }
+
+
+    if (error) {
+
+        error.textContent = "";
+
+    }
+
+
+    try {
+
+        const response =
+            await fetch(
+                SETTINGS_DEACTIVATE_WEBHOOK,
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body: JSON.stringify({
+
+                        sessionToken,
+
+                        confirmation:
+                            "DEACTIVATE"
+
+                    })
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (
+            !response.ok ||
+            !data.success
+        ) {
+
+            if (
+                data.code ===
+                "INVALID_SESSION"
+            ) {
+
+                redirectToLogin();
+
+                return;
+            }
+
+            throw new Error(
+                data.message ||
+                "Unable to deactivate restaurant."
+            );
+        }
+
+
+        closeDeactivateModal();
+
+
+        showSaveMessage(
+            "Restaurant has been deactivated successfully.",
+            "success"
+        );
+
+
+        // Refresh authoritative backend state.
+
+        await loadSettings();
+
+
+    }
+    catch (errorObject) {
+
+        console.error(
+            "Restaurant deactivation error:",
+            errorObject
+        );
+
+        if (error) {
+
+            error.textContent =
+                errorObject.message ||
+                "Unable to deactivate restaurant.";
+
+        }
+
+    }
+    finally {
+
+        if (button) {
+
+            button.disabled = false;
+
+            button.textContent =
+                "Deactivate Restaurant";
+
+        }
+
+    }
 
 }

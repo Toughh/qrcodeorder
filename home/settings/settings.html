@@ -3,10 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>QR Order SaaS — Settings</title>
 
@@ -15,1261 +12,1178 @@
 
 <body>
 
-<div class="app">
+    <div class="app">
 
-    <!-- ======================================
+        <!-- ======================================
          SIDEBAR
     ======================================= -->
 
-    <aside class="sidebar">
+        <aside class="sidebar">
 
-        <div class="brand">
-            <div class="brand-logo">QR</div>
+            <div class="brand">
+                <div class="brand-logo">QR</div>
 
-            <div>
-                <div class="brand-name">
-                    QR Order
-                </div>
+                <div>
+                    <div class="brand-name">
+                        QR Order
+                    </div>
 
-                <div class="brand-subtitle">
-                    SaaS
+                    <div class="brand-subtitle">
+                        SaaS
+                    </div>
                 </div>
             </div>
-        </div>
 
 
-        <nav class="navigation">
+            <nav class="navigation">
 
-            <a
-                href="../dashboard/dashboard.html"
-                class="nav-item"
-            >
-                <span>📊</span>
-                Dashboard
-            </a>
+                <a href="../dashboard/dashboard.html" class="nav-item">
+                    <span>📊</span>
+                    Dashboard
+                </a>
 
-            <a
-                href="../restaurant/restaurant.html"
-                class="nav-item"
-            >
-                <span>🏪</span>
-                Restaurant
-            </a>
+                <a href="../restaurant/restaurant.html" class="nav-item">
+                    <span>🏪</span>
+                    Restaurant
+                </a>
 
-            <a
-                href="../branches/branches.html"
-                class="nav-item"
-            >
-                <span>🏢</span>
-                Branches
-            </a>
+                <a href="../branches/branches.html" class="nav-item">
+                    <span>🏢</span>
+                    Branches
+                </a>
 
-            <a
-                href="../menu/menu.html"
-                class="nav-item"
-            >
-                <span>🍽️</span>
-                Menu
-            </a>
+                <a href="../menu/menu.html" class="nav-item">
+                    <span>🍽️</span>
+                    Menu
+                </a>
 
-            <a
-                href="../users/users.html"
-                class="nav-item"
-            >
-                <span>👥</span>
-                Users
-            </a>
+                <a href="../users/users.html" class="nav-item">
+                    <span>👥</span>
+                    Users
+                </a>
 
-            <a
-                href="../orders/orders.html"
-                class="nav-item"
-            >
-                <span>📦</span>
-                Orders
-            </a>
+                <a href="../orders/orders.html" class="nav-item">
+                    <span>📦</span>
+                    Orders
+                </a>
 
-            <a
-                href="../reports/reports.html"
-                class="nav-item"
-            >
-                <span>📈</span>
-                Reports
-            </a>
+                <a href="../reports/reports.html" class="nav-item">
+                    <span>📈</span>
+                    Reports
+                </a>
 
-            <a
-                href="#"
-                class="nav-item active"
-            >
-                <span>⚙️</span>
-                Settings
-            </a>
+                <a href="#" class="nav-item active">
+                    <span>⚙️</span>
+                    Settings
+                </a>
 
-        </nav>
+            </nav>
 
 
-        <div class="sidebar-footer">
+            <div class="sidebar-footer">
 
-            <button
-                id="logoutBtn"
-                class="logout-btn"
-            >
-                🚪 Logout
-            </button>
+                <button id="logoutBtn" class="logout-btn">
+                    🚪 Logout
+                </button>
 
-        </div>
+            </div>
 
-    </aside>
+        </aside>
 
 
-    <!-- ======================================
+        <!-- ======================================
          MAIN
     ======================================= -->
 
-    <main class="main">
+        <main class="main">
 
-        <!-- TOPBAR -->
+            <!-- TOPBAR -->
 
-        <header class="topbar">
-
-            <div>
-
-                <div class="page-label">
-                    OWNER PORTAL
-                </div>
-
-                <h1>
-                    Settings
-                </h1>
-
-            </div>
-
-
-            <div class="user-area">
-
-                <div
-                    class="user-avatar"
-                    id="userAvatar"
-                >
-                    A
-                </div>
-
-                <div class="user-info">
-
-                    <strong id="userName">
-                        Loading...
-                    </strong>
-
-                    <span id="userRole">
-                        Owner
-                    </span>
-
-                </div>
-
-            </div>
-
-        </header>
-
-
-        <!-- ==================================
-             PAGE INTRO
-        =================================== -->
-
-        <section class="settings-intro">
-
-            <div>
-
-                <span class="eyebrow">
-                    CONTROL CENTER
-                </span>
-
-                <h2>
-                    Restaurant Settings
-                </h2>
-
-                <p>
-                    Manage your restaurant profile,
-                    ordering preferences, services and
-                    regional configuration from one place.
-                </p>
-
-            </div>
-
-        </section>
-
-
-        <!-- ==================================
-             STATUS STRIP
-        =================================== -->
-
-        <section class="settings-status-card">
-
-            <div class="status-main">
-
-                <div
-                    class="status-indicator"
-                    id="restaurantStatusDot"
-                ></div>
+            <header class="topbar">
 
                 <div>
 
-                    <span class="status-label">
-                        RESTAURANT STATUS
+                    <div class="page-label">
+                        OWNER PORTAL
+                    </div>
+
+                    <h1>
+                        Settings
+                    </h1>
+
+                </div>
+
+
+                <div class="user-area">
+
+                    <div class="user-avatar" id="userAvatar">
+                        A
+                    </div>
+
+                    <div class="user-info">
+
+                        <strong id="userName">
+                            Loading...
+                        </strong>
+
+                        <span id="userRole">
+                            Owner
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </header>
+
+
+            <!-- ==================================
+             PAGE INTRO
+        =================================== -->
+
+            <section class="settings-intro">
+
+                <div>
+
+                    <span class="eyebrow">
+                        CONTROL CENTER
                     </span>
 
-                    <strong id="restaurantStatus">
-                        Loading...
+                    <h2>
+                        Restaurant Settings
+                    </h2>
+
+                    <p>
+                        Manage your restaurant profile,
+                        ordering preferences, services and
+                        regional configuration from one place.
+                    </p>
+
+                </div>
+
+            </section>
+
+
+            <!-- ==================================
+             STATUS STRIP
+        =================================== -->
+
+            <section class="settings-status-card">
+
+                <div class="status-main">
+
+                    <div class="status-indicator" id="restaurantStatusDot"></div>
+
+                    <div>
+
+                        <span class="status-label">
+                            RESTAURANT STATUS
+                        </span>
+
+                        <strong id="restaurantStatus">
+                            Loading...
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <div class="status-divider"></div>
+
+
+                <div class="status-info">
+
+                    <span>
+                        PLAN
+                    </span>
+
+                    <strong id="planName">
+                        Starter
                     </strong>
 
                 </div>
 
-            </div>
+
+                <div class="status-info">
+
+                    <span>
+                        BRANCHES
+                    </span>
+
+                    <strong id="branchUsage">
+                        —
+                    </strong>
+
+                </div>
+
+            </section>
 
 
-            <div class="status-divider"></div>
-
-
-            <div class="status-info">
-
-                <span>
-                    PLAN
-                </span>
-
-                <strong id="planName">
-                    Starter
-                </strong>
-
-            </div>
-
-
-            <div class="status-info">
-
-                <span>
-                    BRANCHES
-                </span>
-
-                <strong id="branchUsage">
-                    —
-                </strong>
-
-            </div>
-
-        </section>
-
-
-        <!-- ==================================
+            <!-- ==================================
              SETTINGS LAYOUT
         =================================== -->
 
-        <section class="settings-layout">
+            <section class="settings-layout">
 
 
-            <!-- ==================================
+                <!-- ==================================
                  SETTINGS NAVIGATION
             =================================== -->
 
-            <aside class="settings-nav-card">
+                <aside class="settings-nav-card">
 
-                <button
-                    class="settings-nav-item active"
-                    data-section="general"
-                >
-                    <span class="settings-nav-icon">
-                        ⚙️
-                    </span>
+                    <button class="settings-nav-item active" data-section="general">
+                        <span class="settings-nav-icon">
+                            ⚙️
+                        </span>
 
-                    <span>
-                        <strong>General</strong>
-                        <small>
-                            Restaurant profile
-                        </small>
-                    </span>
-                </button>
+                        <span>
+                            <strong>General</strong>
+                            <small>
+                                Restaurant profile
+                            </small>
+                        </span>
+                    </button>
 
 
-                <button
-                    class="settings-nav-item"
-                    data-section="orders"
-                >
-                    <span class="settings-nav-icon">
-                        🛒
-                    </span>
+                    <button class="settings-nav-item" data-section="orders">
+                        <span class="settings-nav-icon">
+                            🛒
+                        </span>
 
-                    <span>
-                        <strong>Order Settings</strong>
-                        <small>
-                            Order behaviour
-                        </small>
-                    </span>
-                </button>
+                        <span>
+                            <strong>Order Settings</strong>
+                            <small>
+                                Order behaviour
+                            </small>
+                        </span>
+                    </button>
 
 
-                <button
-                    class="settings-nav-item"
-                    data-section="services"
-                >
-                    <span class="settings-nav-icon">
-                        🚚
-                    </span>
+                    <button class="settings-nav-item" data-section="services">
+                        <span class="settings-nav-icon">
+                            🚚
+                        </span>
 
-                    <span>
-                        <strong>Services</strong>
-                        <small>
-                            Ordering channels
-                        </small>
-                    </span>
-                </button>
+                        <span>
+                            <strong>Services</strong>
+                            <small>
+                                Ordering channels
+                            </small>
+                        </span>
+                    </button>
 
 
-                <button
-                    class="settings-nav-item"
-                    data-section="regional"
-                >
-                    <span class="settings-nav-icon">
-                        🌍
-                    </span>
+                    <button class="settings-nav-item" data-section="regional">
+                        <span class="settings-nav-icon">
+                            🌍
+                        </span>
 
-                    <span>
-                        <strong>Regional</strong>
-                        <small>
-                            Currency & timezone
-                        </small>
-                    </span>
-                </button>
+                        <span>
+                            <strong>Regional</strong>
+                            <small>
+                                Currency & timezone
+                            </small>
+                        </span>
+                    </button>
 
 
-                <button
-                    class="settings-nav-item"
-                    data-section="account"
-                >
-                    <span class="settings-nav-icon">
-                        🔐
-                    </span>
+                    <button class="settings-nav-item" data-section="account">
+                        <span class="settings-nav-icon">
+                            🔐
+                        </span>
 
-                    <span>
-                        <strong>Account</strong>
-                        <small>
-                            Owner & security
-                        </small>
-                    </span>
-                </button>
+                        <span>
+                            <strong>Account</strong>
+                            <small>
+                                Owner & security
+                            </small>
+                        </span>
+                    </button>
 
 
-                <button
-                    class="settings-nav-item"
-                    data-section="subscription"
-                >
-                    <span class="settings-nav-icon">
-                        💳
-                    </span>
+                    <button class="settings-nav-item" data-section="subscription">
+                        <span class="settings-nav-icon">
+                            💳
+                        </span>
 
-                    <span>
-                        <strong>Subscription</strong>
-                        <small>
-                            Plan & usage
-                        </small>
-                    </span>
-                </button>
+                        <span>
+                            <strong>Subscription</strong>
+                            <small>
+                                Plan & usage
+                            </small>
+                        </span>
+                    </button>
 
-            </aside>
+                </aside>
 
 
-            <!-- ==================================
+                <!-- ==================================
                  SETTINGS CONTENT
             =================================== -->
 
-            <div class="settings-content">
+                <div class="settings-content">
 
 
-                <!-- ==================================
+                    <!-- ==================================
                      GENERAL
                 =================================== -->
 
-                <section
-                    class="settings-panel active"
-                    id="section-general"
-                >
+                    <section class="settings-panel active" id="section-general">
 
-                    <div class="panel-header">
-
-                        <div>
-
-                            <span class="panel-eyebrow">
-                                GENERAL
-                            </span>
-
-                            <h2>
-                                Restaurant Profile
-                            </h2>
-
-                            <p>
-                                Basic information associated
-                                with your restaurant account.
-                            </p>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="form-grid">
-
-                        <div class="form-group">
-
-                            <label>
-                                RESTAURANT ID
-                            </label>
-
-                            <input
-                                type="text"
-                                id="restaurantId"
-                                readonly
-                            >
-
-                        </div>
-
-
-                        <div class="form-group">
-
-                            <label>
-                                RESTAURANT STATUS
-                            </label>
-
-                            <input
-                                type="text"
-                                id="generalStatus"
-                                readonly
-                            >
-
-                        </div>
-
-
-                        <div class="form-group">
-
-                            <label>
-                                OWNER NAME
-                            </label>
-
-                            <input
-                                type="text"
-                                id="ownerName"
-                                readonly
-                            >
-
-                        </div>
-
-
-                        <div class="form-group">
-
-                            <label>
-                                EMAIL ADDRESS
-                            </label>
-
-                            <input
-                                type="email"
-                                id="ownerEmail"
-                                readonly
-                            >
-
-                        </div>
-
-
-                        <div class="form-group">
-
-                            <label>
-                                MOBILE
-                            </label>
-
-                            <input
-                                type="text"
-                                id="ownerMobile"
-                                readonly
-                            >
-
-                        </div>
-
-
-                        <div class="form-group">
-
-                            <label>
-                                BUSINESS TYPE
-                            </label>
-
-                            <input
-                                type="text"
-                                id="businessType"
-                                readonly
-                            >
-
-                        </div>
-
-
-                        <div class="form-group">
-
-                            <label>
-                                CITY
-                            </label>
-
-                            <input
-                                type="text"
-                                id="city"
-                                readonly
-                            >
-
-                        </div>
-
-
-                        <div class="form-group">
-
-                            <label>
-                                WEBSITE
-                            </label>
-
-                            <input
-                                type="text"
-                                id="website"
-                                readonly
-                            >
-
-                        </div>
-
-                    </div>
-
-                    <div class="read-only-note">
-
-                        <span>🔒</span>
-
-                        <div>
-                            <strong>Profile information</strong>
-
-                            <p>
-                                These details are managed through
-                                your restaurant registration and
-                                account administration.
-                            </p>
-                        </div>
-
-                    </div>
-
-                </section>
-
-
-                <!-- ==================================
-                     ORDER SETTINGS
-                =================================== -->
-
-                <section
-                    class="settings-panel"
-                    id="section-orders"
-                >
-
-                    <div class="panel-header">
-
-                        <div>
-
-                            <span class="panel-eyebrow">
-                                ORDER MANAGEMENT
-                            </span>
-
-                            <h2>
-                                Order Settings
-                            </h2>
-
-                            <p>
-                                Control how your restaurant
-                                receives and processes orders.
-                            </p>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="setting-list">
-
-                        <div class="setting-row">
-
-                            <div class="setting-copy">
-
-                                <strong>
-                                    Accept New Orders
-                                </strong>
-
-                                <span>
-                                    Allow customers to place
-                                    new orders.
-                                </span>
-
-                            </div>
-
-                            <label class="switch">
-
-                                <input
-                                    type="checkbox"
-                                    id="acceptOrders"
-                                >
-
-                                <span class="slider"></span>
-
-                            </label>
-
-                        </div>
-
-
-                        <div class="setting-row">
-
-                            <div class="setting-copy">
-
-                                <strong>
-                                    Kitchen Order Processing
-                                </strong>
-
-                                <span>
-                                    Enable kitchen processing
-                                    for incoming orders.
-                                </span>
-
-                            </div>
-
-                            <label class="switch">
-
-                                <input
-                                    type="checkbox"
-                                    id="kitchenEnabled"
-                                >
-
-                                <span class="slider"></span>
-
-                            </label>
-
-                        </div>
-
-                    </div>
-
-                </section>
-
-
-                <!-- ==================================
-                     SERVICES
-                =================================== -->
-
-                <section
-                    class="settings-panel"
-                    id="section-services"
-                >
-
-                    <div class="panel-header">
-
-                        <div>
-
-                            <span class="panel-eyebrow">
-                                ORDERING CHANNELS
-                            </span>
-
-                            <h2>
-                                Services
-                            </h2>
-
-                            <p>
-                                Configure the services available
-                                to your customers.
-                            </p>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="service-grid">
-
-                        <div class="service-card">
-
-                            <div class="service-icon">
-                                🥡
-                            </div>
+                        <div class="panel-header">
 
                             <div>
 
-                                <strong>
-                                    Pickup
-                                </strong>
-
-                                <span>
-                                    Allow customers to collect
-                                    their orders.
+                                <span class="panel-eyebrow">
+                                    GENERAL
                                 </span>
 
-                            </div>
-
-                            <label class="switch">
-
-                                <input
-                                    type="checkbox"
-                                    id="pickupEnabled"
-                                >
-
-                                <span class="slider"></span>
-
-                            </label>
-
-                        </div>
-
-
-                        <div class="service-card">
-
-                            <div class="service-icon">
-                                🚚
-                            </div>
-
-                            <div>
-
-                                <strong>
-                                    Delivery
-                                </strong>
-
-                                <span>
-                                    Enable customer delivery
-                                    orders.
-                                </span>
-
-                            </div>
-
-                            <label class="switch">
-
-                                <input
-                                    type="checkbox"
-                                    id="deliveryEnabled"
-                                >
-
-                                <span class="slider"></span>
-
-                            </label>
-
-                        </div>
-
-
-                        <div class="service-card">
-
-                            <div class="service-icon">
-                                👨‍🍳
-                            </div>
-
-                            <div>
-
-                                <strong>
-                                    Kitchen
-                                </strong>
-
-                                <span>
-                                    Enable kitchen order
-                                    processing.
-                                </span>
-
-                            </div>
-
-                            <label class="switch">
-
-                                <input
-                                    type="checkbox"
-                                    id="serviceKitchenEnabled"
-                                >
-
-                                <span class="slider"></span>
-
-                            </label>
-
-                        </div>
-
-
-                        <div class="service-card">
-
-                            <div class="service-icon">
-                                💬
-                            </div>
-
-                            <div>
-
-                                <strong>
-                                    WhatsApp
-                                </strong>
-
-                                <span>
-                                    Enable WhatsApp order
-                                    notifications.
-                                </span>
-
-                            </div>
-
-                            <label class="switch">
-
-                                <input
-                                    type="checkbox"
-                                    id="whatsappEnabled"
-                                >
-
-                                <span class="slider"></span>
-
-                            </label>
-
-                        </div>
-
-                    </div>
-
-                </section>
-
-
-                <!-- ==================================
-                     REGIONAL
-                =================================== -->
-
-                <section
-                    class="settings-panel"
-                    id="section-regional"
-                >
-
-                    <div class="panel-header">
-
-                        <div>
-
-                            <span class="panel-eyebrow">
-                                REGIONAL CONFIGURATION
-                            </span>
-
-                            <h2>
-                                Regional Settings
-                            </h2>
-
-                            <p>
-                                Configure currency, language,
-                                timezone and tax preferences.
-                            </p>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="form-grid">
-
-                        <div class="form-group">
-
-                            <label>
-                                CURRENCY
-                            </label>
-
-                            <select id="currency">
-
-                                <option value="AED">
-                                    AED — UAE Dirham
-                                </option>
-
-                                <option value="USD">
-                                    USD — US Dollar
-                                </option>
-
-                                <option value="EUR">
-                                    EUR — Euro
-                                </option>
-
-                                <option value="GBP">
-                                    GBP — British Pound
-                                </option>
-
-                                <option value="INR">
-                                    INR — Indian Rupee
-                                </option>
-
-                            </select>
-
-                        </div>
-
-
-                        <div class="form-group">
-
-                            <label>
-                                LANGUAGE
-                            </label>
-
-                            <select id="language">
-
-                                <option value="English">
-                                    English
-                                </option>
-
-                            </select>
-
-                        </div>
-
-
-                        <div class="form-group form-group-wide">
-
-                            <label>
-                                TIMEZONE
-                            </label>
-
-                            <select id="timezone">
-
-                                <option value="Asia/Dubai">
-                                    Asia/Dubai — Gulf Standard Time
-                                </option>
-
-                                <option value="Asia/Kolkata">
-                                    Asia/Kolkata — India
-                                </option>
-
-                                <option value="Asia/Singapore">
-                                    Asia/Singapore
-                                </option>
-
-                                <option value="Europe/London">
-                                    Europe/London
-                                </option>
-
-                                <option value="America/New_York">
-                                    America/New_York
-                                </option>
-
-                            </select>
-
-                        </div>
-
-
-                        <div class="form-group">
-
-                            <label>
-                                VAT / TAX (%)
-                            </label>
-
-                            <input
-                                type="number"
-                                id="vat"
-                                min="0"
-                                max="100"
-                                step="0.01"
-                            >
-
-                        </div>
-
-                    </div>
-
-                </section>
-
-
-                <!-- ==================================
-                     ACCOUNT
-                =================================== -->
-
-                <section
-                    class="settings-panel"
-                    id="section-account"
-                >
-
-                    <div class="panel-header">
-
-                        <div>
-
-                            <span class="panel-eyebrow">
-                                ACCOUNT & SECURITY
-                            </span>
-
-                            <h2>
-                                Account
-                            </h2>
-
-                            <p>
-                                Review your owner account and
-                                security information.
-                            </p>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="account-card">
-
-                        <div class="account-avatar">
-                            A
-                        </div>
-
-                        <div class="account-details">
-
-                            <strong id="accountOwnerName">
-                                —
-                            </strong>
-
-                            <span id="accountEmail">
-                                —
-                            </span>
-
-                            <div class="account-meta">
-
-                                <span>
-                                    ROLE
-                                </span>
-
-                                <strong id="accountRole">
-                                    Owner
-                                </strong>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="security-card">
-
-                        <div>
-
-                            <span class="security-icon">
-                                🔐
-                            </span>
-
-                            <div>
-
-                                <strong>
-                                    Password Security
-                                </strong>
+                                <h2>
+                                    Restaurant Profile
+                                </h2>
 
                                 <p>
-                                    Change your password through
-                                    the secure account recovery
-                                    flow.
+                                    Basic information associated
+                                    with your restaurant account.
                                 </p>
 
                             </div>
 
                         </div>
 
-                        <button
-                            type="button"
-                            class="secondary-btn"
-                            id="changePasswordBtn"
-                        >
-                            Change Password
+
+                        <div class="form-grid">
+
+                            <div class="form-group">
+
+                                <label>
+                                    RESTAURANT ID
+                                </label>
+
+                                <input type="text" id="restaurantId" readonly>
+
+                            </div>
+
+
+                            <div class="form-group">
+
+                                <label>
+                                    RESTAURANT STATUS
+                                </label>
+
+                                <input type="text" id="generalStatus" readonly>
+
+                            </div>
+
+
+                            <div class="form-group">
+
+                                <label>
+                                    OWNER NAME
+                                </label>
+
+                                <input type="text" id="ownerName" readonly>
+
+                            </div>
+
+
+                            <div class="form-group">
+
+                                <label>
+                                    EMAIL ADDRESS
+                                </label>
+
+                                <input type="email" id="ownerEmail" readonly>
+
+                            </div>
+
+
+                            <div class="form-group">
+
+                                <label>
+                                    MOBILE
+                                </label>
+
+                                <input type="text" id="ownerMobile" readonly>
+
+                            </div>
+
+
+                            <div class="form-group">
+
+                                <label>
+                                    BUSINESS TYPE
+                                </label>
+
+                                <input type="text" id="businessType" readonly>
+
+                            </div>
+
+
+                            <div class="form-group">
+
+                                <label>
+                                    CITY
+                                </label>
+
+                                <input type="text" id="city" readonly>
+
+                            </div>
+
+
+                            <div class="form-group">
+
+                                <label>
+                                    WEBSITE
+                                </label>
+
+                                <input type="text" id="website" readonly>
+
+                            </div>
+
+                        </div>
+
+                        <div class="read-only-note">
+
+                            <span>🔒</span>
+
+                            <div>
+                                <strong>Profile information</strong>
+
+                                <p>
+                                    These details are managed through
+                                    your restaurant registration and
+                                    account administration.
+                                </p>
+                            </div>
+
+                        </div>
+
+                    </section>
+
+
+                    <!-- ==================================
+                     ORDER SETTINGS
+                =================================== -->
+
+                    <section class="settings-panel" id="section-orders">
+
+                        <div class="panel-header">
+
+                            <div>
+
+                                <span class="panel-eyebrow">
+                                    ORDER MANAGEMENT
+                                </span>
+
+                                <h2>
+                                    Order Settings
+                                </h2>
+
+                                <p>
+                                    Control how your restaurant
+                                    receives and processes orders.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="setting-list">
+
+                            <div class="setting-row">
+
+                                <div class="setting-copy">
+
+                                    <strong>
+                                        Accept New Orders
+                                    </strong>
+
+                                    <span>
+                                        Allow customers to place
+                                        new orders.
+                                    </span>
+
+                                </div>
+
+                                <label class="switch">
+
+                                    <input type="checkbox" id="acceptOrders">
+
+                                    <span class="slider"></span>
+
+                                </label>
+
+                            </div>
+
+
+                            <div class="setting-row">
+
+                                <div class="setting-copy">
+
+                                    <strong>
+                                        Kitchen Order Processing
+                                    </strong>
+
+                                    <span>
+                                        Enable kitchen processing
+                                        for incoming orders.
+                                    </span>
+
+                                </div>
+
+                                <label class="switch">
+
+                                    <input type="checkbox" id="kitchenEnabled">
+
+                                    <span class="slider"></span>
+
+                                </label>
+
+                            </div>
+
+                        </div>
+
+                    </section>
+
+
+                    <!-- ==================================
+                     SERVICES
+                =================================== -->
+
+                    <section class="settings-panel" id="section-services">
+
+                        <div class="panel-header">
+
+                            <div>
+
+                                <span class="panel-eyebrow">
+                                    ORDERING CHANNELS
+                                </span>
+
+                                <h2>
+                                    Services
+                                </h2>
+
+                                <p>
+                                    Configure the services available
+                                    to your customers.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="service-grid">
+
+                            <div class="service-card">
+
+                                <div class="service-icon">
+                                    🥡
+                                </div>
+
+                                <div>
+
+                                    <strong>
+                                        Pickup
+                                    </strong>
+
+                                    <span>
+                                        Allow customers to collect
+                                        their orders.
+                                    </span>
+
+                                </div>
+
+                                <label class="switch">
+
+                                    <input type="checkbox" id="pickupEnabled">
+
+                                    <span class="slider"></span>
+
+                                </label>
+
+                            </div>
+
+
+                            <div class="service-card">
+
+                                <div class="service-icon">
+                                    🚚
+                                </div>
+
+                                <div>
+
+                                    <strong>
+                                        Delivery
+                                    </strong>
+
+                                    <span>
+                                        Enable customer delivery
+                                        orders.
+                                    </span>
+
+                                </div>
+
+                                <label class="switch">
+
+                                    <input type="checkbox" id="deliveryEnabled">
+
+                                    <span class="slider"></span>
+
+                                </label>
+
+                            </div>
+
+
+                            <div class="service-card">
+
+                                <div class="service-icon">
+                                    👨‍🍳
+                                </div>
+
+                                <div>
+
+                                    <strong>
+                                        Kitchen
+                                    </strong>
+
+                                    <span>
+                                        Enable kitchen order
+                                        processing.
+                                    </span>
+
+                                </div>
+
+                                <label class="switch">
+
+                                    <input type="checkbox" id="serviceKitchenEnabled">
+
+                                    <span class="slider"></span>
+
+                                </label>
+
+                            </div>
+
+
+                            <div class="service-card">
+
+                                <div class="service-icon">
+                                    💬
+                                </div>
+
+                                <div>
+
+                                    <strong>
+                                        WhatsApp
+                                    </strong>
+
+                                    <span>
+                                        Enable WhatsApp order
+                                        notifications.
+                                    </span>
+
+                                </div>
+
+                                <label class="switch">
+
+                                    <input type="checkbox" id="whatsappEnabled">
+
+                                    <span class="slider"></span>
+
+                                </label>
+
+                            </div>
+
+                        </div>
+
+                    </section>
+
+
+                    <!-- ==================================
+                     REGIONAL
+                =================================== -->
+
+                    <section class="settings-panel" id="section-regional">
+
+                        <div class="panel-header">
+
+                            <div>
+
+                                <span class="panel-eyebrow">
+                                    REGIONAL CONFIGURATION
+                                </span>
+
+                                <h2>
+                                    Regional Settings
+                                </h2>
+
+                                <p>
+                                    Configure currency, language,
+                                    timezone and tax preferences.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="form-grid">
+
+                            <div class="form-group">
+
+                                <label>
+                                    CURRENCY
+                                </label>
+
+                                <select id="currency">
+
+                                    <option value="AED">
+                                        AED — UAE Dirham
+                                    </option>
+
+                                    <option value="USD">
+                                        USD — US Dollar
+                                    </option>
+
+                                    <option value="EUR">
+                                        EUR — Euro
+                                    </option>
+
+                                    <option value="GBP">
+                                        GBP — British Pound
+                                    </option>
+
+                                    <option value="INR">
+                                        INR — Indian Rupee
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+
+                            <div class="form-group">
+
+                                <label>
+                                    LANGUAGE
+                                </label>
+
+                                <select id="language">
+
+                                    <option value="English">
+                                        English
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+
+                            <div class="form-group form-group-wide">
+
+                                <label>
+                                    TIMEZONE
+                                </label>
+
+                                <select id="timezone">
+
+                                    <option value="Asia/Dubai">
+                                        Asia/Dubai — Gulf Standard Time
+                                    </option>
+
+                                    <option value="Asia/Kolkata">
+                                        Asia/Kolkata — India
+                                    </option>
+
+                                    <option value="Asia/Singapore">
+                                        Asia/Singapore
+                                    </option>
+
+                                    <option value="Europe/London">
+                                        Europe/London
+                                    </option>
+
+                                    <option value="America/New_York">
+                                        America/New_York
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+
+                            <div class="form-group">
+
+                                <label>
+                                    VAT / TAX (%)
+                                </label>
+
+                                <input type="number" id="vat" min="0" max="100" step="0.01">
+
+                            </div>
+
+                        </div>
+
+                    </section>
+
+
+                    <!-- ==================================
+                     ACCOUNT
+                =================================== -->
+
+                    <section class="settings-panel" id="section-account">
+
+                        <div class="panel-header">
+
+                            <div>
+
+                                <span class="panel-eyebrow">
+                                    ACCOUNT & SECURITY
+                                </span>
+
+                                <h2>
+                                    Account
+                                </h2>
+
+                                <p>
+                                    Review your owner account and
+                                    security information.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="account-card">
+
+                            <div class="account-avatar">
+                                A
+                            </div>
+
+                            <div class="account-details">
+
+                                <strong id="accountOwnerName">
+                                    —
+                                </strong>
+
+                                <span id="accountEmail">
+                                    —
+                                </span>
+
+                                <div class="account-meta">
+
+                                    <span>
+                                        ROLE
+                                    </span>
+
+                                    <strong id="accountRole">
+                                        Owner
+                                    </strong>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="security-card">
+
+                            <div>
+
+                                <span class="security-icon">
+                                    🔐
+                                </span>
+
+                                <div>
+
+                                    <strong>
+                                        Password Security
+                                    </strong>
+
+                                    <p>
+                                        Change your password through
+                                        the secure account recovery
+                                        flow.
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                            <button type="button" class="secondary-btn" id="changePasswordBtn">
+                                Change Password
+                            </button>
+
+                        </div>
+
+                    </section>
+
+
+                    <!-- ==================================
+                     SUBSCRIPTION
+                =================================== -->
+
+                    <section class="settings-panel" id="section-subscription">
+
+                        <div class="panel-header">
+
+                            <div>
+
+                                <span class="panel-eyebrow">
+                                    SUBSCRIPTION
+                                </span>
+
+                                <h2>
+                                    Plan & Usage
+                                </h2>
+
+                                <p>
+                                    Review your current plan and
+                                    account usage.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="subscription-card">
+
+                            <div class="subscription-top">
+
+                                <div>
+
+                                    <span>
+                                        CURRENT PLAN
+                                    </span>
+
+                                    <h3 id="subscriptionPlan">
+                                        Starter
+                                    </h3>
+
+                                </div>
+
+                                <div class="plan-badge">
+                                    ACTIVE
+                                </div>
+
+                            </div>
+
+
+                            <div class="usage-list">
+
+                                <div class="usage-item">
+
+                                    <div>
+
+                                        <span>
+                                            Branches
+                                        </span>
+
+                                        <strong id="subscriptionBranches">
+                                            —
+                                        </strong>
+
+                                    </div>
+
+                                    <div class="usage-track">
+
+                                        <div id="branchUsageBar" class="usage-fill"></div>
+
+                                    </div>
+
+                                </div>
+
+
+                                <div class="usage-item">
+
+                                    <div>
+
+                                        <span>
+                                            Orders
+                                        </span>
+
+                                        <strong>
+                                            Available
+                                        </strong>
+
+                                    </div>
+
+                                    <div class="usage-track">
+
+                                        <div class="usage-fill" style="width: 18%;"></div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="plan-features">
+
+                                <div>
+                                    ✓ QR Ordering
+                                </div>
+
+                                <div>
+                                    ✓ Menu Management
+                                </div>
+
+                                <div>
+                                    ✓ Order Management
+                                </div>
+
+                                <div>
+                                    ✓ Dashboard Analytics
+                                </div>
+
+                                <div>
+                                    ✓ Reports
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </section>
+
+
+                    <!-- ==================================
+                     SAVE BAR
+                =================================== -->
+
+                    <div class="settings-save-bar">
+
+                        <div id="saveMessage" class="save-message">
+                            Changes are saved to your restaurant
+                            configuration.
+                        </div>
+
+                        <button type="button" id="saveSettings" class="primary-btn">
+                            <span>✓</span>
+                            Save Changes
                         </button>
 
                     </div>
 
-                </section>
 
-
-                <!-- ==================================
-                     SUBSCRIPTION
+                    <!-- ==================================
+                     DANGER ZONE
                 =================================== -->
 
-                <section
-                    class="settings-panel"
-                    id="section-subscription"
-                >
-
-                    <div class="panel-header">
+                    <section class="danger-zone">
 
                         <div>
 
-                            <span class="panel-eyebrow">
-                                SUBSCRIPTION
+                            <span class="danger-eyebrow">
+                                DANGER ZONE
                             </span>
 
-                            <h2>
-                                Plan & Usage
-                            </h2>
+                            <h3>
+                                Restaurant Account
+                            </h3>
 
                             <p>
-                                Review your current plan and
-                                account usage.
+                                Restaurant deactivation and permanent
+                                deletion will require additional
+                                verification.
                             </p>
 
                         </div>
 
-                    </div>
+                        <button type="button" id="deactivateRestaurantBtn" class="danger-btn">
+                            Deactivate Restaurant
+                        </button>
 
-
-                    <div class="subscription-card">
-
-                        <div class="subscription-top">
-
-                            <div>
-
-                                <span>
-                                    CURRENT PLAN
-                                </span>
-
-                                <h3 id="subscriptionPlan">
-                                    Starter
-                                </h3>
-
-                            </div>
-
-                            <div class="plan-badge">
-                                ACTIVE
-                            </div>
-
-                        </div>
-
-
-                        <div class="usage-list">
-
-                            <div class="usage-item">
-
-                                <div>
-
-                                    <span>
-                                        Branches
-                                    </span>
-
-                                    <strong id="subscriptionBranches">
-                                        —
-                                    </strong>
-
-                                </div>
-
-                                <div class="usage-track">
-
-                                    <div
-                                        id="branchUsageBar"
-                                        class="usage-fill"
-                                    ></div>
-
-                                </div>
-
-                            </div>
-
-
-                            <div class="usage-item">
-
-                                <div>
-
-                                    <span>
-                                        Orders
-                                    </span>
-
-                                    <strong>
-                                        Available
-                                    </strong>
-
-                                </div>
-
-                                <div class="usage-track">
-
-                                    <div
-                                        class="usage-fill"
-                                        style="width: 18%;"
-                                    ></div>
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-
-                        <div class="plan-features">
-
-                            <div>
-                                ✓ QR Ordering
-                            </div>
-
-                            <div>
-                                ✓ Menu Management
-                            </div>
-
-                            <div>
-                                ✓ Order Management
-                            </div>
-
-                            <div>
-                                ✓ Dashboard Analytics
-                            </div>
-
-                            <div>
-                                ✓ Reports
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                </section>
-
-
-                <!-- ==================================
-                     SAVE BAR
-                =================================== -->
-
-                <div class="settings-save-bar">
-
-                    <div
-                        id="saveMessage"
-                        class="save-message"
-                    >
-                        Changes are saved to your restaurant
-                        configuration.
-                    </div>
-
-                    <button
-                        type="button"
-                        id="saveSettings"
-                        class="primary-btn"
-                    >
-                        <span>✓</span>
-                        Save Changes
-                    </button>
+                    </section>
 
                 </div>
 
+            </section>
 
-                <!-- ==================================
-                     DANGER ZONE
-                =================================== -->
+        </main>
 
-                <section class="danger-zone">
+    </div>
 
-                    <div>
+    <!-- ======================================
+     DEACTIVATION MODAL
+======================================= -->
 
-                        <span class="danger-eyebrow">
-                            DANGER ZONE
-                        </span>
+    <div id="deactivateModal" class="modal-overlay" aria-hidden="true">
 
-                        <h3>
-                            Restaurant Account
-                        </h3>
+        <div class="modal-card">
 
-                        <p>
-                            Restaurant deactivation and permanent
-                            deletion will require additional
-                            verification.
-                        </p>
+            <div class="modal-icon">
+                !
+            </div>
 
-                    </div>
+            <div class="modal-header">
 
-                    <button
-                        type="button"
-                        class="danger-btn"
-                        disabled
-                    >
-                        Deactivate Restaurant
-                    </button>
+                <span class="modal-eyebrow">
+                    ACCOUNT ACTION
+                </span>
 
-                </section>
+                <h2>
+                    Deactivate Restaurant?
+                </h2>
+
+                <p>
+                <p>
+                    This will stop customers from placing
+                    new orders. Your restaurant data,
+                    menu and existing orders will remain preserved.
+                </p>
+                </p>
 
             </div>
 
-        </section>
 
-    </main>
+            <div class="confirmation-box">
 
-</div>
+                <label for="deactivateConfirmation">
+                    TYPE <strong>DEACTIVATE</strong> TO CONFIRM
+                </label>
+
+                <input type="text" id="deactivateConfirmation" autocomplete="off" placeholder="DEACTIVATE">
+
+            </div>
 
 
-<!-- ======================================
+            <div id="deactivateError" class="modal-error"></div>
+
+
+            <div class="modal-actions">
+
+                <button type="button" id="cancelDeactivate" class="secondary-btn">
+                    Cancel
+                </button>
+
+                <button type="button" id="confirmDeactivate" class="danger-confirm-btn">
+                    Deactivate Restaurant
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ======================================
      SCRIPTS
 ======================================= -->
 
-<script src="../../config/config.js"></script>
-<script src="../../auth.js"></script>
-<script src="settings.js"></script>
+    <script src="../../config/config.js"></script>
+    <script src="../../auth.js"></script>
+    <script src="settings.js"></script>
 
 </body>
+
 </html>
