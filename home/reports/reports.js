@@ -653,10 +653,9 @@ function populateBranchFilter(
 
 
         const branchName =
-            branch.branch ||
-            branch.Branch ||
-            branchId ||
-            "Unnamed Branch";
+    branch.branch ||
+    branch.branchName ||
+    "Unnamed Branch";
 
 
         if (!branchId) {
@@ -1800,8 +1799,8 @@ function renderBranchPerformance(
             return {
 
                 branchName:
+                    branch.branch ||
                     branch.branchName ||
-                    branch.BranchName ||
                     branch.branchId ||
                     "Unnamed Branch",
 
@@ -1839,7 +1838,7 @@ function renderBranchPerformance(
                             <div class="branch-name-cell">
                                 <strong>
                                     ${escapeHtml(
-                                        branch.branchName
+                                        branch.branch
                                     )}
                                 </strong>
                             </div>
@@ -2569,7 +2568,7 @@ function exportReport() {
 
 
         rows.push([
-            branch.branchName ||
+            branch.branch ||
                 branch.branchId ||
                 "",
             orderCount,
