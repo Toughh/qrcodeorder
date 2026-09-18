@@ -325,6 +325,8 @@ async function loadSettings() {
 
         hideLoadingState();
 
+        console.log("SETTINGS API RESPONSE:", data);
+
     }
     catch (error) {
 
@@ -388,28 +390,50 @@ function populateSettings(data) {
     // STATUS
     // --------------------------------------
 
+    // --------------------------------------
+    // STATUS
+    // --------------------------------------
+
     const status =
-        profile.status ||
-        restaurant.status ||
-        "Active";
+        String(
+            restaurant.status ||
+            profile.status ||
+            "Active"
+        ).trim();
+
+    const normalizedStatus =
+        status.toLowerCase();
 
     const deactivateButton =
         $("deactivateRestaurantBtn");
 
     if (deactivateButton) {
 
-        const isActive =
-            String(status).toLowerCase() ===
-            "active";
+        if (normalizedStatus === "active") {
 
-        deactivateButton.disabled =
-            !isActive;
+            deactivateButton.disabled = false;
 
-        deactivateButton.textContent =
-            isActive
-                ? "Deactivate Restaurant"
-                : "Restaurant Deactivated";
+            deactivateButton.textContent =
+                "Deactivate Restaurant";
 
+        }
+        else if (normalizedStatus === "inactive") {
+
+            deactivateButton.disabled = true;
+
+            deactivateButton.textContent =
+                "Restaurant Deactivated";
+
+        }
+        else {
+
+            // Unknown/loading status
+            deactivateButton.disabled = true;
+
+            deactivateButton.textContent =
+                "Deactivate Restaurant";
+
+        }
     }
 
     setText(
@@ -429,31 +453,10 @@ function populateSettings(data) {
 
         statusDot.classList.toggle(
             "inactive",
-            String(status).toLowerCase() !==
-            "active"
+            normalizedStatus !== "active"
         );
 
     }
-
-
-    // --------------------------------------
-    // PLAN
-    // --------------------------------------
-
-    const plan =
-        profile.plan ||
-        restaurant.planId ||
-        "Starter";
-
-    setText(
-        "planName",
-        plan
-    );
-
-    setText(
-        "subscriptionPlan",
-        plan
-    );
 
 
     // --------------------------------------
