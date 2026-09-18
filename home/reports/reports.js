@@ -1838,7 +1838,7 @@ function renderBranchPerformance(
                             <div class="branch-name-cell">
                                 <strong>
                                     ${escapeHtml(
-                                        branch.branch
+                                        branch.branchName
                                     )}
                                 </strong>
                             </div>
