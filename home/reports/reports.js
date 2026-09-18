@@ -653,8 +653,8 @@ function populateBranchFilter(
 
 
         const branchName =
-            branch.branchName ||
-            branch.BranchName ||
+            branch.branch ||
+            branch.Branch ||
             branchId ||
             "Unnamed Branch";
 
@@ -2308,7 +2308,7 @@ function handleLogout() {
 function redirectToLogin() {
 
     window.location.href =
-        "../login/login.html";
+        "../../login/login.html";
 
 }
 
