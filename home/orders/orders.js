@@ -1,25 +1,30 @@
-// ==========================================
-// QR RESTAURANT SAAS
-// PREMIUM OWNER ORDERS
-// ==========================================
+/* ==========================================
+QR RESTAURANT SAAS
+PREMIUM OWNER ORDERS
+========================================== */
 
-// ==========================================
-// CONFIGURATION
-// ==========================================
+/* ==========================================
+CONFIGURATION
+========================================== */
 
 const N8N_ORDERS_WEBHOOK =
-    `${N8N_BASE_URL}/owner-orders`;
+`${N8N_BASE_URL}/owner-orders`;
 
 const SESSION_TOKEN_KEY =
-    "qro_session_token";
+"qro_session_token";
 
 const SESSION_DATA_KEY =
-    "qro_session_data";
+"qro_session_data";
 
+const ORDERS_TIME_ZONE =
+"Asia/Dubai";
 
-// ==========================================
-// STATE
-// ==========================================
+const ORDERS_PER_PAGE =
+10;
+
+/* ==========================================
+STATE
+========================================== */
 
 let allOrders = [];
 
@@ -27,748 +32,303 @@ let filteredOrders = [];
 
 let currentPage = 1;
 
-const ordersPerPage = 10;
+let isLoadingOrders = false;
 
+/* ==========================================
+ELEMENTS
+========================================== */
 
-// ==========================================
-// ELEMENTS
-// ==========================================
-
-// KPI cards
+/* KPI */
 
 const totalOrdersEl =
-    document.getElementById("totalOrders");
+document.getElementById("totalOrders");
 
 const pendingOrdersEl =
-    document.getElementById("pendingOrders");
+document.getElementById("pendingOrders");
 
 const preparingOrdersEl =
-    document.getElementById("preparingOrders");
+document.getElementById("preparingOrders");
 
 const readyOrdersEl =
-    document.getElementById("readyOrders");
+document.getElementById("readyOrders");
 
 const completedOrdersEl =
-    document.getElementById("completedOrders");
+document.getElementById("completedOrders");
 
+const totalOrdersFooter =
+document.getElementById("totalOrdersFooter");
 
-// Filters
+/* Filters */
 
 const orderSearch =
-    document.getElementById("orderSearch");
+document.getElementById("orderSearch");
 
 const branchFilter =
-    document.getElementById("branchFilter");
+document.getElementById("branchFilter");
 
 const statusFilter =
-    document.getElementById("statusFilter");
+document.getElementById("statusFilter");
 
 const dateFilter =
-    document.getElementById("dateFilter");
+document.getElementById("dateFilter");
 
 const resetFilters =
-    document.getElementById("resetFilters");
+document.getElementById("resetFilters");
 
+const refreshOrdersButton =
+document.getElementById("refreshOrdersButton");
 
-// Table
+/* Table */
 
 const ordersTableBody =
-    document.getElementById("ordersTableBody");
+document.getElementById("ordersTableBody");
 
 const ordersEmpty =
-    document.getElementById("ordersEmpty");
+document.getElementById("ordersEmpty");
 
-
-// Footer
-
-const ordersFrom =
-    document.getElementById("ordersFrom");
-
-const ordersTo =
-    document.getElementById("ordersTo");
-
-const ordersTotal =
-    document.getElementById("ordersTotal");
-
-
-// Pagination
-
-const previousPage =
-    document.getElementById("previousPage");
-
-const paginationPages =
-    document.getElementById("paginationPages");
-
-const nextPage =
-    document.getElementById("nextPage");
-
-
-// Modal
-
-const orderModal =
-    document.getElementById("orderModal");
-
-const modalOrderId =
-    document.getElementById("modalOrderId");
-
-const modalOrderStatus =
-    document.getElementById("modalOrderStatus");
-
-const modalCustomer =
-    document.getElementById("modalCustomer");
-
-const modalMobile =
-    document.getElementById("modalMobile");
-
-const modalBranch =
-    document.getElementById("modalBranch");
-
-const modalTable =
-    document.getElementById("modalTable");
-
-const modalOrderTime =
-    document.getElementById("modalOrderTime");
-
-const modalItems =
-    document.getElementById("modalItems");
-
-const modalRequestSection =
-    document.getElementById("modalRequestSection");
-
-const modalRequest =
-    document.getElementById("modalRequest");
-
-const modalSubtotal =
-    document.getElementById("modalSubtotal");
-
-const modalTax =
-    document.getElementById("modalTax");
-
-const modalTotal =
-    document.getElementById("modalTotal");
-
-const closeOrderModal =
-    document.getElementById("closeOrderModal");
-
-const modalCloseButton =
-    document.getElementById("modalCloseButton");
-
-
-// ==========================================
-// INITIALIZE
-// ==========================================
-
-document.addEventListener(
-    "DOMContentLoaded",
-    initializeOrdersPage
+const ordersMonitoringText =
+document.getElementById(
+"ordersMonitoringText"
 );
 
+/* Footer */
 
-// ==========================================
-// TOPBAR OWNER
-// ==========================================
+const ordersFrom =
+document.getElementById("ordersFrom");
 
-function updateOrdersTopbarOwner(ownerNameFromResponse = null) {
+const ordersTo =
+document.getElementById("ordersTo");
 
-    let sessionData = null;
+const ordersTotal =
+document.getElementById("ordersTotal");
 
-    try {
+/* Pagination */
 
-        const storedSession =
-            localStorage.getItem(
-                SESSION_DATA_KEY
-            );
+const previousPage =
+document.getElementById("previousPage");
 
-        if (storedSession) {
+const paginationPages =
+document.getElementById("paginationPages");
 
-            sessionData =
-                JSON.parse(
-                    storedSession
-                );
+const nextPage =
+document.getElementById("nextPage");
 
-        }
+/* Modal */
 
-        console.log("ORDERS SESSION DATA:", sessionData);
+const orderModal =
+document.getElementById("orderModal");
 
-    } catch (error) {
+const modalOrderId =
+document.getElementById("modalOrderId");
 
-        console.warn(
-            "Unable to read session data:",
-            error
-        );
+const modalOrderStatus =
+document.getElementById("modalOrderStatus");
 
-    }
+const modalCustomer =
+document.getElementById("modalCustomer");
 
+const modalMobile =
+document.getElementById("modalMobile");
 
-    const ownerName =
-        ownerNameFromResponse ||
-        sessionData?.ownerName ||
-        sessionData?.OwnerName ||
-        sessionData?.name ||
-        sessionData?.Name ||
-        "Owner";
+const modalBranch =
+document.getElementById("modalBranch");
 
+const modalTable =
+document.getElementById("modalTable");
 
-    const ownerRole =
-        sessionData?.role ||
-        sessionData?.Role ||
-        "Owner";
+const modalOrderTime =
+document.getElementById("modalOrderTime");
 
+const modalItems =
+document.getElementById("modalItems");
 
-    const topbarUserName =
-        document.getElementById(
-            "topbarUserName"
-        );
+const modalRequestSection =
+document.getElementById("modalRequestSection");
 
-    if (topbarUserName) {
+const modalRequest =
+document.getElementById("modalRequest");
 
-        topbarUserName.textContent =
-            ownerName;
+const modalSubtotal =
+document.getElementById("modalSubtotal");
 
-    }
+const modalTax =
+document.getElementById("modalTax");
 
+const modalTotal =
+document.getElementById("modalTotal");
 
-    const topbarUserRole =
-        document.getElementById(
-            "topbarUserRole"
-        );
+const closeOrderModal =
+document.getElementById("closeOrderModal");
 
-    if (topbarUserRole) {
+const modalCloseButton =
+document.getElementById("modalCloseButton");
 
-        topbarUserRole.textContent =
-            ownerRole;
+const mobileMenuButton =
+document.getElementById("mobileMenuButton");
 
-    }
+const sidebar =
+document.querySelector(".sidebar");
 
+/* ==========================================
+INITIALIZE
+========================================== */
 
-    const topbarUserAvatar =
-        document.getElementById(
-            "topbarUserAvatar"
-        );
+document.addEventListener(
+"DOMContentLoaded",
+initializeOrdersPage
+);
 
-    if (topbarUserAvatar) {
-
-        topbarUserAvatar.textContent =
-            ownerName
-                .charAt(0)
-                .toUpperCase();
-
-    }
-
-}
-
+/* ==========================================
+INITIALIZE ORDERS PAGE
+========================================== */
 
 async function initializeOrdersPage() {
 
-    try {
 
-        // ----------------------------------
-        // Authentication
-        // ----------------------------------
+try {
 
-        if (
-            typeof requireAuthentication ===
-            "function"
-        ) {
+    /* ----------------------------------
+       Mobile navigation
+    ---------------------------------- */
 
-            const authenticated =
-                await requireAuthentication();
+    initializeMobileNavigation();
 
-            if (authenticated === false) {
-                return;
-            }
-        }
 
-        // ----------------------------------
-        // Load Orders
-        // ----------------------------------
-
-        await loadOrders();
-
-    } catch (error) {
-
-        console.error(
-            "Orders initialization failed:",
-            error
-        );
-
-        showOrdersError();
-
-    }
-
-}
-
-
-// ==========================================
-// LOAD ORDERS
-// ==========================================
-
-async function loadOrders() {
-
-    showLoadingState();
-
-    try {
-
-        const sessionToken =
-            localStorage.getItem(
-                SESSION_TOKEN_KEY
-            );
-
-        if (!sessionToken) {
-
-            redirectToLogin();
-
-            return;
-        }
-
-
-        const response =
-            await fetch(
-                N8N_ORDERS_WEBHOOK,
-                {
-                    method: "POST",
-
-                    headers: {
-                        "Content-Type":
-                            "application/json"
-                    },
-
-                    body: JSON.stringify({
-
-                        sessionToken
-
-                    })
-                }
-            );
-
-
-        if (
-            response.status === 401
-        ) {
-
-            handleSessionExpired();
-
-            return;
-        }
-
-
-        if (!response.ok) {
-
-            throw new Error(
-                `Orders API returned ${response.status}`
-            );
-
-        }
-
-
-        const data =
-            await response.json();
-
-
-        console.log(
-            "Orders API Response:",
-            data
-        );
-
-
-        if (
-            !data ||
-            data.success !== true
-        ) {
-
-            if (
-                data?.code ===
-                "INVALID_SESSION"
-            ) {
-
-                handleSessionExpired();
-
-                return;
-            }
-
-            throw new Error(
-                data?.message ||
-                "Unable to load orders."
-            );
-        }
-
-
-        // ----------------------------------
-        // Owner Name
-        // ----------------------------------
-
-        updateOrdersTopbarOwner(data.ownerName);
-
-
-        allOrders =
-            Array.isArray(data.orders)
-                ? data.orders
-                : [];
-
-
-        // ----------------------------------
-        // Normalize orders
-        // ----------------------------------
-
-        allOrders =
-            allOrders.map(
-                normalizeOrder
-            );
-
-        console.log(
-            "Normalized Orders:",
-            allOrders
-        );
-
-        console.log(
-            "Orders Count:",
-            allOrders.length
-        );
-
-
-        // ----------------------------------
-        // Sort newest first
-        // ----------------------------------
-
-        allOrders.sort(
-            (a, b) => {
-
-                const dateA =
-                    new Date(
-                        a.orderDate
-                    ).getTime() || 0;
-
-                const dateB =
-                    new Date(
-                        b.orderDate
-                    ).getTime() || 0;
-
-                return dateB - dateA;
-
-            }
-        );
-
-        console.log(
-            "ALL ORDERS:",
-            allOrders.length
-        );
-
-        console.log(
-            "DATE FILTER VALUE:",
-            dateFilter?.value
-        );
-
-
-        // ----------------------------------
-        // Populate branch filter
-        // ----------------------------------
-
-        populateBranchFilter();
-
-
-        // ----------------------------------
-        // Update KPI
-        // ----------------------------------
-
-        updateOrderMetrics();
-
-
-        // ----------------------------------
-        // Apply filters
-        // ----------------------------------
-
-        applyFilters();
-
-        console.log(
-            "FILTERED ORDERS:",
-            filteredOrders.length
-        );
-
-        console.log(
-            "FILTERED DATA:",
-            filteredOrders
-        );
-
-
-    } catch (error) {
-
-        console.error(
-            "Failed to load orders:",
-            error
-        );
-
-        showOrdersError();
-
-    }
-
-}
-
-
-// ==========================================
-// NORMALIZE ORDER
-// ==========================================
-
-function normalizeOrder(order) {
-
-    return {
-
-        orderId:
-            String(
-                order?.orderId ||
-                ""
-            ).trim(),
-
-        restaurantId:
-            String(
-                order?.restaurantId ||
-                ""
-            ).trim(),
-
-        branchOutlet:
-            String(
-                order?.branchOutlet ||
-                ""
-            ).trim(),
-
-        customerName:
-            String(
-                order?.customerName ||
-                ""
-            ).trim(),
-
-        mobileNumber:
-            String(
-                order?.mobileNumber ||
-                ""
-            ).trim(),
-
-        whatsappNumber:
-            String(
-                order?.whatsappNumber ||
-                ""
-            ).trim(),
-
-        orderedItems:
-            String(
-                order?.orderedItems ||
-                ""
-            ).trim(),
-
-        customizedRequest:
-            String(
-                order?.customizedRequest ||
-                ""
-            ).trim(),
-
-        tableNumber:
-            String(
-                order?.tableNumber ||
-                ""
-            ).trim(),
-
-        deliveryAddress:
-            String(
-                order?.deliveryAddress ||
-                ""
-            ).trim(),
-
-        subTotal:
-            Number(
-                order?.subTotal
-            ) || 0,
-
-        taxTotal:
-            Number(
-                order?.taxTotal
-            ) || 0,
-
-        total:
-            Number(
-                order?.total
-            ) || 0,
-
-        taxDetails:
-            String(
-                order?.taxDetails ||
-                ""
-            ).trim(),
-
-        status:
-            String(
-                order?.status ||
-                ""
-            )
-                .trim()
-                .toLowerCase(),
-
-        orderDate:
-            order?.orderDate ||
-            ""
-
-    };
-
-}
-
-
-// ==========================================
-// KPI METRICS
-// ==========================================
-
-function updateOrderMetrics() {
-
-    const total =
-        allOrders.length;
-
-
-    const pending =
-        allOrders.filter(
-            order =>
-                order.status ===
-                "pending"
-        ).length;
-
-
-    const preparing =
-        allOrders.filter(
-            order =>
-                order.status ===
-                "preparing"
-        ).length;
-
-
-    const ready =
-        allOrders.filter(
-            order =>
-                order.status ===
-                "ready"
-        ).length;
-
-
-    const completed =
-        allOrders.filter(
-            order =>
-                order.status ===
-                "completed"
-        ).length;
-
-
-    if (totalOrdersEl) {
-        totalOrdersEl.textContent =
-            total;
-    }
-
-    if (pendingOrdersEl) {
-        pendingOrdersEl.textContent =
-            pending;
-    }
-
-    if (preparingOrdersEl) {
-        preparingOrdersEl.textContent =
-            preparing;
-    }
-
-    if (readyOrdersEl) {
-        readyOrdersEl.textContent =
-            ready;
-    }
-
-    if (completedOrdersEl) {
-        completedOrdersEl.textContent =
-            completed;
-    }
-
-}
-
-
-// ==========================================
-// BRANCH FILTER
-// ==========================================
-
-function populateBranchFilter() {
-
-    if (!branchFilter) {
-        return;
-    }
-
-
-    const currentValue =
-        branchFilter.value;
-
-
-    const branches =
-        [
-            ...new Set(
-                allOrders
-                    .map(
-                        order =>
-                            order.branchOutlet
-                    )
-                    .filter(Boolean)
-            )
-        ]
-            .sort(
-                (a, b) =>
-                    a.localeCompare(b)
-            );
-
-
-    branchFilter.innerHTML = "";
-
-
-    const allOption =
-        document.createElement(
-            "option"
-        );
-
-    allOption.value = "";
-
-    allOption.textContent =
-        "All Branches";
-
-    branchFilter.appendChild(
-        allOption
-    );
-
-
-    branches.forEach(
-        branch => {
-
-            const option =
-                document.createElement(
-                    "option"
-                );
-
-            option.value =
-                branch;
-
-            option.textContent =
-                branch;
-
-            branchFilter.appendChild(
-                option
-            );
-
-        }
-    );
-
+    /* ----------------------------------
+       Authentication
+    ---------------------------------- */
 
     if (
-        branches.includes(
-            currentValue
-        )
+        typeof requireAuthentication ===
+        "function"
     ) {
 
-        branchFilter.value =
-            currentValue;
+        const authenticated =
+            await requireAuthentication();
+
+        if (
+            authenticated === false
+        ) {
+
+            return;
+
+        }
 
     }
+
+
+    /* ----------------------------------
+       Filter events
+    ---------------------------------- */
+
+    initializeFilterEvents();
+
+
+    /* ----------------------------------
+       Load orders
+    ---------------------------------- */
+
+    await loadOrders();
+
+}
+
+catch (error) {
+
+    console.error(
+        "Orders initialization failed:",
+        error
+    );
+
+    showOrdersError();
 
 }
 
 
-// ==========================================
-// FILTER EVENTS
-// ==========================================
+}
+
+/* ==========================================
+MOBILE NAVIGATION
+========================================== */
+
+function initializeMobileNavigation() {
+
+
+if (
+    !mobileMenuButton ||
+    !sidebar
+) {
+
+    return;
+
+}
+
+
+mobileMenuButton.addEventListener(
+    "click",
+    () => {
+
+        sidebar.classList.toggle(
+            "open"
+        );
+
+    }
+);
+
+
+document.addEventListener(
+    "click",
+    event => {
+
+        if (
+            window.innerWidth > 760
+        ) {
+
+            return;
+
+        }
+
+
+        if (
+            !sidebar.classList.contains(
+                "open"
+            )
+        ) {
+
+            return;
+
+        }
+
+
+        if (
+            sidebar.contains(
+                event.target
+            ) ||
+            mobileMenuButton.contains(
+                event.target
+            )
+        ) {
+
+            return;
+
+        }
+
+
+        sidebar.classList.remove(
+            "open"
+        );
+
+    }
+);
+
+
+}
+
+/* ==========================================
+FILTER EVENTS
+========================================== */
+
+function initializeFilterEvents() {
+
 
 if (orderSearch) {
 
@@ -820,1029 +380,27 @@ if (resetFilters) {
 }
 
 
-function handleFilterChange() {
+if (refreshOrdersButton) {
 
-    currentPage = 1;
-
-    applyFilters();
-
-}
-
-
-// ==========================================
-// APPLY FILTERS
-// ==========================================
-
-function applyFilters() {
-
-    const search =
-        String(
-            orderSearch?.value ||
-            ""
-        )
-            .trim()
-            .toLowerCase();
-
-
-    const branch =
-        String(
-            branchFilter?.value ||
-            ""
-        ).trim();
-
-
-    const status =
-        String(
-            statusFilter?.value ||
-            ""
-        ).trim()
-            .toLowerCase();
-
-
-    const dateRange =
-        String(
-            dateFilter?.value ||
-            "all"
-        ).trim()
-            .toLowerCase();
-
-
-    filteredOrders =
-        allOrders.filter(
-            order => {
-
-                // --------------------------
-                // Search
-                // --------------------------
-
-                if (search) {
-
-                    const searchableText =
-                        [
-
-                            order.orderId,
-
-                            order.customerName,
-
-                            order.mobileNumber,
-
-                            order.whatsappNumber,
-
-                            order.branchOutlet,
-
-                            order.tableNumber,
-
-                            order.orderedItems,
-
-                            order.customizedRequest
-
-                        ]
-                            .join(" ")
-                            .toLowerCase();
-
-
-                    if (
-                        !searchableText.includes(
-                            search
-                        )
-                    ) {
-
-                        return false;
-
-                    }
-
-                }
-
-
-                // --------------------------
-                // Branch
-                // --------------------------
-
-                if (
-                    branch &&
-                    order.branchOutlet !==
-                    branch
-                ) {
-
-                    return false;
-
-                }
-
-
-                // --------------------------
-                // Status
-                // --------------------------
-
-                if (
-                    status &&
-                    status !== "all" &&
-                    order.status !== status
-                ) {
-
-                    return false;
-
-                }
-
-
-                // --------------------------
-                // Date
-                // --------------------------
-
-                if (
-                    !matchesDateFilter(
-                        order,
-                        dateRange
-                    )
-                ) {
-
-                    return false;
-
-                }
-                return true;
-
-            }
-        );
-
-
-    renderOrders();
-
-}
-
-
-// ==========================================
-// DATE FILTER
-// ==========================================
-
-function matchesDateFilter(order, filter) {
-
-    console.log(
-        "DATE DEBUG:",
-        {
-            filter: filter,
-            orderDate: order.orderDate,
-            parsedDate: new Date(order.orderDate),
-            isValid: !isNaN(
-                new Date(order.orderDate).getTime()
-            )
-        }
-    );
-
-    if (!filter || filter === "all") {
-        return true;
-    }
-
-    const orderDate =
-        new Date(order.orderDate);
-
-    if (isNaN(orderDate.getTime())) {
-        return false;
-    }
-
-    // Get today's date in Dubai
-    const now =
-        new Date();
-
-    const todayDubai =
-        new Intl.DateTimeFormat(
-            "en-CA",
-            {
-                timeZone: "Asia/Dubai",
-                year: "numeric",
-                month: "2-digit",
-                day: "2-digit"
-            }
-        ).format(now);
-
-    const orderDubai =
-        new Intl.DateTimeFormat(
-            "en-CA",
-            {
-                timeZone: "Asia/Dubai",
-                year: "numeric",
-                month: "2-digit",
-                day: "2-digit"
-            }
-        ).format(orderDate);
-
-    // ==========================================
-    // TODAY
-    // ==========================================
-
-    if (filter === "today") {
-        return orderDubai === todayDubai;
-    }
-
-    // ==========================================
-    // ROLLING DATE FILTERS
-    // ==========================================
-
-    const today =
-        new Date();
-
-    const startDate =
-        new Date();
-
-    if (filter === "7") {
-        startDate.setDate(
-            today.getDate() - 6
-        );
-    }
-
-    else if (filter === "14") {
-        startDate.setDate(
-            today.getDate() - 13
-        );
-    }
-
-    else if (filter === "30") {
-        startDate.setDate(
-            today.getDate() - 29
-        );
-    }
-
-    else {
-        return true;
-    }
-
-    // Compare using timestamps
-    // so the complete selected period is included.
-
-    startDate.setHours(
-        0, 0, 0, 0
-    );
-
-    today.setHours(
-        23, 59, 59, 999
-    );
-
-    return (
-        orderDate >= startDate &&
-        orderDate <= today
-    );
-}
-
-// ==========================================
-// DUBAI DATE KEY
-// ==========================================
-
-function getDubaiDateKey(
-    date
-) {
-
-    return new Intl.DateTimeFormat(
-        "en-CA",
-        {
-            timeZone:
-                "Asia/Dubai",
-
-            year:
-                "numeric",
-
-            month:
-                "2-digit",
-
-            day:
-                "2-digit"
-        }
-    ).format(date);
-
-}
-
-
-// ==========================================
-// RENDER ORDERS
-// ==========================================
-
-function renderOrders() {
-
-    if (!ordersTableBody) {
-        return;
-    }
-
-
-    // ==========================================
-    // CLEAR TABLE
-    // ==========================================
-
-    ordersTableBody.innerHTML = "";
-
-
-    // ==========================================
-    // NO ORDERS AFTER FILTER
-    // ==========================================
-
-    if (
-        !Array.isArray(filteredOrders) ||
-        filteredOrders.length === 0
-    ) {
-
-        showEmptyState();
-
-        updatePagination();
-
-        return;
-
-    }
-
-
-    // ==========================================
-    // HIDE EMPTY STATE
-    // ==========================================
-
-    hideEmptyState();
-
-
-    // ==========================================
-    // TOTAL PAGES
-    // ==========================================
-
-    const totalPages =
-        Math.ceil(
-            filteredOrders.length /
-            ordersPerPage
-        );
-
-
-    if (
-        currentPage >
-        totalPages
-    ) {
-
-        currentPage =
-            totalPages;
-
-    }
-
-
-    if (
-        currentPage < 1
-    ) {
-
-        currentPage =
-            1;
-
-    }
-
-
-    // ==========================================
-    // CURRENT PAGE RANGE
-    // ==========================================
-
-    const startIndex =
-        (
-            currentPage -
-            1
-        ) *
-        ordersPerPage;
-
-
-    const endIndex =
-        Math.min(
-            startIndex +
-            ordersPerPage,
-
-            filteredOrders.length
-        );
-
-
-    const pageOrders =
-        filteredOrders.slice(
-            startIndex,
-            endIndex
-        );
-
-
-    // ==========================================
-    // RENDER ROWS
-    // ==========================================
-
-    pageOrders.forEach(
-        order => {
-
-            const row =
-                createOrderRow(
-                    order
-                );
-
-            ordersTableBody.appendChild(
-                row
-            );
-
-        }
-    );
-
-
-    // ==========================================
-    // UPDATE PAGINATION
-    // ==========================================
-
-    updatePagination();
-
-}
-
-// ==========================================
-// CREATE ORDER ROW
-// ==========================================
-
-function createOrderRow(
-    order
-) {
-
-    const row =
-        document.createElement(
-            "tr"
-        );
-
-
-    // --------------------------------------
-    // Order ID
-    // --------------------------------------
-
-    const orderCell =
-        document.createElement(
-            "td"
-        );
-
-    orderCell.innerHTML = `
-        <div class="order-id-cell">
-            <span class="order-id">
-                ${escapeHtml(
-        order.orderId ||
-        "—"
-    )}
-            </span>
-        </div>
-    `;
-
-
-    // --------------------------------------
-    // Customer
-    // --------------------------------------
-
-    const customerCell =
-        document.createElement(
-            "td"
-        );
-
-
-    const customerName =
-        order.customerName ||
-        "Walk-in Customer";
-
-
-    const avatarLetter =
-        customerName
-            .charAt(0)
-            .toUpperCase();
-
-
-    const mobile =
-        order.mobileNumber ||
-        order.whatsappNumber ||
-        "";
-
-
-    customerCell.innerHTML = `
-        <div class="customer-cell">
-            <div class="customer-avatar">
-                ${escapeHtml(
-        avatarLetter
-    )}
-            </div>
-
-            <div class="customer-info">
-                <span class="customer-name">
-                    ${escapeHtml(
-        customerName
-    )}
-                </span>
-
-                ${mobile
-            ? `
-                        <span class="customer-mobile">
-                            ${escapeHtml(
-                mobile
-            )}
-                        </span>
-                        `
-            : ""
-        }
-            </div>
-        </div>
-    `;
-
-
-    // --------------------------------------
-    // Branch
-    // --------------------------------------
-
-    const branchCell =
-        document.createElement(
-            "td"
-        );
-
-    branchCell.innerHTML = `
-        <span class="branch-name">
-            ${escapeHtml(
-        order.branchOutlet ||
-        "—"
-    )}
-        </span>
-    `;
-
-
-    // --------------------------------------
-    // Table
-    // --------------------------------------
-
-    const tableCell =
-        document.createElement(
-            "td"
-        );
-
-    tableCell.innerHTML = `
-        <span class="table-number">
-            ${order.tableNumber
-            ? `Table ${escapeHtml(
-                order.tableNumber
-            )}`
-            : "—"
-        }
-        </span>
-    `;
-
-
-    // --------------------------------------
-    // Amount
-    // --------------------------------------
-
-    const amountCell =
-        document.createElement(
-            "td"
-        );
-
-    amountCell.innerHTML = `
-        <span class="order-amount">
-            ${formatCurrency(
-        order.total
-    )}
-        </span>
-    `;
-
-
-    // --------------------------------------
-    // Status
-    // --------------------------------------
-
-    const statusCell =
-        document.createElement(
-            "td"
-        );
-
-    statusCell.innerHTML =
-        createStatusBadge(
-            order.status
-        );
-
-
-    // --------------------------------------
-    // Time
-    // --------------------------------------
-
-    const timeCell =
-        document.createElement(
-            "td"
-        );
-
-    timeCell.innerHTML = `
-        <span class="order-time">
-            ${formatOrderDate(
-        order.orderDate
-    )}
-        </span>
-    `;
-
-
-    // --------------------------------------
-    // Action
-    // --------------------------------------
-
-    const actionCell =
-        document.createElement(
-            "td"
-        );
-
-
-    const viewButton =
-        document.createElement(
-            "button"
-        );
-
-
-    viewButton.type =
-        "button";
-
-    viewButton.className =
-        "order-view-btn";
-
-    viewButton.innerHTML =
-        "View";
-
-    viewButton.addEventListener(
+    refreshOrdersButton.addEventListener(
         "click",
-        () => openOrderModal(order)
-    );
-
-
-    actionCell.appendChild(
-        viewButton
-    );
-
-
-    // --------------------------------------
-    // Append cells
-    // --------------------------------------
-
-    row.appendChild(
-        orderCell
-    );
-
-    row.appendChild(
-        customerCell
-    );
-
-    row.appendChild(
-        branchCell
-    );
-
-    row.appendChild(
-        tableCell
-    );
-
-    row.appendChild(
-        amountCell
-    );
-
-    row.appendChild(
-        statusCell
-    );
-
-    row.appendChild(
-        timeCell
-    );
-
-    row.appendChild(
-        actionCell
-    );
-
-
-    return row;
-
-}
-
-
-// ==========================================
-// STATUS BADGE
-// ==========================================
-
-function createStatusBadge(
-    status
-) {
-
-    const normalized =
-        String(
-            status ||
-            ""
-        )
-            .trim()
-            .toLowerCase();
-
-
-    const label =
-        normalized
-            ? capitalizeStatus(
-                normalized
-            )
-            : "Unknown";
-
-
-    return `
-        <span class="
-            status-badge
-            status-${escapeHtml(
-        normalized ||
-        "unknown"
-    )}
-        ">
-            <span class="status-dot"></span>
-            ${escapeHtml(
-        label
-    )}
-        </span>
-    `;
-
-}
-
-
-function capitalizeStatus(
-    status
-) {
-
-    return status
-        .charAt(0)
-        .toUpperCase() +
-        status.slice(1);
-
-}
-
-
-// ==========================================
-// PAGINATION
-// ==========================================
-
-function updatePagination() {
-
-    const total =
-        filteredOrders.length;
-
-
-    const totalPages =
-        Math.max(
-            1,
-            Math.ceil(
-                total /
-                ordersPerPage
-            )
-        );
-
-
-    if (
-        currentPage >
-        totalPages
-    ) {
-
-        currentPage =
-            totalPages;
-
-    }
-
-
-    const start =
-        total === 0
-            ? 0
-            : (
-                (
-                    currentPage -
-                    1
-                ) *
-                ordersPerPage
-            ) + 1;
-
-
-    const end =
-        total === 0
-            ? 0
-            : Math.min(
-                currentPage *
-                ordersPerPage,
-
-                total
-            );
-
-
-    if (ordersFrom) {
-        ordersFrom.textContent =
-            start;
-    }
-
-    if (ordersTo) {
-        ordersTo.textContent =
-            end;
-    }
-
-    if (ordersTotal) {
-        ordersTotal.textContent =
-            total;
-    }
-
-
-    // --------------------------------------
-    // Previous
-    // --------------------------------------
-
-    if (previousPage) {
-
-        previousPage.disabled =
-            currentPage <= 1 ||
-            total === 0;
-
-    }
-
-
-    // --------------------------------------
-    // Next
-    // --------------------------------------
-
-    if (nextPage) {
-
-        nextPage.disabled =
-            currentPage >=
-            totalPages ||
-            total === 0;
-
-    }
-
-
-    // --------------------------------------
-    // Page numbers
-    // --------------------------------------
-
-    if (!paginationPages) {
-        return;
-    }
-
-
-    paginationPages.innerHTML =
-        "";
-
-
-    if (total === 0) {
-        return;
-    }
-
-
-    const pages =
-        getPaginationPages(
-            currentPage,
-            totalPages
-        );
-
-
-    pages.forEach(
-        page => {
+        async () => {
 
             if (
-                page === "..."
+                isLoadingOrders
             ) {
-
-                const ellipsis =
-                    document.createElement(
-                        "span"
-                    );
-
-                ellipsis.className =
-                    "pagination-ellipsis";
-
-                ellipsis.textContent =
-                    "…";
-
-                paginationPages.appendChild(
-                    ellipsis
-                );
 
                 return;
 
             }
 
-
-            const button =
-                document.createElement(
-                    "button"
-                );
-
-            button.type =
-                "button";
-
-            button.className =
-                "pagination-page";
-
-
-            if (
-                page ===
-                currentPage
-            ) {
-
-                button.classList.add(
-                    "active"
-                );
-
-            }
-
-
-            button.textContent =
-                page;
-
-
-            button.addEventListener(
-                "click",
-                () => {
-
-                    currentPage =
-                        page;
-
-                    renderOrders();
-
-                }
-            );
-
-
-            paginationPages.appendChild(
-                button
-            );
+            await loadOrders();
 
         }
     );
 
 }
 
-
-// ==========================================
-// PAGINATION RANGE
-// ==========================================
-
-function getPaginationPages(
-    current,
-    total
-) {
-
-    if (
-        total <= 7
-    ) {
-
-        return Array.from(
-            {
-                length: total
-            },
-            (_, index) =>
-                index + 1
-        );
-
-    }
-
-
-    const pages = [];
-
-
-    pages.push(1);
-
-
-    if (
-        current > 4
-    ) {
-
-        pages.push("...");
-
-    }
-
-
-    const start =
-        Math.max(
-            2,
-            current - 1
-        );
-
-
-    const end =
-        Math.min(
-            total - 1,
-            current + 1
-        );
-
-
-    for (
-        let page = start;
-        page <= end;
-        page++
-    ) {
-
-        pages.push(page);
-
-    }
-
-
-    if (
-        current <
-        total - 3
-    ) {
-
-        pages.push("...");
-
-    }
-
-
-    pages.push(
-        total
-    );
-
-
-    return pages;
-
-}
-
-
-// ==========================================
-// PAGINATION EVENTS
-// ==========================================
 
 if (previousPage) {
 
@@ -1875,7 +433,7 @@ if (nextPage) {
             const totalPages =
                 Math.ceil(
                     filteredOrders.length /
-                    ordersPerPage
+                    ORDERS_PER_PAGE
                 );
 
 
@@ -1891,348 +449,6 @@ if (nextPage) {
             }
 
         }
-    );
-
-}
-
-
-// ==========================================
-// RESET FILTERS
-// ==========================================
-
-function resetAllFilters() {
-
-    if (orderSearch) {
-        orderSearch.value = "";
-    }
-
-    if (branchFilter) {
-        branchFilter.value = "";
-    }
-
-    if (statusFilter) {
-        statusFilter.value = "";
-    }
-
-    if (dateFilter) {
-        dateFilter.value = "today";
-    }
-
-
-    currentPage = 1;
-
-    applyFilters();
-
-}
-
-
-// ==========================================
-// ORDER MODAL
-// ==========================================
-
-function openOrderModal(
-    order
-) {
-
-    if (!orderModal) {
-        return;
-    }
-
-
-    // --------------------------------------
-    // Order ID
-    // --------------------------------------
-
-    if (modalOrderId) {
-
-        modalOrderId.textContent =
-            order.orderId ||
-            "—";
-
-    }
-
-
-    // --------------------------------------
-    // Status
-    // --------------------------------------
-
-    if (modalOrderStatus) {
-
-        modalOrderStatus.innerHTML =
-            createStatusBadge(
-                order.status
-            );
-
-    }
-
-
-    // --------------------------------------
-    // Customer
-    // --------------------------------------
-
-    if (modalCustomer) {
-
-        modalCustomer.textContent =
-            order.customerName ||
-            "Walk-in Customer";
-
-    }
-
-
-    // --------------------------------------
-    // Mobile
-    // --------------------------------------
-
-    if (modalMobile) {
-
-        modalMobile.textContent =
-            order.mobileNumber ||
-            order.whatsappNumber ||
-            "—";
-
-    }
-
-
-    // --------------------------------------
-    // Branch
-    // --------------------------------------
-
-    if (modalBranch) {
-
-        modalBranch.textContent =
-            order.branchOutlet ||
-            "—";
-
-    }
-
-
-    // --------------------------------------
-    // Table
-    // --------------------------------------
-
-    if (modalTable) {
-
-        modalTable.textContent =
-            order.tableNumber
-                ? `Table ${order.tableNumber}`
-                : "—";
-
-    }
-
-
-    // --------------------------------------
-    // Order time
-    // --------------------------------------
-
-    if (modalOrderTime) {
-
-        modalOrderTime.textContent =
-            formatOrderDate(
-                order.orderDate,
-                true
-            );
-
-    }
-
-
-    // --------------------------------------
-    // Ordered Items
-    // --------------------------------------
-
-    renderModalItems(
-        order.orderedItems
-    );
-
-
-    // --------------------------------------
-    // Customized Request
-    // --------------------------------------
-
-    if (
-        modalRequestSection &&
-        modalRequest
-    ) {
-
-        if (
-            order.customizedRequest
-        ) {
-
-            modalRequest.textContent =
-                order.customizedRequest;
-
-            modalRequestSection.style.display =
-                "";
-
-        } else {
-
-            modalRequest.textContent =
-                "";
-
-            modalRequestSection.style.display =
-                "none";
-
-        }
-
-    }
-
-
-    // --------------------------------------
-    // Billing
-    // --------------------------------------
-
-    if (modalSubtotal) {
-
-        modalSubtotal.textContent =
-            formatCurrency(
-                order.subTotal
-            );
-
-    }
-
-
-    if (modalTax) {
-
-        modalTax.textContent =
-            formatCurrency(
-                order.taxTotal
-            );
-
-    }
-
-
-    if (modalTotal) {
-
-        modalTotal.textContent =
-            formatCurrency(
-                order.total
-            );
-
-    }
-
-
-    // --------------------------------------
-    // Show modal
-    // --------------------------------------
-
-    orderModal.style.display = "flex";
-
-    orderModal.classList.add(
-        "open"
-    );
-
-    document.body.classList.add(
-        "modal-open"
-    );
-
-}
-
-
-// ==========================================
-// RENDER MODAL ITEMS
-// ==========================================
-
-function renderModalItems(
-    itemsText
-) {
-
-    if (!modalItems) {
-        return;
-    }
-
-
-    modalItems.innerHTML =
-        "";
-
-
-    if (!itemsText) {
-
-        modalItems.innerHTML = `
-            <div class="modal-item-empty">
-                No item details available.
-            </div>
-        `;
-
-        return;
-
-    }
-
-
-    const lines =
-        String(
-            itemsText
-        )
-            .split(
-                /\r?\n|;/
-            )
-            .map(
-                item =>
-                    item.trim()
-            )
-            .filter(Boolean);
-
-
-    if (
-        lines.length === 0
-    ) {
-
-        modalItems.innerHTML = `
-            <div class="modal-item-empty">
-                No item details available.
-            </div>
-        `;
-
-        return;
-
-    }
-
-
-    lines.forEach(
-        line => {
-
-            const item =
-                document.createElement(
-                    "div"
-                );
-
-            item.className =
-                "modal-order-item";
-
-
-            item.textContent =
-                line;
-
-
-            modalItems.appendChild(
-                item
-            );
-
-        }
-    );
-
-}
-
-
-// ==========================================
-// CLOSE MODAL
-// ==========================================
-
-function closeOrderDetails() {
-
-    if (!orderModal) {
-        return;
-    }
-
-
-    orderModal.classList.remove(
-        "open"
-    );
-
-    orderModal.style.display =
-        "none";
-
-
-    document.body.classList.remove(
-        "modal-open"
     );
 
 }
@@ -2296,102 +512,2344 @@ document.addEventListener(
 );
 
 
-// ==========================================
-// FORMAT CURRENCY
-// ==========================================
+}
 
-function formatCurrency(
-    amount
+/* ==========================================
+FILTER CHANGE
+========================================== */
+
+function handleFilterChange() {
+
+
+currentPage = 1;
+
+applyFilters();
+
+
+}
+
+/* ==========================================
+LOAD ORDERS
+========================================== */
+
+async function loadOrders() {
+
+
+if (
+    isLoadingOrders
 ) {
 
-    const value =
-        Number(
-            amount
-        ) || 0;
-
-
-    return new Intl.NumberFormat(
-        "en-IN",
-        {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2
-        }
-    ).format(value);
+    return;
 
 }
 
 
-// ==========================================
-// FORMAT ORDER DATE
-// ==========================================
+isLoadingOrders = true;
 
-function formatOrderDate(
-    value,
-    detailed = false
-) {
 
-    if (!value) {
-        return "—";
+showLoadingState();
+
+setRefreshButtonLoading(
+    true
+);
+
+
+try {
+
+    const sessionToken =
+        localStorage.getItem(
+            SESSION_TOKEN_KEY
+        );
+
+
+    if (!sessionToken) {
+
+        redirectToLogin();
+
+        return;
+
     }
 
 
-    const date =
-        new Date(value);
+    const response =
+        await fetch(
+            N8N_ORDERS_WEBHOOK,
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type":
+                        "application/json"
+                },
+
+                body: JSON.stringify({
+                    sessionToken
+                })
+            }
+        );
 
 
     if (
-        Number.isNaN(
-            date.getTime()
-        )
+        response.status ===
+        401
     ) {
 
-        return "—";
+        handleSessionExpired();
+
+        return;
 
     }
 
 
-    if (detailed) {
+    if (
+        !response.ok
+    ) {
 
-        return new Intl.DateTimeFormat(
-            "en-GB",
-            {
-                timeZone:
-                    "Asia/Dubai",
+        throw new Error(
+            `Orders API returned ${response.status}`
+        );
 
-                day:
-                    "2-digit",
+    }
 
-                month:
-                    "short",
 
-                year:
-                    "numeric",
+    const data =
+        await response.json();
 
-                hour:
-                    "2-digit",
 
-                minute:
-                    "2-digit",
+    console.log(
+        "Orders API Response:",
+        data
+    );
 
-                hour12:
-                    true
+
+    if (
+        !data ||
+        data.success !== true
+    ) {
+
+        if (
+            data?.code ===
+            "INVALID_SESSION"
+        ) {
+
+            handleSessionExpired();
+
+            return;
+
+        }
+
+
+        throw new Error(
+            data?.message ||
+            "Unable to load orders."
+        );
+
+    }
+
+
+    /* ----------------------------------
+       Owner display only
+       ----------------------------------
+
+       IMPORTANT:
+       ownerName is used only for UI.
+
+       It is NOT used for authorization.
+       Authorization remains based on the
+       validated session.
+    ---------------------------------- */
+
+    updateOrdersTopbarOwner(
+        data.ownerName ||
+        data.OwnerName ||
+        null
+    );
+
+
+    /* ----------------------------------
+       Normalize orders
+    ---------------------------------- */
+
+    allOrders =
+        Array.isArray(
+            data.orders
+        )
+            ? data.orders.map(
+                normalizeOrder
+            )
+            : [];
+
+
+    /* ----------------------------------
+       Sort newest first
+    ---------------------------------- */
+
+    allOrders.sort(
+        (a, b) => {
+
+            const dateA =
+                new Date(
+                    a.orderDate
+                ).getTime() || 0;
+
+            const dateB =
+                new Date(
+                    b.orderDate
+                ).getTime() || 0;
+
+            return dateB - dateA;
+
+        }
+    );
+
+
+    console.log(
+        "Normalized Orders:",
+        allOrders
+    );
+
+
+    /* ----------------------------------
+       Populate branches
+    ---------------------------------- */
+
+    populateBranchFilter();
+
+
+    /* ----------------------------------
+       Apply current filters
+    ---------------------------------- */
+
+    applyFilters();
+
+
+    if (
+        ordersMonitoringText
+    ) {
+
+        ordersMonitoringText.textContent =
+            allOrders.length
+                ? `${allOrders.length} Orders`
+                : "Monitoring";
+
+    }
+
+}
+
+catch (error) {
+
+    console.error(
+        "Failed to load orders:",
+        error
+    );
+
+    showOrdersError();
+
+}
+
+finally {
+
+    isLoadingOrders = false;
+
+    setRefreshButtonLoading(
+        false
+    );
+
+}
+
+
+}
+
+/* ==========================================
+REFRESH BUTTON STATE
+========================================== */
+
+function setRefreshButtonLoading(
+loading
+) {
+
+
+if (
+    !refreshOrdersButton
+) {
+
+    return;
+
+}
+
+
+refreshOrdersButton.disabled =
+    loading;
+
+
+if (loading) {
+
+    refreshOrdersButton.classList.add(
+        "loading"
+    );
+
+    refreshOrdersButton.innerHTML = `
+        <span class="refresh-icon refresh-spinning">
+            ↻
+        </span>
+        Refreshing
+    `;
+
+}
+
+else {
+
+    refreshOrdersButton.classList.remove(
+        "loading"
+    );
+
+    refreshOrdersButton.innerHTML = `
+        <span class="refresh-icon">
+            ↻
+        </span>
+        Refresh
+    `;
+
+}
+
+
+}
+
+/* ==========================================
+TOPBAR OWNER
+========================================== */
+
+function updateOrdersTopbarOwner(
+ownerNameFromResponse = null
+) {
+
+
+let sessionData = null;
+
+
+try {
+
+    const storedSession =
+        localStorage.getItem(
+            SESSION_DATA_KEY
+        );
+
+
+    if (
+        storedSession
+    ) {
+
+        sessionData =
+            JSON.parse(
+                storedSession
+            );
+
+    }
+
+}
+
+catch (error) {
+
+    console.warn(
+        "Unable to read session data:",
+        error
+    );
+
+}
+
+
+const ownerName =
+    String(
+        ownerNameFromResponse ||
+        sessionData?.ownerName ||
+        sessionData?.OwnerName ||
+        sessionData?.name ||
+        sessionData?.Name ||
+        "Owner"
+    ).trim() ||
+    "Owner";
+
+
+const ownerRole =
+    String(
+        sessionData?.role ||
+        sessionData?.Role ||
+        "Owner"
+    ).trim() ||
+    "Owner";
+
+
+const topbarUserName =
+    document.getElementById(
+        "topbarUserName"
+    );
+
+
+if (
+    topbarUserName
+) {
+
+    topbarUserName.textContent =
+        ownerName;
+
+}
+
+
+const topbarUserRole =
+    document.getElementById(
+        "topbarUserRole"
+    );
+
+
+if (
+    topbarUserRole
+) {
+
+    topbarUserRole.textContent =
+        ownerRole;
+
+}
+
+
+const topbarUserAvatar =
+    document.getElementById(
+        "topbarUserAvatar"
+    );
+
+
+if (
+    topbarUserAvatar
+) {
+
+    topbarUserAvatar.textContent =
+        getInitials(
+            ownerName
+        );
+
+}
+
+
+}
+
+/* ==========================================
+GET INITIALS
+========================================== */
+
+function getInitials(
+name
+) {
+
+
+const cleanName =
+    String(
+        name ||
+        "Owner"
+    ).trim();
+
+
+if (
+    !cleanName
+) {
+
+    return "O";
+
+}
+
+
+const parts =
+    cleanName
+        .split(/\s+/)
+        .filter(Boolean);
+
+
+if (
+    parts.length === 1
+) {
+
+    return parts[0]
+        .charAt(0)
+        .toUpperCase();
+
+}
+
+
+return (
+    parts[0].charAt(0) +
+    parts[parts.length - 1]
+        .charAt(0)
+).toUpperCase();
+
+
+}
+
+/* ==========================================
+NORMALIZE ORDER
+========================================== */
+
+function normalizeOrder(
+order
+) {
+
+
+return {
+
+    orderId:
+        String(
+            order?.orderId ||
+            ""
+        ).trim(),
+
+    restaurantId:
+        String(
+            order?.restaurantId ||
+            ""
+        ).trim(),
+
+    branchOutlet:
+        String(
+            order?.branchOutlet ||
+            ""
+        ).trim(),
+
+    customerName:
+        String(
+            order?.customerName ||
+            ""
+        ).trim(),
+
+    mobileNumber:
+        String(
+            order?.mobileNumber ||
+            ""
+        ).trim(),
+
+    whatsappNumber:
+        String(
+            order?.whatsappNumber ||
+            ""
+        ).trim(),
+
+    orderedItems:
+        String(
+            order?.orderedItems ||
+            ""
+        ).trim(),
+
+    customizedRequest:
+        String(
+            order?.customizedRequest ||
+            ""
+        ).trim(),
+
+    tableNumber:
+        String(
+            order?.tableNumber ||
+            ""
+        ).trim(),
+
+    deliveryAddress:
+        String(
+            order?.deliveryAddress ||
+            ""
+        ).trim(),
+
+    subTotal:
+        Number(
+            order?.subTotal
+        ) || 0,
+
+    taxTotal:
+        Number(
+            order?.taxTotal
+        ) || 0,
+
+    total:
+        Number(
+            order?.total
+        ) || 0,
+
+    taxDetails:
+        String(
+            order?.taxDetails ||
+            ""
+        ).trim(),
+
+    status:
+        String(
+            order?.status ||
+            ""
+        )
+            .trim()
+            .toLowerCase(),
+
+    orderDate:
+        order?.orderDate ||
+        ""
+
+};
+
+
+}
+
+/* ==========================================
+BRANCH FILTER
+========================================== */
+
+function populateBranchFilter() {
+
+
+if (
+    !branchFilter
+) {
+
+    return;
+
+}
+
+
+const currentValue =
+    branchFilter.value;
+
+
+const branches =
+    [
+        ...new Set(
+            allOrders
+                .map(
+                    order =>
+                        order.branchOutlet
+                )
+                .filter(Boolean)
+        )
+    ]
+        .sort(
+            (a, b) =>
+                a.localeCompare(
+                    b
+                )
+        );
+
+
+branchFilter.innerHTML = "";
+
+
+const allOption =
+    document.createElement(
+        "option"
+    );
+
+
+allOption.value =
+    "";
+
+
+allOption.textContent =
+    "All Branches";
+
+
+branchFilter.appendChild(
+    allOption
+);
+
+
+branches.forEach(
+    branch => {
+
+        const option =
+            document.createElement(
+                "option"
+            );
+
+
+        option.value =
+            branch;
+
+
+        option.textContent =
+            branch;
+
+
+        branchFilter.appendChild(
+            option
+        );
+
+    }
+);
+
+
+if (
+    branches.includes(
+        currentValue
+    )
+) {
+
+    branchFilter.value =
+        currentValue;
+
+}
+
+
+}
+
+/* ==========================================
+APPLY FILTERS
+========================================== */
+
+function applyFilters() {
+
+
+const search =
+    String(
+        orderSearch?.value ||
+        ""
+    )
+        .trim()
+        .toLowerCase();
+
+
+const branch =
+    String(
+        branchFilter?.value ||
+        ""
+    ).trim();
+
+
+const status =
+    String(
+        statusFilter?.value ||
+        ""
+    )
+        .trim()
+        .toLowerCase();
+
+
+const dateRange =
+    String(
+        dateFilter?.value ||
+        "today"
+    )
+        .trim()
+        .toLowerCase();
+
+
+filteredOrders =
+    allOrders.filter(
+        order => {
+
+            /* SEARCH */
+
+            if (
+                search
+            ) {
+
+                const searchableText =
+                    [
+                        order.orderId,
+                        order.customerName,
+                        order.mobileNumber,
+                        order.whatsappNumber,
+                        order.branchOutlet,
+                        order.tableNumber,
+                        order.orderedItems,
+                        order.customizedRequest
+                    ]
+                        .join(" ")
+                        .toLowerCase();
+
+
+                if (
+                    !searchableText.includes(
+                        search
+                    )
+                ) {
+
+                    return false;
+
+                }
+
             }
-        ).format(date);
+
+
+            /* BRANCH */
+
+            if (
+                branch &&
+                branch !== "all" &&
+                order.branchOutlet !==
+                branch
+            ) {
+
+                return false;
+
+            }
+
+
+            /* STATUS */
+
+            if (
+                status &&
+                status !== "all" &&
+                order.status !==
+                status
+            ) {
+
+                return false;
+
+            }
+
+
+            /* DATE */
+
+            if (
+                !matchesDateFilter(
+                    order,
+                    dateRange
+                )
+            ) {
+
+                return false;
+
+            }
+
+
+            return true;
+
+        }
+    );
+
+
+updateOrderMetrics(
+    filteredOrders
+);
+
+
+updateFilterSummary();
+
+
+renderOrders();
+
+
+}
+
+/* ==========================================
+UPDATE KPI METRICS
+========================================== */
+
+function updateOrderMetrics(
+orders
+) {
+
+
+const source =
+    Array.isArray(
+        orders
+    )
+        ? orders
+        : [];
+
+
+const total =
+    source.length;
+
+
+const pending =
+    source.filter(
+        order =>
+            order.status ===
+            "pending"
+    ).length;
+
+
+const preparing =
+    source.filter(
+        order =>
+            order.status ===
+            "preparing"
+    ).length;
+
+
+const ready =
+    source.filter(
+        order =>
+            order.status ===
+            "ready"
+    ).length;
+
+
+const completed =
+    source.filter(
+        order =>
+            order.status ===
+            "completed"
+    ).length;
+
+
+if (
+    totalOrdersEl
+) {
+
+    totalOrdersEl.textContent =
+        total;
+
+}
+
+
+if (
+    pendingOrdersEl
+) {
+
+    pendingOrdersEl.textContent =
+        pending;
+
+}
+
+
+if (
+    preparingOrdersEl
+) {
+
+    preparingOrdersEl.textContent =
+        preparing;
+
+}
+
+
+if (
+    readyOrdersEl
+) {
+
+    readyOrdersEl.textContent =
+        ready;
+
+}
+
+
+if (
+    completedOrdersEl
+) {
+
+    completedOrdersEl.textContent =
+        completed;
+
+}
+
+
+}
+
+/* ==========================================
+FILTER SUMMARY
+========================================== */
+
+function updateFilterSummary() {
+
+
+if (
+    !totalOrdersFooter
+) {
+
+    return;
+
+}
+
+
+const date =
+    dateFilter?.value ||
+    "today";
+
+
+const branch =
+    branchFilter?.value ||
+    "";
+
+
+const status =
+    statusFilter?.value ||
+    "";
+
+
+const hasSearch =
+    Boolean(
+        orderSearch?.value?.trim()
+    );
+
+
+if (
+    hasSearch ||
+    branch ||
+    status
+) {
+
+    totalOrdersFooter.textContent =
+        "Orders matching current filters";
+
+    return;
+
+}
+
+
+const labels = {
+
+    today:
+        "Orders today",
+
+    "7":
+        "Orders in last 7 days",
+
+    "14":
+        "Orders in last 14 days",
+
+    "30":
+        "Orders in last 30 days",
+
+    all:
+        "Orders across all time"
+
+};
+
+
+totalOrdersFooter.textContent =
+    labels[date] ||
+    "Orders in selected period";
+
+
+}
+
+/* ==========================================
+DATE FILTER
+========================================== */
+
+function matchesDateFilter(
+order,
+filter
+) {
+
+
+if (
+    !filter ||
+    filter === "all"
+) {
+
+    return true;
+
+}
+
+
+const orderDate =
+    new Date(
+        order.orderDate
+    );
+
+
+if (
+    Number.isNaN(
+        orderDate.getTime()
+    )
+) {
+
+    return false;
+
+}
+
+
+const todayKey =
+    getDubaiDateKey(
+        new Date()
+    );
+
+
+const orderKey =
+    getDubaiDateKey(
+        orderDate
+    );
+
+
+/* TODAY */
+
+if (
+    filter === "today"
+) {
+
+    return (
+        orderKey ===
+        todayKey
+    );
+
+}
+
+
+/* ROLLING PERIOD */
+
+const now =
+    new Date();
+
+
+const start =
+    new Date(
+        now
+    );
+
+
+const days =
+    Number(
+        filter
+    );
+
+
+if (
+    !Number.isFinite(
+        days
+    ) ||
+    days <= 0
+) {
+
+    return true;
+
+}
+
+
+start.setDate(
+    start.getDate() -
+    (days - 1)
+);
+
+
+const startKey =
+    getDubaiDateKey(
+        start
+    );
+
+
+return (
+    orderKey >=
+    startKey &&
+    orderKey <=
+    todayKey
+);
+
+
+}
+
+/* ==========================================
+DUBAI DATE KEY
+========================================== */
+
+function getDubaiDateKey(
+date
+) {
+
+
+return new Intl.DateTimeFormat(
+    "en-CA",
+    {
+        timeZone:
+            ORDERS_TIME_ZONE,
+
+        year:
+            "numeric",
+
+        month:
+            "2-digit",
+
+        day:
+            "2-digit"
+    }
+).format(
+    date
+);
+
+
+}
+
+/* ==========================================
+RENDER ORDERS
+========================================== */
+
+function renderOrders() {
+
+
+if (
+    !ordersTableBody
+) {
+
+    return;
+
+}
+
+
+ordersTableBody.innerHTML =
+    "";
+
+
+if (
+    !Array.isArray(
+        filteredOrders
+    ) ||
+    filteredOrders.length === 0
+) {
+
+    showEmptyState();
+
+    updatePagination();
+
+    return;
+
+}
+
+
+hideEmptyState();
+
+
+const totalPages =
+    Math.ceil(
+        filteredOrders.length /
+        ORDERS_PER_PAGE
+    );
+
+
+if (
+    currentPage >
+    totalPages
+) {
+
+    currentPage =
+        totalPages;
+
+}
+
+
+if (
+    currentPage <
+    1
+) {
+
+    currentPage =
+        1;
+
+}
+
+
+const startIndex =
+    (
+        currentPage -
+        1
+    ) *
+    ORDERS_PER_PAGE;
+
+
+const endIndex =
+    Math.min(
+        startIndex +
+        ORDERS_PER_PAGE,
+        filteredOrders.length
+    );
+
+
+const pageOrders =
+    filteredOrders.slice(
+        startIndex,
+        endIndex
+    );
+
+
+pageOrders.forEach(
+    order => {
+
+        ordersTableBody.appendChild(
+            createOrderRow(
+                order
+            )
+        );
+
+    }
+);
+
+
+updatePagination();
+
+
+}
+
+/* ==========================================
+CREATE ORDER ROW
+========================================== */
+
+function createOrderRow(
+order
+) {
+
+
+const row =
+    document.createElement(
+        "tr"
+    );
+
+
+/* ORDER */
+
+const orderCell =
+    document.createElement(
+        "td"
+    );
+
+
+orderCell.innerHTML = `
+    <div class="order-id-cell">
+        <span class="order-id">
+            ${escapeHtml(
+                order.orderId ||
+                "—"
+            )}
+        </span>
+    </div>
+`;
+
+
+/* CUSTOMER */
+
+const customerCell =
+    document.createElement(
+        "td"
+    );
+
+
+const customerName =
+    order.customerName ||
+    "Walk-in Customer";
+
+
+const avatarLetter =
+    customerName
+        .charAt(0)
+        .toUpperCase();
+
+
+const mobile =
+    order.mobileNumber ||
+    order.whatsappNumber ||
+    "";
+
+
+customerCell.innerHTML = `
+    <div class="customer-cell">
+
+        <div class="customer-avatar">
+            ${escapeHtml(
+                avatarLetter
+            )}
+        </div>
+
+        <div class="customer-info">
+
+            <span class="customer-name">
+                ${escapeHtml(
+                    customerName
+                )}
+            </span>
+
+            ${
+                mobile
+                    ? `
+                        <span class="customer-mobile">
+                            ${escapeHtml(
+                                mobile
+                            )}
+                        </span>
+                      `
+                    : ""
+            }
+
+        </div>
+
+    </div>
+`;
+
+
+/* BRANCH */
+
+const branchCell =
+    document.createElement(
+        "td"
+    );
+
+
+branchCell.innerHTML = `
+    <span class="branch-name">
+        ${escapeHtml(
+            order.branchOutlet ||
+            "—"
+        )}
+    </span>
+`;
+
+
+/* TABLE */
+
+const tableCell =
+    document.createElement(
+        "td"
+    );
+
+
+tableCell.innerHTML = `
+    <span class="table-number">
+        ${
+            order.tableNumber
+                ? `Table ${escapeHtml(
+                    order.tableNumber
+                )}`
+                : "—"
+        }
+    </span>
+`;
+
+
+/* AMOUNT */
+
+const amountCell =
+    document.createElement(
+        "td"
+    );
+
+
+amountCell.innerHTML = `
+    <span class="order-amount">
+        ${formatCurrency(
+            order.total
+        )}
+    </span>
+`;
+
+
+/* STATUS */
+
+const statusCell =
+    document.createElement(
+        "td"
+    );
+
+
+statusCell.innerHTML =
+    createStatusBadge(
+        order.status
+    );
+
+
+/* TIME */
+
+const timeCell =
+    document.createElement(
+        "td"
+    );
+
+
+timeCell.innerHTML = `
+    <span class="order-time">
+        ${formatOrderDate(
+            order.orderDate
+        )}
+    </span>
+`;
+
+
+/* ACTION */
+
+const actionCell =
+    document.createElement(
+        "td"
+    );
+
+
+const viewButton =
+    document.createElement(
+        "button"
+    );
+
+
+viewButton.type =
+    "button";
+
+
+viewButton.className =
+    "order-view-btn";
+
+
+viewButton.innerHTML =
+    "View";
+
+
+viewButton.addEventListener(
+    "click",
+    () =>
+        openOrderModal(
+            order
+        )
+);
+
+
+actionCell.appendChild(
+    viewButton
+);
+
+
+/* APPEND */
+
+row.appendChild(
+    orderCell
+);
+
+row.appendChild(
+    customerCell
+);
+
+row.appendChild(
+    branchCell
+);
+
+row.appendChild(
+    tableCell
+);
+
+row.appendChild(
+    amountCell
+);
+
+row.appendChild(
+    statusCell
+);
+
+row.appendChild(
+    timeCell
+);
+
+row.appendChild(
+    actionCell
+);
+
+
+return row;
+
+
+}
+
+/* ==========================================
+STATUS BADGE
+========================================== */
+
+function createStatusBadge(
+status
+) {
+
+
+const normalized =
+    String(
+        status ||
+        ""
+    )
+        .trim()
+        .toLowerCase();
+
+
+const label =
+    normalized
+        ? capitalizeStatus(
+            normalized
+        )
+        : "Unknown";
+
+
+return `
+    <span class="
+        status-badge
+        status-${escapeHtml(
+            normalized ||
+            "unknown"
+        )}
+    ">
+        <span class="status-dot"></span>
+
+        ${escapeHtml(
+            label
+        )}
+
+    </span>
+`;
+
+
+}
+
+function capitalizeStatus(
+status
+) {
+
+
+return status
+    .charAt(0)
+    .toUpperCase() +
+    status.slice(1);
+
+
+}
+
+/* ==========================================
+PAGINATION
+========================================== */
+
+function updatePagination() {
+
+
+const total =
+    filteredOrders.length;
+
+
+const totalPages =
+    Math.max(
+        1,
+        Math.ceil(
+            total /
+            ORDERS_PER_PAGE
+        )
+    );
+
+
+if (
+    currentPage >
+    totalPages
+) {
+
+    currentPage =
+        totalPages;
+
+}
+
+
+const start =
+    total === 0
+        ? 0
+        : (
+            (
+                currentPage -
+                1
+            ) *
+            ORDERS_PER_PAGE
+        ) + 1;
+
+
+const end =
+    total === 0
+        ? 0
+        : Math.min(
+            currentPage *
+            ORDERS_PER_PAGE,
+            total
+        );
+
+
+if (
+    ordersFrom
+) {
+
+    ordersFrom.textContent =
+        start;
+
+}
+
+
+if (
+    ordersTo
+) {
+
+    ordersTo.textContent =
+        end;
+
+}
+
+
+if (
+    ordersTotal
+) {
+
+    ordersTotal.textContent =
+        total;
+
+}
+
+
+if (
+    previousPage
+) {
+
+    previousPage.disabled =
+        currentPage <= 1 ||
+        total === 0;
+
+}
+
+
+if (
+    nextPage
+) {
+
+    nextPage.disabled =
+        currentPage >=
+        totalPages ||
+        total === 0;
+
+}
+
+
+if (
+    !paginationPages
+) {
+
+    return;
+
+}
+
+
+paginationPages.innerHTML =
+    "";
+
+
+if (
+    total === 0
+) {
+
+    return;
+
+}
+
+
+const pages =
+    getPaginationPages(
+        currentPage,
+        totalPages
+    );
+
+
+pages.forEach(
+    page => {
+
+        if (
+            page === "..."
+        ) {
+
+            const ellipsis =
+                document.createElement(
+                    "span"
+                );
+
+
+            ellipsis.className =
+                "pagination-ellipsis";
+
+
+            ellipsis.textContent =
+                "…";
+
+
+            paginationPages.appendChild(
+                ellipsis
+            );
+
+
+            return;
+
+        }
+
+
+        const button =
+            document.createElement(
+                "button"
+            );
+
+
+        button.type =
+            "button";
+
+
+        button.className =
+            "pagination-page";
+
+
+        if (
+            page ===
+            currentPage
+        ) {
+
+            button.classList.add(
+                "active"
+            );
+
+        }
+
+
+        button.textContent =
+            page;
+
+
+        button.addEventListener(
+            "click",
+            () => {
+
+                currentPage =
+                    page;
+
+                renderOrders();
+
+            }
+        );
+
+
+        paginationPages.appendChild(
+            button
+        );
+
+    }
+);
+
+
+}
+
+/* ==========================================
+PAGINATION RANGE
+========================================== */
+
+function getPaginationPages(
+current,
+total
+) {
+
+
+if (
+    total <= 7
+) {
+
+    return Array.from(
+        {
+            length: total
+        },
+        (_, index) =>
+            index + 1
+    );
+
+}
+
+
+const pages = [];
+
+
+pages.push(1);
+
+
+if (
+    current > 4
+) {
+
+    pages.push("...");
+
+}
+
+
+const start =
+    Math.max(
+        2,
+        current - 1
+    );
+
+
+const end =
+    Math.min(
+        total - 1,
+        current + 1
+    );
+
+
+for (
+    let page = start;
+    page <= end;
+    page++
+) {
+
+    pages.push(
+        page
+    );
+
+}
+
+
+if (
+    current <
+    total - 3
+) {
+
+    pages.push("...");
+
+}
+
+
+pages.push(
+    total
+);
+
+
+return pages;
+
+
+}
+
+/* ==========================================
+RESET FILTERS
+========================================== */
+
+function resetAllFilters() {
+
+
+if (
+    orderSearch
+) {
+
+    orderSearch.value =
+        "";
+
+}
+
+
+if (
+    branchFilter
+) {
+
+    branchFilter.value =
+        "";
+
+}
+
+
+if (
+    statusFilter
+) {
+
+    statusFilter.value =
+        "";
+
+}
+
+
+if (
+    dateFilter
+) {
+
+    dateFilter.value =
+        "today";
+
+}
+
+
+currentPage =
+    1;
+
+
+applyFilters();
+
+
+}
+
+/* ==========================================
+ORDER MODAL
+========================================== */
+
+function openOrderModal(
+order
+) {
+
+
+if (
+    !orderModal
+) {
+
+    return;
+
+}
+
+
+if (
+    modalOrderId
+) {
+
+    modalOrderId.textContent =
+        order.orderId ||
+        "—";
+
+}
+
+
+if (
+    modalOrderStatus
+) {
+
+    modalOrderStatus.innerHTML =
+        createStatusBadge(
+            order.status
+        );
+
+}
+
+
+if (
+    modalCustomer
+) {
+
+    modalCustomer.textContent =
+        order.customerName ||
+        "Walk-in Customer";
+
+}
+
+
+if (
+    modalMobile
+) {
+
+    modalMobile.textContent =
+        order.mobileNumber ||
+        order.whatsappNumber ||
+        "—";
+
+}
+
+
+if (
+    modalBranch
+) {
+
+    modalBranch.textContent =
+        order.branchOutlet ||
+        "—";
+
+}
+
+
+if (
+    modalTable
+) {
+
+    modalTable.textContent =
+        order.tableNumber
+            ? `Table ${order.tableNumber}`
+            : "—";
+
+}
+
+
+if (
+    modalOrderTime
+) {
+
+    modalOrderTime.textContent =
+        formatOrderDate(
+            order.orderDate,
+            true
+        );
+
+}
+
+
+renderModalItems(
+    order.orderedItems
+);
+
+
+if (
+    modalRequestSection &&
+    modalRequest
+) {
+
+    if (
+        order.customizedRequest
+    ) {
+
+        modalRequest.textContent =
+            order.customizedRequest;
+
+
+        modalRequestSection.style.display =
+            "";
 
     }
 
+    else {
+
+        modalRequest.textContent =
+            "";
+
+
+        modalRequestSection.style.display =
+            "none";
+
+    }
+
+}
+
+
+if (
+    modalSubtotal
+) {
+
+    modalSubtotal.textContent =
+        formatCurrency(
+            order.subTotal
+        );
+
+}
+
+
+if (
+    modalTax
+) {
+
+    modalTax.textContent =
+        formatCurrency(
+            order.taxTotal
+        );
+
+}
+
+
+if (
+    modalTotal
+) {
+
+    modalTotal.textContent =
+        formatCurrency(
+            order.total
+        );
+
+}
+
+
+orderModal.style.display =
+    "flex";
+
+
+orderModal.classList.add(
+    "open"
+);
+
+
+document.body.classList.add(
+    "modal-open"
+);
+
+
+}
+
+/* ==========================================
+RENDER MODAL ITEMS
+========================================== */
+
+function renderModalItems(
+itemsText
+) {
+
+
+if (
+    !modalItems
+) {
+
+    return;
+
+}
+
+
+modalItems.innerHTML =
+    "";
+
+
+if (
+    !itemsText
+) {
+
+    modalItems.innerHTML = `
+        <div class="modal-item-empty">
+            No item details available.
+        </div>
+    `;
+
+    return;
+
+}
+
+
+const lines =
+    String(
+        itemsText
+    )
+        .split(
+            /\r?\n|;/
+        )
+        .map(
+            item =>
+                item.trim()
+        )
+        .filter(Boolean);
+
+
+if (
+    lines.length === 0
+) {
+
+    modalItems.innerHTML = `
+        <div class="modal-item-empty">
+            No item details available.
+        </div>
+    `;
+
+    return;
+
+}
+
+
+lines.forEach(
+    line => {
+
+        const item =
+            document.createElement(
+                "div"
+            );
+
+
+        item.className =
+            "modal-order-item";
+
+
+        item.textContent =
+            line;
+
+
+        modalItems.appendChild(
+            item
+        );
+
+    }
+);
+
+
+}
+
+/* ==========================================
+CLOSE MODAL
+========================================== */
+
+function closeOrderDetails() {
+
+
+if (
+    !orderModal
+) {
+
+    return;
+
+}
+
+
+orderModal.classList.remove(
+    "open"
+);
+
+
+orderModal.style.display =
+    "none";
+
+
+document.body.classList.remove(
+    "modal-open"
+);
+
+
+}
+
+/* ==========================================
+FORMAT CURRENCY
+========================================== */
+
+function formatCurrency(
+amount
+) {
+
+
+const value =
+    Number(
+        amount
+    ) || 0;
+
+
+return `AED ${new Intl.NumberFormat(
+    "en-IN",
+    {
+        minimumFractionDigits:
+            2,
+
+        maximumFractionDigits:
+            2
+    }
+).format(value)}`;
+
+
+}
+
+/* ==========================================
+FORMAT ORDER DATE
+========================================== */
+
+function formatOrderDate(
+value,
+detailed = false
+) {
+
+
+if (
+    !value
+) {
+
+    return "—";
+
+}
+
+
+const date =
+    new Date(
+        value
+    );
+
+
+if (
+    Number.isNaN(
+        date.getTime()
+    )
+) {
+
+    return "—";
+
+}
+
+
+if (
+    detailed
+) {
 
     return new Intl.DateTimeFormat(
         "en-GB",
         {
             timeZone:
-                "Asia/Dubai",
+                ORDERS_TIME_ZONE,
 
             day:
                 "2-digit",
 
             month:
                 "short",
+
+            year:
+                "numeric",
 
             hour:
                 "2-digit",
@@ -2402,203 +2860,332 @@ function formatOrderDate(
             hour12:
                 true
         }
-    ).format(date);
+    ).format(
+        date
+    );
 
 }
 
 
-// ==========================================
-// LOADING STATE
-// ==========================================
+return new Intl.DateTimeFormat(
+    "en-GB",
+    {
+        timeZone:
+            ORDERS_TIME_ZONE,
+
+        day:
+            "2-digit",
+
+        month:
+            "short",
+
+        hour:
+            "2-digit",
+
+        minute:
+            "2-digit",
+
+        hour12:
+            true
+    }
+).format(
+    date
+);
+
+
+}
+
+/* ==========================================
+LOADING STATE
+========================================== */
 
 function showLoadingState() {
 
-    if (!ordersTableBody) {
-        return;
-    }
 
+if (
+    !ordersTableBody
+) {
 
-    hideEmptyState();
-
-
-    ordersTableBody.innerHTML = `
-        <tr>
-            <td
-                colspan="8"
-                class="orders-loading"
-            >
-                <div class="loading-spinner"></div>
-                <span>
-                    Loading customer orders...
-                </span>
-            </td>
-        </tr>
-    `;
+    return;
 
 }
 
 
-// ==========================================
-// EMPTY STATE
-// ==========================================
+hideEmptyState();
+
+
+ordersTableBody.innerHTML = `
+    <tr>
+
+        <td
+            colspan="8"
+            class="orders-loading">
+
+            <div class="loading-spinner"></div>
+
+            <span>
+                Loading customer orders...
+            </span>
+
+        </td>
+
+    </tr>
+`;
+
+
+}
+
+/* ==========================================
+EMPTY STATE
+========================================== */
 
 function showEmptyState() {
 
-    if (ordersEmpty) {
 
-        ordersEmpty.hidden =
-            false;
+if (
+    ordersEmpty
+) {
 
-        ordersEmpty.style.display =
-            "";
+    ordersEmpty.style.display =
+        "";
+
+    ordersEmpty.hidden =
+        false;
+
+
+    const title =
+        ordersEmpty.querySelector(
+            ".orders-empty-title"
+        );
+
+
+    const message =
+        ordersEmpty.querySelector(
+            ".orders-empty-text"
+        );
+
+
+    const hasFilters =
+        Boolean(
+            orderSearch?.value?.trim() ||
+            branchFilter?.value ||
+            statusFilter?.value
+        );
+
+
+    if (
+        title
+    ) {
+
+        title.textContent =
+            hasFilters
+                ? "No matching orders"
+                : "No orders found";
 
     }
 
 
-    if (ordersTableBody) {
+    if (
+        message
+    ) {
 
-        ordersTableBody.innerHTML =
-            "";
+        message.textContent =
+            hasFilters
+                ? "Try adjusting your search or filters to find the order you need."
+                : "New customer orders will appear here as soon as they are received.";
 
     }
+
+}
+
+
+if (
+    ordersTableBody
+) {
+
+    ordersTableBody.innerHTML =
+        "";
+
+}
+
 
 }
 
 function hideEmptyState() {
 
-    if (!ordersEmpty) {
-        return;
-    }
 
-    ordersEmpty.style.display =
-        "none";
+if (
+    !ordersEmpty
+) {
 
-    ordersEmpty.hidden =
-        true;
+    return;
 
 }
 
-// ==========================================
-// ERROR STATE
-// ==========================================
+
+ordersEmpty.style.display =
+    "none";
+
+
+ordersEmpty.hidden =
+    true;
+
+
+}
+
+/* ==========================================
+ERROR STATE
+========================================== */
 
 function showOrdersError() {
 
-    if (ordersEmpty) {
 
-        ordersEmpty.style.display =
-            "";
+if (
+    ordersMonitoringText
+) {
 
-        const title =
-            ordersEmpty.querySelector(
-                ".orders-empty-title"
-            );
+    ordersMonitoringText.textContent =
+        "Connection issue";
 
-        const message =
-            ordersEmpty.querySelector(
-                ".orders-empty-text"
-            );
+}
 
 
-        if (title) {
+if (
+    ordersEmpty
+) {
 
-            title.textContent =
-                "Unable to load orders";
+    ordersEmpty.style.display =
+        "";
 
-        }
+    ordersEmpty.hidden =
+        false;
 
 
-        if (message) {
+    const title =
+        ordersEmpty.querySelector(
+            ".orders-empty-title"
+        );
 
-            message.textContent =
-                "Please refresh the page and try again.";
 
-        }
+    const message =
+        ordersEmpty.querySelector(
+            ".orders-empty-text"
+        );
+
+
+    if (
+        title
+    ) {
+
+        title.textContent =
+            "Unable to load orders";
 
     }
 
 
-    if (ordersTableBody) {
+    if (
+        message
+    ) {
 
-        ordersTableBody.innerHTML =
-            "";
+        message.textContent =
+            "Please refresh the page and try again.";
 
     }
 
 }
 
 
-// ==========================================
-// SESSION EXPIRED
-// ==========================================
+if (
+    ordersTableBody
+) {
+
+    ordersTableBody.innerHTML =
+        "";
+
+}
+
+
+updatePagination();
+
+
+}
+
+/* ==========================================
+SESSION EXPIRED
+========================================== */
 
 function handleSessionExpired() {
 
-    console.warn(
-        "Restaurant session expired."
-    );
+
+console.warn(
+    "Restaurant session expired."
+);
 
 
-    localStorage.removeItem(
-        SESSION_TOKEN_KEY
-    );
-
-    localStorage.removeItem(
-        SESSION_DATA_KEY
-    );
-
-    localStorage.removeItem(
-        "qro_validated_session"
-    );
+localStorage.removeItem(
+    SESSION_TOKEN_KEY
+);
 
 
-    redirectToLogin();
+localStorage.removeItem(
+    SESSION_DATA_KEY
+);
+
+
+localStorage.removeItem(
+    "qro_validated_session"
+);
+
+
+redirectToLogin();
+
 
 }
 
-
-// ==========================================
-// REDIRECT LOGIN
-// ==========================================
+/* ==========================================
+REDIRECT LOGIN
+========================================== */
 
 function redirectToLogin() {
 
-    window.location.href =
-        "../login/login.html";
+
+window.location.href =
+    "../login/login.html";
+
 
 }
 
-
-// ==========================================
-// HTML ESCAPE
-// ==========================================
+/* ==========================================
+HTML ESCAPE
+========================================== */
 
 function escapeHtml(
-    value
+value
 ) {
 
-    return String(
-        value ?? ""
+
+return String(
+    value ?? ""
+)
+    .replace(
+        /&/g,
+        "&amp;"
     )
-        .replace(
-            /&/g,
-            "&amp;"
-        )
-        .replace(
-            /</g,
-            "&lt;"
-        )
-        .replace(
-            />/g,
-            "&gt;"
-        )
-        .replace(
-            /"/g,
-            "&quot;"
-        )
-        .replace(
-            /'/g,
-            "&#039;"
-        );
+    .replace(
+        /</g,
+        "&lt;"
+    )
+    .replace(
+        />/g,
+        "&gt;"
+    )
+    .replace(
+        /"/g,
+        "&quot;"
+    )
+    .replace(
+        /'/g,
+        "&#039;"
+    );
 
 }
