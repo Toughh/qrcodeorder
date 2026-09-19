@@ -1,13 +1,11 @@
-// ==========================================
+// =========================================================
 // QR RESTAURANT SAAS
 // PREMIUM OWNER ORDERS
-// Dashboard / Reports Visual Language
-// ==========================================
+// =========================================================
 
-
-// ==========================================
+// =========================================================
 // CONFIGURATION
-// ==========================================
+// =========================================================
 
 const N8N_ORDERS_WEBHOOK =
     `${N8N_BASE_URL}/owner-orders`;
@@ -21,379 +19,324 @@ const SESSION_DATA_KEY =
 const VALIDATED_SESSION_KEY =
     "qro_validated_session";
 
-const RESTAURANT_TIMEZONE =
-    "Asia/Dubai";
+const ORDERS_PAGE_SIZE = 10;
+
+const DUBAI_TIME_ZONE = "Asia/Dubai";
 
 
-// ==========================================
-// STATE
-// ==========================================
+// =========================================================
+// PAGE STATE
+// =========================================================
 
 let allOrders = [];
-
 let filteredOrders = [];
 
 let currentPage = 1;
 
-const ordersPerPage = 10;
+let currentFilters = {
+    search: "",
+    branch: "all",
+    status: "all",
+    date: "all"
+};
 
-let currentCurrency = "AED";
-
-
-// ==========================================
-// ELEMENTS
-// ==========================================
-
-// KPI cards
-
-const totalOrdersEl =
-    document.getElementById("totalOrders");
-
-const pendingOrdersEl =
-    document.getElementById("pendingOrders");
-
-const preparingOrdersEl =
-    document.getElementById("preparingOrders");
-
-const readyOrdersEl =
-    document.getElementById("readyOrders");
-
-const completedOrdersEl =
-    document.getElementById("completedOrders");
+let selectedOrder = null;
 
 
-// Business snapshot
+// =========================================================
+// INITIALIZATION
+// =========================================================
 
-const ordersFilteredRevenueEl =
-    document.getElementById("ordersFilteredRevenue");
+document.addEventListener("DOMContentLoaded", async () => {
 
-const ordersAverageValueEl =
-    document.getElementById("ordersAverageValue");
-
-const ordersActiveCountEl =
-    document.getElementById("ordersActiveCount");
-
-const ordersCompletionRateEl =
-    document.getElementById("ordersCompletionRate");
-
-
-// Filters
-
-const orderSearch =
-    document.getElementById("orderSearch");
-
-const branchFilter =
-    document.getElementById("branchFilter");
-
-const statusFilter =
-    document.getElementById("statusFilter");
-
-const dateFilter =
-    document.getElementById("dateFilter");
-
-const resetFilters =
-    document.getElementById("resetFilters");
-
-
-// Table
-
-const ordersTableBody =
-    document.getElementById("ordersTableBody");
-
-const ordersEmpty =
-    document.getElementById("ordersEmpty");
-
-
-// Footer
-
-const ordersFrom =
-    document.getElementById("ordersFrom");
-
-const ordersTo =
-    document.getElementById("ordersTo");
-
-const ordersTotal =
-    document.getElementById("ordersTotal");
-
-
-// Pagination
-
-const previousPage =
-    document.getElementById("previousPage");
-
-const paginationPages =
-    document.getElementById("paginationPages");
-
-const nextPage =
-    document.getElementById("nextPage");
-
-
-// Modal
-
-const orderModal =
-    document.getElementById("orderModal");
-
-const modalOrderId =
-    document.getElementById("modalOrderId");
-
-const modalOrderStatus =
-    document.getElementById("modalOrderStatus");
-
-const modalCustomer =
-    document.getElementById("modalCustomer");
-
-const modalMobile =
-    document.getElementById("modalMobile");
-
-const modalBranch =
-    document.getElementById("modalBranch");
-
-const modalTable =
-    document.getElementById("modalTable");
-
-const modalOrderTime =
-    document.getElementById("modalOrderTime");
-
-const modalItems =
-    document.getElementById("modalItems");
-
-const modalRequestSection =
-    document.getElementById("modalRequestSection");
-
-const modalRequest =
-    document.getElementById("modalRequest");
-
-const modalSubtotal =
-    document.getElementById("modalSubtotal");
-
-const modalTax =
-    document.getElementById("modalTax");
-
-const modalTotal =
-    document.getElementById("modalTotal");
-
-const closeOrderModal =
-    document.getElementById("closeOrderModal");
-
-const modalCloseButton =
-    document.getElementById("modalCloseButton");
-
-
-// ==========================================
-// INITIALIZE
-// ==========================================
-
-document.addEventListener(
-    "DOMContentLoaded",
-    initializeOrdersPage
-);
-
-
-// ==========================================
-// TOPBAR OWNER
-// ==========================================
-
-function updateOrdersTopbarOwner(
-    ownerNameFromResponse = null
-) {
-
-    let sessionData = null;
+    console.log("[Orders] Initializing Owner Orders page...");
 
     try {
 
-        const storedSession =
-            localStorage.getItem(
-                SESSION_DATA_KEY
-            );
+        const session = await requireAuthentication();
 
-        if (storedSession) {
-
-            sessionData =
-                JSON.parse(
-                    storedSession
-                );
-
+        if (!session) {
+            return;
         }
 
-    } catch (error) {
-
-        console.warn(
-            "Unable to read session data:",
-            error
-        );
-
-    }
-
-
-    const ownerName =
-        String(
-            ownerNameFromResponse ||
-            sessionData?.ownerName ||
-            sessionData?.OwnerName ||
-            sessionData?.name ||
-            sessionData?.Name ||
-            "Owner"
-        ).trim() || "Owner";
-
-
-    const ownerRole =
-        String(
-            sessionData?.role ||
-            sessionData?.Role ||
-            "Owner"
-        ).trim() || "Owner";
-
-
-    const topbarUserName =
-        document.getElementById(
-            "topbarUserName"
-        );
-
-    if (topbarUserName) {
-
-        topbarUserName.textContent =
-            ownerName;
-
-    }
-
-
-    const topbarUserRole =
-        document.getElementById(
-            "topbarUserRole"
-        );
-
-    if (topbarUserRole) {
-
-        topbarUserRole.textContent =
-            ownerRole;
-
-    }
-
-
-    const topbarUserAvatar =
-        document.getElementById(
-            "topbarUserAvatar"
-        );
-
-    if (topbarUserAvatar) {
-
-        topbarUserAvatar.textContent =
-            ownerName
-                .charAt(0)
-                .toUpperCase();
-
-    }
-
-}
-
-
-// ==========================================
-// INITIALIZE PAGE
-// ==========================================
-
-async function initializeOrdersPage() {
-
-    try {
-
-        // ----------------------------------
-        // Authentication
-        // ----------------------------------
-
-        if (
-            typeof requireAuthentication ===
-            "function"
-        ) {
-
-            const authenticated =
-                await requireAuthentication();
-
-            if (authenticated === false) {
-
-                return;
-
-            }
-
-        }
-
-
-        // ----------------------------------
-        // Load Orders
-        // ----------------------------------
+        initializeOrdersEvents();
 
         await loadOrders();
 
     } catch (error) {
 
-        console.error(
-            "Orders initialization failed:",
-            error
-        );
+        console.error("[Orders] Initialization failed:", error);
 
         showOrdersError(
-            error?.message ||
-            "Unable to initialize the Orders page."
+            "Unable to load orders. Please try again."
         );
+    }
+});
 
+
+// =========================================================
+// EVENT INITIALIZATION
+// =========================================================
+
+function initializeOrdersEvents() {
+
+    const searchInput =
+        document.getElementById("orderSearch");
+
+    const branchFilter =
+        document.getElementById("branchFilter");
+
+    const statusFilter =
+        document.getElementById("statusFilter");
+
+    const dateFilter =
+        document.getElementById("dateFilter");
+
+    const resetButton =
+        document.getElementById("resetFilters");
+
+    const previousButton =
+        document.getElementById("previousPage");
+
+    const nextButton =
+        document.getElementById("nextPage");
+
+    const closeModalButton =
+        document.getElementById("closeOrderModal");
+
+    const modalCloseButton =
+        document.getElementById("modalCloseButton");
+
+    const modal =
+        document.getElementById("orderModal");
+
+    const logoutButton =
+        document.getElementById("logoutBtn");
+
+    // ---------------------------------------------------------
+    // Search
+    // ---------------------------------------------------------
+
+    if (searchInput) {
+
+        searchInput.addEventListener("input", () => {
+
+            currentFilters.search =
+                searchInput.value.trim();
+
+            currentPage = 1;
+
+            applyFiltersAndRender();
+        });
     }
 
+
+    // ---------------------------------------------------------
+    // Branch
+    // ---------------------------------------------------------
+
+    if (branchFilter) {
+
+        branchFilter.addEventListener("change", () => {
+
+            currentFilters.branch =
+                branchFilter.value || "all";
+
+            currentPage = 1;
+
+            applyFiltersAndRender();
+        });
+    }
+
+
+    // ---------------------------------------------------------
+    // Status
+    // ---------------------------------------------------------
+
+    if (statusFilter) {
+
+        statusFilter.addEventListener("change", () => {
+
+            currentFilters.status =
+                statusFilter.value || "all";
+
+            currentPage = 1;
+
+            applyFiltersAndRender();
+        });
+    }
+
+
+    // ---------------------------------------------------------
+    // Date
+    // ---------------------------------------------------------
+
+    if (dateFilter) {
+
+        dateFilter.addEventListener("change", () => {
+
+            currentFilters.date =
+                dateFilter.value || "all";
+
+            currentPage = 1;
+
+            applyFiltersAndRender();
+        });
+    }
+
+
+    // ---------------------------------------------------------
+    // Reset Filters
+    // ---------------------------------------------------------
+
+    if (resetButton) {
+
+        resetButton.addEventListener("click", () => {
+
+            resetFilters();
+        });
+    }
+
+
+    // ---------------------------------------------------------
+    // Pagination
+    // ---------------------------------------------------------
+
+    if (previousButton) {
+
+        previousButton.addEventListener("click", () => {
+
+            if (currentPage > 1) {
+
+                currentPage--;
+
+                renderOrdersTable();
+            }
+        });
+    }
+
+
+    if (nextButton) {
+
+        nextButton.addEventListener("click", () => {
+
+            const totalPages =
+                Math.max(
+                    1,
+                    Math.ceil(
+                        filteredOrders.length /
+                        ORDERS_PAGE_SIZE
+                    )
+                );
+
+            if (currentPage < totalPages) {
+
+                currentPage++;
+
+                renderOrdersTable();
+            }
+        });
+    }
+
+
+    // ---------------------------------------------------------
+    // Modal
+    // ---------------------------------------------------------
+
+    if (closeModalButton) {
+
+        closeModalButton.addEventListener(
+            "click",
+            closeOrderModal
+        );
+    }
+
+
+    if (modalCloseButton) {
+
+        modalCloseButton.addEventListener(
+            "click",
+            closeOrderModal
+        );
+    }
+
+
+    if (modal) {
+
+        modal.addEventListener("click", (event) => {
+
+            if (event.target === modal) {
+
+                closeOrderModal();
+            }
+        });
+    }
+
+
+    document.addEventListener("keydown", (event) => {
+
+        if (event.key === "Escape") {
+
+            closeOrderModal();
+        }
+    });
+
+
+    // ---------------------------------------------------------
+    // Logout
+    // ---------------------------------------------------------
+
+    if (logoutButton) {
+
+        logoutButton.addEventListener("click", () => {
+
+            clearSession();
+
+            window.location.href =
+                "../../login/login.html";
+        });
+    }
 }
 
 
-// ==========================================
+// =========================================================
 // LOAD ORDERS
-// ==========================================
+// =========================================================
 
 async function loadOrders() {
 
-    showLoadingState();
+    showOrdersLoading();
+
+    const sessionToken =
+        localStorage.getItem(
+            SESSION_TOKEN_KEY
+        );
+
+    if (!sessionToken) {
+
+        redirectToLogin();
+
+        return;
+    }
+
 
     try {
 
-        const sessionToken =
-            localStorage.getItem(
-                SESSION_TOKEN_KEY
-            );
+        const response = await fetch(
+            N8N_ORDERS_WEBHOOK,
+            {
+                method: "POST",
 
+                headers: {
+                    "Content-Type": "application/json"
+                },
 
-        if (!sessionToken) {
+                body: JSON.stringify({
+                    sessionToken
+                })
+            }
+        );
 
-            redirectToLogin();
-
-            return;
-
-        }
-
-
-        const response =
-            await fetch(
-                N8N_ORDERS_WEBHOOK,
-                {
-                    method: "POST",
-
-                    headers: {
-                        "Content-Type":
-                            "application/json"
-                    },
-
-                    body: JSON.stringify({
-
-                        // ----------------------------------
-                        // IMPORTANT:
-                        // Authorization remains session-based.
-                        // Do NOT send restaurantId from Clients.
-                        // ----------------------------------
-
-                        sessionToken
-
-                    })
-
-                }
-            );
-
-
-        // ----------------------------------
-        // HTTP SESSION FAILURE
-        // ----------------------------------
 
         if (
             response.status === 401 ||
@@ -403,427 +346,455 @@ async function loadOrders() {
             handleSessionExpired();
 
             return;
-
         }
 
 
         if (!response.ok) {
 
             throw new Error(
-                `Orders API returned ${response.status}`
+                `Orders request failed: HTTP ${response.status}`
             );
-
         }
 
 
-        let rawData =
+        const result =
             await response.json();
 
 
-        console.log(
-            "Orders API Response:",
-            rawData
-        );
-
-
-        // ----------------------------------
-        // Support n8n array/object response
-        // ----------------------------------
-
-        const data =
-            Array.isArray(rawData)
-                ? rawData[0]
-                : rawData;
+        const ordersData =
+            result?.data || result;
 
 
         if (
-            !data ||
-            data.success !== true
+            ordersData?.code ===
+            "INVALID_SESSION" ||
+            ordersData?.code ===
+            "SESSION_EXPIRED"
         ) {
 
-            if (
-                data?.code ===
-                "INVALID_SESSION"
-            ) {
+            handleSessionExpired();
 
-                handleSessionExpired();
-
-                return;
-
-            }
-
-
-            throw new Error(
-                data?.message ||
-                "Unable to load orders."
-            );
-
+            return;
         }
 
 
-        // ==================================
-        // CURRENCY
-        // ==================================
+        if (!ordersData?.success) {
 
-        currentCurrency =
-            String(
-                data.currency ||
-                data.settings?.currency ||
-                data.restaurant?.currency ||
-                data.restaurantSettings?.currency ||
-                "AED"
-            )
-                .trim()
-                .toUpperCase() ||
-            "AED";
+            throw new Error(
+                ordersData?.message ||
+                "Orders data could not be loaded."
+            );
+        }
 
 
-        // ==================================
-        // OWNER NAME
-        // Display only
-        // ==================================
+        // -----------------------------------------------------
+        // Normalize response
+        // -----------------------------------------------------
 
-        updateOrdersTopbarOwner(
+        const rawOrders =
+            Array.isArray(ordersData.orders)
+                ? ordersData.orders
+                : Array.isArray(ordersData.data)
+                    ? ordersData.data
+                    : [];
 
-            data.ownerName ||
-
-            data.OwnerName ||
-
-            data.client?.ownerName ||
-
-            data.client?.OwnerName ||
-
-            null
-
-        );
-
-
-        // ==================================
-        // ORDERS
-        // ==================================
 
         allOrders =
-            Array.isArray(data.orders)
-                ? data.orders
-                    .map(normalizeOrder)
-                    .filter(order =>
-                        Boolean(
-                            order.orderId ||
-                            order.orderDate ||
-                            order.customerName
-                        )
-                    )
-                : [];
+            rawOrders
+                .map(normalizeOrder)
+                .filter(Boolean)
+                .sort(
+                    (a, b) =>
+                        getTimestamp(b.orderDate) -
+                        getTimestamp(a.orderDate)
+                );
 
 
-        // ==================================
-        // NEWEST FIRST
-        // ==================================
+        // -----------------------------------------------------
+        // Owner / Restaurant context
+        // -----------------------------------------------------
 
-        allOrders.sort(
-            (a, b) => {
-
-                const dateA =
-                    new Date(
-                        a.orderDate
-                    ).getTime() || 0;
-
-                const dateB =
-                    new Date(
-                        b.orderDate
-                    ).getTime() || 0;
-
-                return dateB - dateA;
-
-            }
-        );
+        updateOwnerContext(ordersData);
 
 
-        console.log(
-            "Normalized Orders:",
+        // -----------------------------------------------------
+        // Branch filter
+        // -----------------------------------------------------
+
+        populateBranchFilter(
             allOrders
         );
 
 
+        // -----------------------------------------------------
+        // Render
+        // -----------------------------------------------------
+
+        currentPage = 1;
+
+        applyFiltersAndRender();
+
+
         console.log(
-            "Orders Count:",
-            allOrders.length
+            `[Orders] Loaded ${allOrders.length} orders.`
         );
-
-
-        // ==================================
-        // BRANCH FILTER
-        // ==================================
-
-        populateBranchFilter();
-
-
-        // ==================================
-        // APPLY CURRENT FILTERS
-        // ==================================
-
-        applyFilters();
-
 
     } catch (error) {
 
         console.error(
-            "Failed to load orders:",
+            "[Orders] Failed to load orders:",
             error
         );
 
         showOrdersError(
-            error?.message ||
             "Unable to load orders. Please try again."
         );
-
     }
-
 }
 
 
-// ==========================================
+// =========================================================
 // NORMALIZE ORDER
-// ==========================================
+// =========================================================
 
 function normalizeOrder(order) {
 
-    const source =
-        order || {};
-
-
-    // --------------------------------------
-    // Preserve structured orderedItems
-    // --------------------------------------
-
-    let orderedItems =
-        source.orderedItems ??
-        source.OrderedItems ??
-        "";
-
-
-    if (
-        orderedItems === null ||
-        orderedItems === undefined
-    ) {
-
-        orderedItems = "";
-
+    if (!order || typeof order !== "object") {
+        return null;
     }
+
+
+    const orderId =
+        firstValue(
+            order.orderId,
+            order.OrderId,
+            order.id,
+            order.ID,
+            order.OrderID
+        );
+
+
+    if (!orderId) {
+        return null;
+    }
+
+
+    const customerName =
+        firstValue(
+            order.customerName,
+            order.CustomerName,
+            order.customer,
+            order.Customer,
+            "Guest"
+        );
+
+
+    const mobileNumber =
+        firstValue(
+            order.mobileNumber,
+            order.MobileNumber,
+            order.mobile,
+            order.Mobile,
+            order.phone,
+            order.Phone,
+            ""
+        );
+
+
+    const branchOutlet =
+        firstValue(
+            order.branchOutlet,
+            order.BranchOutlet,
+            order.branchName,
+            order.BranchName,
+            order.branch,
+            order.Branch,
+            "Main Branch"
+        );
+
+
+    const tableNumber =
+        firstValue(
+            order.tableNumber,
+            order.TableNumber,
+            order.table,
+            order.Table,
+            order.tableNo,
+            order.TableNo,
+            ""
+        );
+
+
+    const amount =
+        toNumber(
+            firstValue(
+                order.totalAmount,
+                order.TotalAmount,
+                order.total,
+                order.Total,
+                order.amount,
+                order.Amount,
+                order.grandTotal,
+                order.GrandTotal,
+                0
+            )
+        );
+
+
+    const subtotal =
+        toNumber(
+            firstValue(
+                order.subtotal,
+                order.Subtotal,
+                order.subTotal,
+                order.SubTotal,
+                0
+            )
+        );
+
+
+    const tax =
+        toNumber(
+            firstValue(
+                order.tax,
+                order.Tax,
+                order.taxAmount,
+                order.TaxAmount,
+                order.taxTotal,
+                order.TaxTotal,
+                0
+            )
+        );
+
+
+    const status =
+        normalizeStatus(
+            firstValue(
+                order.status,
+                order.Status,
+                order.orderStatus,
+                order.OrderStatus,
+                "pending"
+            )
+        );
+
+
+    const orderDate =
+        firstValue(
+            order.orderDate,
+            order.OrderDate,
+            order.createdAt,
+            order.CreatedAt,
+            order.timestamp,
+            order.Timestamp,
+            order.created,
+            order.Created,
+            ""
+        );
+
+
+    const orderedItems =
+        normalizeOrderedItems(
+            firstValue(
+                order.orderedItems,
+                order.OrderedItems,
+                order.items,
+                order.Items,
+                order.orderItems,
+                order.OrderItems,
+                []
+            )
+        );
+
+
+    const customRequest =
+        firstValue(
+            order.customRequest,
+            order.CustomRequest,
+            order.specialRequest,
+            order.SpecialRequest,
+            order.customerRequest,
+            order.CustomerRequest,
+            order.notes,
+            order.Notes,
+            ""
+        );
 
 
     return {
 
-        orderId:
-            String(
-                source.orderId ??
-                source.OrderId ??
-                source.id ??
-                source.ID ??
-                ""
-            ).trim(),
+        ...order,
 
-
-        restaurantId:
-            String(
-                source.restaurantId ??
-                source.RestaurantId ??
-                ""
-            ).trim(),
-
-
-        branchOutlet:
-            String(
-                source.branchOutlet ??
-                source.BranchOutlet ??
-                source.branch ??
-                source.Branch ??
-                ""
-            ).trim(),
-
+        orderId: String(orderId),
 
         customerName:
-            String(
-                source.customerName ??
-                source.CustomerName ??
-                source.customer ??
-                source.Customer ??
-                ""
-            ).trim(),
-
+            String(customerName || "Guest"),
 
         mobileNumber:
-            String(
-                source.mobileNumber ??
-                source.MobileNumber ??
-                source.mobile ??
-                source.Mobile ??
-                ""
-            ).trim(),
+            String(mobileNumber || ""),
 
-
-        whatsappNumber:
-            String(
-                source.whatsappNumber ??
-                source.WhatsappNumber ??
-                source.WhatsAppNumber ??
-                ""
-            ).trim(),
-
-
-        orderedItems:
-            orderedItems,
-
-
-        customizedRequest:
-            String(
-                source.customizedRequest ??
-                source.CustomizedRequest ??
-                source.specialRequest ??
-                source.SpecialRequest ??
-                ""
-            ).trim(),
-
+        branchOutlet:
+            String(branchOutlet || "Main Branch"),
 
         tableNumber:
-            String(
-                source.tableNumber ??
-                source.TableNumber ??
-                source.table ??
-                source.Table ??
-                ""
-            ).trim(),
+            String(tableNumber || ""),
 
+        amount,
 
-        deliveryAddress:
-            String(
-                source.deliveryAddress ??
-                source.DeliveryAddress ??
-                ""
-            ).trim(),
+        subtotal,
 
+        tax,
 
-        subTotal:
-            toNumber(
-                source.subTotal ??
-                source.SubTotal ??
-                source.subtotal ??
-                source.Subtotal
-            ),
+        status,
 
+        orderDate,
 
-        taxTotal:
-            toNumber(
-                source.taxTotal ??
-                source.TaxTotal ??
-                source.tax ??
-                source.Tax
-            ),
+        orderedItems,
 
-
-        total:
-            toNumber(
-                source.total ??
-                source.Total ??
-                source.orderTotal ??
-                source.OrderTotal
-            ),
-
-
-        taxDetails:
-            String(
-                source.taxDetails ??
-                source.TaxDetails ??
-                ""
-            ).trim(),
-
-
-        status:
-            String(
-                source.status ??
-                source.Status ??
-                ""
-            )
-                .trim()
-                .toLowerCase(),
-
-
-        orderDate:
-            source.orderDate ??
-            source.OrderDate ??
-            source.createdAt ??
-            source.CreatedAt ??
-            ""
-
+        customRequest
     };
-
 }
 
 
-// ==========================================
-// NUMBER NORMALIZATION
-// ==========================================
+// =========================================================
+// APPLY FILTERS
+// =========================================================
 
-function toNumber(value) {
+function applyFiltersAndRender() {
 
-    if (
-        value === null ||
-        value === undefined ||
-        value === ""
-    ) {
-
-        return 0;
-
-    }
+    const search =
+        currentFilters.search
+            .toLowerCase()
+            .trim();
 
 
-    if (
-        typeof value === "number"
-    ) {
+    filteredOrders =
+        allOrders.filter(order => {
 
-        return Number.isFinite(value)
-            ? value
-            : 0;
+            // -------------------------------------------------
+            // Search
+            // -------------------------------------------------
 
-    }
+            if (search) {
+
+                const searchableText =
+                    [
+                        order.orderId,
+                        order.customerName,
+                        order.mobileNumber,
+                        order.branchOutlet,
+                        order.tableNumber,
+                        stringifyItems(
+                            order.orderedItems
+                        ),
+                        order.customRequest
+                    ]
+                        .join(" ")
+                        .toLowerCase();
 
 
-    const cleaned =
-        String(value)
-            .replace(
-                /[^0-9.-]/g,
-                ""
-            );
+                if (
+                    !searchableText.includes(search)
+                ) {
+
+                    return false;
+                }
+            }
 
 
-    const number =
-        Number(cleaned);
+            // -------------------------------------------------
+            // Branch
+            // -------------------------------------------------
+
+            if (
+                currentFilters.branch !== "all" &&
+                currentFilters.branch !== "" &&
+                order.branchOutlet !==
+                currentFilters.branch
+            ) {
+
+                return false;
+            }
 
 
-    return Number.isFinite(number)
-        ? number
-        : 0;
+            // -------------------------------------------------
+            // Status
+            // -------------------------------------------------
 
+            if (
+                currentFilters.status !== "all" &&
+                normalizeStatus(order.status) !==
+                normalizeStatus(
+                    currentFilters.status
+                )
+            ) {
+
+                return false;
+            }
+
+
+            // -------------------------------------------------
+            // Date
+            // -------------------------------------------------
+
+            if (
+                !matchesDateFilter(
+                    order.orderDate,
+                    currentFilters.date
+                )
+            ) {
+
+                return false;
+            }
+
+
+            return true;
+        });
+
+
+    updateOrderMetrics(
+        filteredOrders
+    );
+
+
+    currentPage = Math.min(
+        currentPage,
+        Math.max(
+            1,
+            Math.ceil(
+                filteredOrders.length /
+                ORDERS_PAGE_SIZE
+            )
+        )
+    );
+
+
+    renderOrdersTable();
 }
-
 
 // ==========================================
 // KPI METRICS
 // ==========================================
+// Customer Orders KPIs are RESTAURANT-WIDE.
+// They are NOT affected by Order Management filters.
+//
+// allOrders = complete restaurant order history
+// filteredOrders = only the currently filtered table records
+// ==========================================
 
-function updateOrderMetrics(
-    orders = filteredOrders
-) {
+function updateOrderMetrics() {
+
+    // --------------------------------------
+    // CUSTOMER ORDERS — RESTAURANT TOTALS
+    // --------------------------------------
 
     const source =
-        Array.isArray(orders)
-            ? orders
+        Array.isArray(allOrders)
+            ? allOrders
             : [];
-
 
     const total =
         source.length;
-
 
     const pending =
         source.filter(
@@ -831,20 +802,17 @@ function updateOrderMetrics(
                 order.status === "pending"
         ).length;
 
-
     const preparing =
         source.filter(
             order =>
                 order.status === "preparing"
         ).length;
 
-
     const ready =
         source.filter(
             order =>
                 order.status === "ready"
         ).length;
-
 
     const completed =
         source.filter(
@@ -853,35 +821,9 @@ function updateOrderMetrics(
         ).length;
 
 
-    const active =
-        pending +
-        preparing +
-        ready;
-
-
-    const revenue =
-        source.reduce(
-            (sum, order) =>
-                sum +
-                toNumber(order.total),
-            0
-        );
-
-
-    const averageOrderValue =
-        total > 0
-            ? revenue / total
-            : 0;
-
-
-    const completionRate =
-        total > 0
-            ? (
-                completed /
-                total
-            ) * 100
-            : 0;
-
+    // --------------------------------------
+    // UPDATE CUSTOMER ORDERS KPI CARDS
+    // --------------------------------------
 
     if (totalOrdersEl) {
 
@@ -890,14 +832,12 @@ function updateOrderMetrics(
 
     }
 
-
     if (pendingOrdersEl) {
 
         pendingOrdersEl.textContent =
             pending;
 
     }
-
 
     if (preparingOrdersEl) {
 
@@ -906,14 +846,12 @@ function updateOrderMetrics(
 
     }
 
-
     if (readyOrdersEl) {
 
         readyOrdersEl.textContent =
             ready;
 
     }
-
 
     if (completedOrdersEl) {
 
@@ -922,793 +860,53 @@ function updateOrderMetrics(
 
     }
 
-
-    if (ordersFilteredRevenueEl) {
-
-        ordersFilteredRevenueEl.textContent =
-            formatCurrency(
-                revenue
-            );
-
-    }
-
-
-    if (ordersAverageValueEl) {
-
-        ordersAverageValueEl.textContent =
-            formatCurrency(
-                averageOrderValue
-            );
-
-    }
-
-
-    if (ordersActiveCountEl) {
-
-        ordersActiveCountEl.textContent =
-            active;
-
-    }
-
-
-    if (ordersCompletionRateEl) {
-
-        ordersCompletionRateEl.textContent =
-            `${completionRate.toFixed(1)}%`;
-
-    }
-
 }
 
+// =========================================================
+// RENDER ORDERS TABLE
+// =========================================================
 
-// ==========================================
-// BRANCH FILTER
-// ==========================================
+function renderOrdersTable() {
 
-function populateBranchFilter() {
+    const tableBody =
+        document.getElementById(
+            "ordersTableBody"
+        );
 
-    if (!branchFilter) {
 
+    if (!tableBody) {
         return;
-
     }
 
 
-    const currentValue =
-        branchFilter.value;
+    if (!filteredOrders.length) {
 
-
-    const branches =
-        [
-            ...new Set(
-                allOrders
-                    .map(
-                        order =>
-                            order.branchOutlet
-                    )
-                    .filter(Boolean)
-            )
-        ]
-            .sort(
-                (a, b) =>
-                    a.localeCompare(b)
-            );
-
-
-    branchFilter.innerHTML = "";
-
-
-    const allOption =
-        document.createElement(
-            "option"
-        );
-
-
-    allOption.value =
-        "all";
-
-
-    allOption.textContent =
-        "All Branches";
-
-
-    branchFilter.appendChild(
-        allOption
-    );
-
-
-    branches.forEach(
-        branch => {
-
-            const option =
-                document.createElement(
-                    "option"
-                );
-
-
-            option.value =
-                branch;
-
-
-            option.textContent =
-                branch;
-
-
-            branchFilter.appendChild(
-                option
-            );
-
-        }
-    );
-
-
-    if (
-        currentValue &&
-        currentValue !== "all" &&
-        branches.includes(
-            currentValue
-        )
-    ) {
-
-        branchFilter.value =
-            currentValue;
-
-    } else {
-
-        branchFilter.value =
-            "all";
-
-    }
-
-}
-
-
-// ==========================================
-// FILTER EVENTS
-// ==========================================
-
-if (orderSearch) {
-
-    orderSearch.addEventListener(
-        "input",
-        handleFilterChange
-    );
-
-}
-
-
-if (branchFilter) {
-
-    branchFilter.addEventListener(
-        "change",
-        handleFilterChange
-    );
-
-}
-
-
-if (statusFilter) {
-
-    statusFilter.addEventListener(
-        "change",
-        handleFilterChange
-    );
-
-}
-
-
-if (dateFilter) {
-
-    dateFilter.addEventListener(
-        "change",
-        handleFilterChange
-    );
-
-}
-
-
-if (resetFilters) {
-
-    resetFilters.addEventListener(
-        "click",
-        resetAllFilters
-    );
-
-}
-
-
-function handleFilterChange() {
-
-    currentPage = 1;
-
-    applyFilters();
-
-}
-
-
-// ==========================================
-// APPLY FILTERS
-// ==========================================
-
-function applyFilters() {
-
-    const search =
-        String(
-            orderSearch?.value ||
-            ""
-        )
-            .trim()
-            .toLowerCase();
-
-
-    const branch =
-        String(
-            branchFilter?.value ||
-            "all"
-        ).trim();
-
-
-    const status =
-        String(
-            statusFilter?.value ||
-            "all"
-        )
-            .trim()
-            .toLowerCase();
-
-
-    const dateRange =
-        String(
-            dateFilter?.value ||
-            "today"
-        )
-            .trim()
-            .toLowerCase();
-
-
-    filteredOrders =
-        allOrders.filter(
-            order => {
-
-                // ----------------------------------
-                // SEARCH
-                // ----------------------------------
-
-                if (search) {
-
-                    const searchableText =
-                        [
-
-                            order.orderId,
-
-                            order.customerName,
-
-                            order.mobileNumber,
-
-                            order.whatsappNumber,
-
-                            order.branchOutlet,
-
-                            order.tableNumber,
-
-                            getOrderedItemsSearchText(
-                                order.orderedItems
-                            ),
-
-                            order.customizedRequest
-
-                        ]
-                            .join(" ")
-                            .toLowerCase();
-
-
-                    if (
-                        !searchableText.includes(
-                            search
-                        )
-                    ) {
-
-                        return false;
-
-                    }
-
-                }
-
-
-                // ----------------------------------
-                // BRANCH
-                // ----------------------------------
-
-                if (
-                    branch &&
-                    branch !== "all" &&
-                    order.branchOutlet !==
-                    branch
-                ) {
-
-                    return false;
-
-                }
-
-
-                // ----------------------------------
-                // STATUS
-                // ----------------------------------
-
-                if (
-                    status &&
-                    status !== "all" &&
-                    order.status !==
-                    status
-                ) {
-
-                    return false;
-
-                }
-
-
-                // ----------------------------------
-                // DATE
-                // ----------------------------------
-
-                if (
-                    !matchesDateFilter(
-                        order,
-                        dateRange
-                    )
-                ) {
-
-                    return false;
-
-                }
-
-
-                return true;
-
-            }
-        );
-
-
-    // --------------------------------------
-    // BUSINESS METRICS
-    // --------------------------------------
-
-    updateOrderMetrics(
-        filteredOrders
-    );
-
-
-    // --------------------------------------
-    // RENDER
-    // --------------------------------------
-
-    renderOrders();
-
-}
-
-
-// ==========================================
-// ORDER ITEM SEARCH TEXT
-// ==========================================
-
-function getOrderedItemsSearchText(
-    items
-) {
-
-    if (
-        items === null ||
-        items === undefined
-    ) {
-
-        return "";
-
-    }
-
-
-    if (
-        Array.isArray(items)
-    ) {
-
-        return items
-            .map(
-                item =>
-                    [
-
-                        item?.name,
-
-                        item?.itemName,
-
-                        item?.ItemName,
-
-                        item?.title,
-
-                        item?.Title
-
-                    ]
-                        .filter(Boolean)
-                        .join(" ")
-            )
-            .join(" ");
-
-    }
-
-
-    if (
-        typeof items === "object"
-    ) {
-
-        return JSON.stringify(
-            items
-        );
-
-    }
-
-
-    return String(items);
-
-}
-
-
-// ==========================================
-// DATE FILTER
-// ==========================================
-
-function matchesDateFilter(
-    order,
-    filter
-) {
-
-    if (
-        !filter ||
-        filter === "all"
-    ) {
-
-        return true;
-
-    }
-
-
-    const orderDate =
-        new Date(
-            order.orderDate
-        );
-
-
-    if (
-        Number.isNaN(
-            orderDate.getTime()
-        )
-    ) {
-
-        return false;
-
-    }
-
-
-    const todayKey =
-        getDubaiDateKey(
-            new Date()
-        );
-
-
-    const orderKey =
-        getDubaiDateKey(
-            orderDate
-        );
-
-
-    // --------------------------------------
-    // TODAY
-    // --------------------------------------
-
-    if (
-        filter === "today"
-    ) {
-
-        return (
-            orderKey ===
-            todayKey
-        );
-
-    }
-
-
-    // --------------------------------------
-    // ROLLING RANGES
-    // --------------------------------------
-
-    const days =
-        filter === "7"
-            ? 7
-            : filter === "14"
-                ? 14
-                : filter === "30"
-                    ? 30
-                    : null;
-
-
-    if (!days) {
-
-        return true;
-
-    }
-
-
-    const startKey =
-        shiftDubaiDateKey(
-            todayKey,
-            -(days - 1)
-        );
-
-
-    return (
-        orderKey >= startKey &&
-        orderKey <= todayKey
-    );
-
-}
-
-
-// ==========================================
-// DUBAI DATE KEY
-// ==========================================
-
-function getDubaiDateKey(
-    date
-) {
-
-    try {
-
-        const parts =
-            new Intl.DateTimeFormat(
-                "en-CA",
-                {
-                    timeZone:
-                        RESTAURANT_TIMEZONE,
-
-                    year:
-                        "numeric",
-
-                    month:
-                        "2-digit",
-
-                    day:
-                        "2-digit"
-                }
-            )
-                .formatToParts(
-                    date
-                );
-
-
-        const values = {};
-
-
-        parts.forEach(
-            part => {
-
-                if (
-                    part.type !==
-                    "literal"
-                ) {
-
-                    values[
-                        part.type
-                    ] =
-                        part.value;
-
-                }
-
-            }
-        );
-
-
-        return (
-            `${values.year}-${values.month}-${values.day}`
-        );
-
-    } catch (error) {
-
-        console.warn(
-            "Unable to create Dubai date key:",
-            error
-        );
-
-        return "";
-
-    }
-
-}
-
-
-// ==========================================
-// SHIFT DUBAI DATE KEY
-// ==========================================
-
-function shiftDubaiDateKey(
-    dateKey,
-    offsetDays
-) {
-
-    const [
-        year,
-        month,
-        day
-    ] =
-        String(
-            dateKey
-        )
-            .split("-")
-            .map(Number);
-
-
-    const date =
-        new Date(
-            Date.UTC(
-                year,
-                month - 1,
-                day
-            )
-        );
-
-
-    date.setUTCDate(
-        date.getUTCDate() +
-        offsetDays
-    );
-
-
-    return [
-
-        date.getUTCFullYear(),
-
-        String(
-            date.getUTCMonth() + 1
-        ).padStart(
-            2,
-            "0"
-        ),
-
-        String(
-            date.getUTCDate()
-        ).padStart(
-            2,
-            "0"
-        )
-
-    ].join("-");
-
-}
-
-
-// ==========================================
-// RESET FILTERS
-// ==========================================
-
-function resetAllFilters() {
-
-    if (orderSearch) {
-
-        orderSearch.value =
-            "";
-
-    }
-
-
-    if (branchFilter) {
-
-        branchFilter.value =
-            "all";
-
-    }
-
-
-    if (statusFilter) {
-
-        statusFilter.value =
-            "all";
-
-    }
-
-
-    if (dateFilter) {
-
-        // Match HTML default.
-        dateFilter.value =
-            "today";
-
-    }
-
-
-    currentPage = 1;
-
-    applyFilters();
-
-}
-
-
-// ==========================================
-// RENDER ORDERS
-// ==========================================
-
-function renderOrders() {
-
-    if (!ordersTableBody) {
-
-        return;
-
-    }
-
-
-    ordersTableBody.innerHTML =
-        "";
-
-
-    // --------------------------------------
-    // EMPTY STATE
-    // --------------------------------------
-
-    if (
-        !filteredOrders.length
-    ) {
+        tableBody.innerHTML = "";
 
         showOrdersEmpty();
 
         updatePagination(
-            0
-        );
-
-        updateOrdersFooter(
             0,
             0,
             0
         );
 
         return;
-
     }
 
 
     hideOrdersEmpty();
 
 
-    // --------------------------------------
-    // PAGINATION
-    // --------------------------------------
-
-    const totalPages =
-        Math.max(
-            1,
-            Math.ceil(
-                filteredOrders.length /
-                ordersPerPage
-            )
-        );
-
-
-    if (
-        currentPage >
-        totalPages
-    ) {
-
-        currentPage =
-            totalPages;
-
-    }
-
-
     const startIndex =
-        (
-            currentPage -
-            1
-        ) *
-        ordersPerPage;
+        (currentPage - 1) *
+        ORDERS_PAGE_SIZE;
 
 
     const endIndex =
         Math.min(
             startIndex +
-            ordersPerPage,
+            ORDERS_PAGE_SIZE,
             filteredOrders.length
         );
 
@@ -1720,1291 +918,1085 @@ function renderOrders() {
         );
 
 
-    // --------------------------------------
-    // RENDER ROWS
-    // --------------------------------------
-
-    pageOrders.forEach(
-        order => {
-
-            const row =
-                document.createElement(
-                    "tr"
-                );
+    const currency =
+        getRestaurantCurrency();
 
 
-            const statusClass =
-                normalizeStatusClass(
-                    order.status
-                );
+    tableBody.innerHTML =
+        pageOrders
+            .map(order =>
+                createOrderRow(
+                    order,
+                    currency
+                )
+            )
+            .join("");
 
 
-            const statusLabel =
-                capitalizeStatus(
-                    order.status
-                );
-
-
-            row.innerHTML = `
-
-                <td>
-                    <div class="order-id-cell">
-                        ${escapeHtml(
-                            order.orderId ||
-                            "—"
-                        )}
-                    </div>
-                </td>
-
-
-                <td>
-                    <div class="customer-cell">
-
-                        <div class="customer-name">
-                            ${escapeHtml(
-                                order.customerName ||
-                                "Guest"
-                            )}
-                        </div>
-
-                        ${
-                            order.mobileNumber ||
-                            order.whatsappNumber
-                                ? `
-                                    <div class="customer-contact">
-                                        ${escapeHtml(
-                                            order.mobileNumber ||
-                                            order.whatsappNumber
-                                        )}
-                                    </div>
-                                  `
-                                : ""
-                        }
-
-                    </div>
-                </td>
-
-
-                <td>
-                    <span class="branch-name">
-                        ${escapeHtml(
-                            order.branchOutlet ||
-                            "—"
-                        )}
-                    </span>
-                </td>
-
-
-                <td>
-                    <span class="table-number">
-                        ${
-                            order.tableNumber
-                                ? `Table ${escapeHtml(
-                                    order.tableNumber
-                                )}`
-                                : "—"
-                        }
-                    </span>
-                </td>
-
-
-                <td>
-                    <span class="order-amount">
-                        ${formatCurrency(
-                            order.total
-                        )}
-                    </span>
-                </td>
-
-
-                <td>
-                    <span class="status-badge status-${statusClass}">
-                        ${escapeHtml(
-                            statusLabel
-                        )}
-                    </span>
-                </td>
-
-
-                <td>
-                    <span class="order-time">
-                        ${formatOrderDate(
-                            order.orderDate
-                        )}
-                    </span>
-                </td>
-
-
-                <td>
-                    <button
-                        type="button"
-                        class="order-view-btn"
-                        data-order-id="${escapeHtml(
-                            order.orderId
-                        )}"
-                    >
-                        View
-                    </button>
-                </td>
-
-            `;
-
-
-            ordersTableBody.appendChild(
-                row
-            );
-
-        }
-    );
-
-
-    // --------------------------------------
-    // VIEW BUTTONS
-    // --------------------------------------
-
-    ordersTableBody
+    tableBody
         .querySelectorAll(
             ".order-view-btn"
         )
-        .forEach(
-            button => {
-
-                button.addEventListener(
-                    "click",
-                    () => {
-
-                        openOrderModal(
-                            button.dataset.orderId
-                        );
-
-                    }
-                );
-
-            }
-        );
-
-
-    // --------------------------------------
-    // FOOTER
-    // --------------------------------------
-
-    updateOrdersFooter(
-        startIndex,
-        endIndex,
-        filteredOrders.length
-    );
-
-
-    // --------------------------------------
-    // PAGINATION
-    // --------------------------------------
-
-    updatePagination(
-        totalPages
-    );
-
-}
-
-
-// ==========================================
-// STATUS CLASS
-// ==========================================
-
-function normalizeStatusClass(
-    status
-) {
-
-    const normalized =
-        String(
-            status || ""
-        )
-            .trim()
-            .toLowerCase();
-
-
-    const allowed = [
-
-        "pending",
-
-        "preparing",
-
-        "ready",
-
-        "completed",
-
-        "rejected",
-
-        "cancelled",
-
-        "canceled"
-
-    ];
-
-
-    if (
-        allowed.includes(
-            normalized
-        )
-    ) {
-
-        return normalized;
-
-    }
-
-
-    return "unknown";
-
-}
-
-
-// ==========================================
-// CAPITALIZE STATUS
-// ==========================================
-
-function capitalizeStatus(
-    status
-) {
-
-    const value =
-        String(
-            status || ""
-        )
-            .trim()
-            .toLowerCase();
-
-
-    if (!value) {
-
-        return "Unknown";
-
-    }
-
-
-    return (
-        value
-            .charAt(0)
-            .toUpperCase() +
-        value.slice(1)
-    );
-
-}
-
-
-// ==========================================
-// UPDATE ORDERS FOOTER
-// ==========================================
-
-function updateOrdersFooter(
-    startIndex,
-    endIndex,
-    total
-) {
-
-    if (ordersFrom) {
-
-        ordersFrom.textContent =
-            total > 0
-                ? startIndex + 1
-                : 0;
-
-    }
-
-
-    if (ordersTo) {
-
-        ordersTo.textContent =
-            total > 0
-                ? endIndex
-                : 0;
-
-    }
-
-
-    if (ordersTotal) {
-
-        ordersTotal.textContent =
-            total;
-
-    }
-
-}
-
-
-// ==========================================
-// PAGINATION
-// ==========================================
-
-function updatePagination(
-    totalPages
-) {
-
-    if (!paginationPages) {
-
-        return;
-
-    }
-
-
-    paginationPages.innerHTML =
-        "";
-
-
-    const safeTotalPages =
-        Math.max(
-            1,
-            Number(totalPages) || 1
-        );
-
-
-    if (previousPage) {
-
-        previousPage.disabled =
-            currentPage <= 1;
-
-    }
-
-
-    if (nextPage) {
-
-        nextPage.disabled =
-            currentPage >=
-            safeTotalPages;
-
-    }
-
-
-    const pages =
-        buildPaginationPages(
-            currentPage,
-            safeTotalPages
-        );
-
-
-    pages.forEach(
-        page => {
-
-            if (
-                page === "..."
-            ) {
-
-                const ellipsis =
-                    document.createElement(
-                        "span"
-                    );
-
-
-                ellipsis.className =
-                    "pagination-ellipsis";
-
-
-                ellipsis.textContent =
-                    "…";
-
-
-                paginationPages.appendChild(
-                    ellipsis
-                );
-
-
-                return;
-
-            }
-
-
-            const button =
-                document.createElement(
-                    "button"
-                );
-
-
-            button.type =
-                "button";
-
-
-            button.className =
-                "pagination-page";
-
-
-            if (
-                page === currentPage
-            ) {
-
-                button.classList.add(
-                    "active"
-                );
-
-            }
-
-
-            button.textContent =
-                page;
-
+        .forEach(button => {
 
             button.addEventListener(
                 "click",
                 () => {
 
-                    currentPage =
-                        page;
+                    const orderId =
+                        button.dataset.orderId;
 
-                    renderOrders();
-
+                    openOrderModal(
+                        orderId
+                    );
                 }
             );
+        });
 
 
-            paginationPages.appendChild(
-                button
-            );
-
-        }
+    updatePagination(
+        startIndex + 1,
+        endIndex,
+        filteredOrders.length
     );
-
 }
 
 
-// ==========================================
-// BUILD PAGINATION
-// ==========================================
+// =========================================================
+// CREATE ORDER ROW
+// =========================================================
 
-function buildPaginationPages(
-    current,
-    total
+function createOrderRow(
+    order,
+    currency
 ) {
 
-    if (
-        total <= 7
-    ) {
-
-        return Array.from(
-            {
-                length: total
-            },
-            (_, index) =>
-                index + 1
-        );
-
-    }
-
-
-    const pages = [];
-
-
-    pages.push(1);
-
-
-    if (
-        current > 4
-    ) {
-
-        pages.push("...");
-
-    }
-
-
-    const start =
-        Math.max(
-            2,
-            current - 1
+    const status =
+        normalizeStatus(
+            order.status
         );
 
 
-    const end =
-        Math.min(
-            total - 1,
-            current + 1
+    const statusLabel =
+        formatStatusLabel(
+            status
         );
 
 
-    for (
-        let page = start;
-        page <= end;
-        page++
-    ) {
-
-        pages.push(page);
-
-    }
+    const customerName =
+        escapeHtml(
+            order.customerName
+        );
 
 
-    if (
-        current <
-        total - 3
-    ) {
-
-        pages.push("...");
-
-    }
+    const mobile =
+        escapeHtml(
+            order.mobileNumber
+        );
 
 
-    pages.push(total);
+    const branch =
+        escapeHtml(
+            order.branchOutlet
+        );
 
 
-    return pages;
-
-}
-
-
-// ==========================================
-// PAGINATION EVENTS
-// ==========================================
-
-if (previousPage) {
-
-    previousPage.addEventListener(
-        "click",
-        () => {
-
-            if (
-                currentPage <= 1
-            ) {
-
-                return;
-
-            }
+    const table =
+        order.tableNumber
+            ? escapeHtml(
+                order.tableNumber
+            )
+            : "Takeaway";
 
 
-            currentPage--;
+    const orderId =
+        escapeHtml(
+            order.orderId
+        );
 
-            renderOrders();
 
+    const amount =
+        formatCurrency(
+            order.amount,
+            currency
+        );
+
+
+    const time =
+        formatOrderDate(
+            order.orderDate
+        );
+
+
+    return `
+        <tr>
+
+            <td class="order-id-cell">
+                <strong>
+                    ${orderId}
+                </strong>
+            </td>
+
+
+            <td class="customer-cell">
+
+                <div class="customer-name">
+                    ${customerName}
+                </div>
+
+                ${mobile
+            ? `
+                            <div class="customer-contact">
+                                ${mobile}
+                            </div>
+                          `
+            : ""
         }
-    );
 
+            </td>
+
+
+            <td class="branch-name">
+                ${branch}
+            </td>
+
+
+            <td class="table-number">
+                ${table}
+            </td>
+
+
+            <td class="order-amount">
+                ${amount}
+            </td>
+
+
+            <td>
+                <span
+                    class="status-badge status-${escapeHtml(status)}"
+                >
+                    ${escapeHtml(statusLabel)}
+                </span>
+            </td>
+
+
+            <td class="order-time">
+                ${escapeHtml(time)}
+            </td>
+
+
+            <td>
+
+                <button
+                    type="button"
+                    class="order-view-btn"
+                    data-order-id="${escapeHtml(order.orderId)}"
+                >
+                    View
+                </button>
+
+            </td>
+
+        </tr>
+    `;
 }
 
 
-if (nextPage) {
+// =========================================================
+// OPEN ORDER MODAL
+// =========================================================
 
-    nextPage.addEventListener(
-        "click",
-        () => {
-
-            const totalPages =
-                Math.max(
-                    1,
-                    Math.ceil(
-                        filteredOrders.length /
-                        ordersPerPage
-                    )
-                );
-
-
-            if (
-                currentPage >=
-                totalPages
-            ) {
-
-                return;
-
-            }
-
-
-            currentPage++;
-
-            renderOrders();
-
-        }
-    );
-
-}
-
-
-// ==========================================
-// ORDER MODAL
-// ==========================================
-
-function openOrderModal(
-    orderId
-) {
+function openOrderModal(orderId) {
 
     const order =
         allOrders.find(
             item =>
-                String(
-                    item.orderId
-                ) ===
-                String(
-                    orderId
-                )
+                String(item.orderId) ===
+                String(orderId)
         );
 
 
     if (!order) {
-
-        console.warn(
-            "Order not found:",
-            orderId
-        );
-
         return;
-
     }
 
 
-    // --------------------------------------
-    // ORDER ID
-    // --------------------------------------
-
-    if (modalOrderId) {
-
-        modalOrderId.textContent =
-            order.orderId ||
-            "Order";
-
-    }
+    selectedOrder = order;
 
 
-    // --------------------------------------
-    // STATUS
-    // --------------------------------------
-
-    if (modalOrderStatus) {
-
-        const statusClass =
-            normalizeStatusClass(
-                order.status
-            );
+    const currency =
+        getRestaurantCurrency();
 
 
-        const statusLabel =
-            capitalizeStatus(
-                order.status
-            );
-
-
-        modalOrderStatus.className =
-            `modal-order-status status-badge status-${statusClass}`;
-
-
-        modalOrderStatus.textContent =
-            statusLabel;
-
-    }
-
-
-    // --------------------------------------
-    // CUSTOMER
-    // --------------------------------------
-
-    if (modalCustomer) {
-
-        modalCustomer.textContent =
-            order.customerName ||
-            "Guest";
-
-    }
-
-
-    // --------------------------------------
-    // MOBILE
-    // --------------------------------------
-
-    if (modalMobile) {
-
-        modalMobile.textContent =
-            order.mobileNumber ||
-            order.whatsappNumber ||
-            "—";
-
-    }
-
-
-    // --------------------------------------
-    // BRANCH
-    // --------------------------------------
-
-    if (modalBranch) {
-
-        modalBranch.textContent =
-            order.branchOutlet ||
-            "—";
-
-    }
-
-
-    // --------------------------------------
-    // TABLE
-    // --------------------------------------
-
-    if (modalTable) {
-
-        modalTable.textContent =
-            order.tableNumber
-                ? `Table ${order.tableNumber}`
-                : "—";
-
-    }
-
-
-    // --------------------------------------
-    // ORDER TIME
-    // --------------------------------------
-
-    if (modalOrderTime) {
-
-        modalOrderTime.textContent =
-            formatOrderDate(
-                order.orderDate
-            );
-
-    }
-
-
-    // --------------------------------------
-    // ITEMS
-    // --------------------------------------
-
-    renderModalItems(
-        order
+    setText(
+        "modalOrderId",
+        order.orderId
     );
 
 
-    // --------------------------------------
-    // SPECIAL REQUEST
-    // --------------------------------------
+    const status =
+        normalizeStatus(
+            order.status
+        );
 
-    if (modalRequestSection) {
 
-        const hasRequest =
-            Boolean(
+    const statusElement =
+        document.getElementById(
+            "modalOrderStatus"
+        );
+
+
+    if (statusElement) {
+
+        statusElement.textContent =
+            formatStatusLabel(status);
+
+
+        statusElement.className =
+            `status-badge status-${status}`;
+    }
+
+
+    setText(
+        "modalCustomer",
+        order.customerName
+    );
+
+
+    setText(
+        "modalMobile",
+        order.mobileNumber || "—"
+    );
+
+
+    setText(
+        "modalBranch",
+        order.branchOutlet || "—"
+    );
+
+
+    setText(
+        "modalTable",
+        order.tableNumber
+            ? order.tableNumber
+            : "Takeaway"
+    );
+
+
+    setText(
+        "modalOrderTime",
+        formatOrderDate(
+            order.orderDate,
+            true
+        )
+    );
+
+
+    renderModalItems(
+        order.orderedItems,
+        currency
+    );
+
+
+    // ---------------------------------------------------------
+    // Customer Request
+    // ---------------------------------------------------------
+
+    const requestSection =
+        document.getElementById(
+            "modalRequestSection"
+        );
+
+
+    const requestElement =
+        document.getElementById(
+            "modalRequest"
+        );
+
+
+    if (
+        requestSection &&
+        requestElement
+    ) {
+
+        if (
+            order.customRequest &&
+            String(
+                order.customRequest
+            ).trim()
+        ) {
+
+            requestElement.textContent =
                 String(
-                    order.customizedRequest ||
-                    ""
-                ).trim()
-            );
+                    order.customRequest
+                );
 
+            requestSection.style.display =
+                "";
+        } else {
 
-        modalRequestSection.style.display =
-            hasRequest
-                ? ""
-                : "none";
+            requestElement.textContent =
+                "";
 
+            requestSection.style.display =
+                "none";
+        }
     }
 
 
-    if (modalRequest) {
+    // ---------------------------------------------------------
+    // Financial Summary
+    // ---------------------------------------------------------
 
-        modalRequest.textContent =
-            order.customizedRequest ||
-            "";
-
-    }
-
-
-    // --------------------------------------
-    // BILLING
-    // --------------------------------------
-
-    if (modalSubtotal) {
-
-        modalSubtotal.textContent =
-            formatCurrency(
-                order.subTotal
-            );
-
-    }
+    setText(
+        "modalSubtotal",
+        formatCurrency(
+            order.subtotal,
+            currency
+        )
+    );
 
 
-    if (modalTax) {
-
-        modalTax.textContent =
-            formatCurrency(
-                order.taxTotal
-            );
-
-    }
-
-
-    if (modalTotal) {
-
-        modalTotal.textContent =
-            formatCurrency(
-                order.total
-            );
-
-    }
+    setText(
+        "modalTax",
+        formatCurrency(
+            order.tax,
+            currency
+        )
+    );
 
 
-    // --------------------------------------
-    // SHOW MODAL
+    setText(
+        "modalTotal",
+        formatCurrency(
+            order.amount,
+            currency
+        )
+    );
+
+
+    // ---------------------------------------------------------
     // IMPORTANT:
     // HTML has inline display:none.
-    // Therefore we explicitly override it.
-    // --------------------------------------
+    // Explicitly override it here.
+    // ---------------------------------------------------------
 
-    if (orderModal) {
+    const modal =
+        document.getElementById(
+            "orderModal"
+        );
 
-        orderModal.style.display =
+
+    if (modal) {
+
+        modal.style.display =
             "flex";
 
-
-        orderModal.classList.add(
+        modal.classList.add(
             "active"
         );
 
-
-        document.body.classList.add(
-            "modal-open"
-        );
-
+        document.body.style.overflow =
+            "hidden";
     }
-
 }
 
 
-// ==========================================
-// RENDER MODAL ITEMS
-// ==========================================
+// =========================================================
+// CLOSE ORDER MODAL
+// =========================================================
 
-function renderModalItems(
-    order
-) {
+function closeOrderModal() {
 
-    if (!modalItems) {
+    const modal =
+        document.getElementById(
+            "orderModal"
+        );
 
-        return;
 
+    if (modal) {
+
+        modal.classList.remove(
+            "active"
+        );
+
+        // Required because HTML contains
+        // inline style="display:none;"
+        modal.style.display =
+            "none";
     }
 
 
-    modalItems.innerHTML =
+    document.body.style.overflow =
         "";
 
 
-    const rawItems =
-        order?.orderedItems;
+    selectedOrder = null;
+}
 
 
-    if (
-        rawItems === null ||
-        rawItems === undefined ||
-        rawItems === ""
-    ) {
+// =========================================================
+// RENDER MODAL ITEMS
+// =========================================================
 
-        showModalEmptyItems();
+function renderModalItems(
+    items,
+    currency
+) {
 
-        return;
-
-    }
-
-
-    // --------------------------------------
-    // Already structured array
-    // --------------------------------------
-
-    if (
-        Array.isArray(rawItems)
-    ) {
-
-        renderStructuredModalItems(
-            rawItems
+    const container =
+        document.getElementById(
+            "modalItems"
         );
 
-        return;
 
+    if (!container) {
+        return;
     }
 
 
-    // --------------------------------------
-    // Already structured object
-    // --------------------------------------
+    if (!items) {
+
+        container.innerHTML =
+            `<div class="order-item-empty">
+                No item details available.
+             </div>`;
+
+        return;
+    }
+
+
+    // ---------------------------------------------------------
+    // Array
+    // ---------------------------------------------------------
+
+    if (Array.isArray(items)) {
+
+        if (!items.length) {
+
+            container.innerHTML =
+                `<div class="order-item-empty">
+                    No item details available.
+                 </div>`;
+
+            return;
+        }
+
+
+        container.innerHTML =
+            items
+                .map(
+                    item =>
+                        createModalItem(
+                            item,
+                            currency
+                        )
+                )
+                .join("");
+
+        return;
+    }
+
+
+    // ---------------------------------------------------------
+    // Object
+    // ---------------------------------------------------------
 
     if (
-        typeof rawItems ===
+        typeof items ===
         "object"
     ) {
 
-        renderStructuredModalItems(
-            [rawItems]
-        );
-
-        return;
-
-    }
-
-
-    const rawText =
-        String(
-            rawItems
-        ).trim();
-
-
-    if (!rawText) {
-
-        showModalEmptyItems();
-
-        return;
-
-    }
-
-
-    // --------------------------------------
-    // Try JSON string
-    // --------------------------------------
-
-    try {
-
-        const parsed =
-            JSON.parse(
-                rawText
-            );
-
-
         if (
-            Array.isArray(parsed)
+            Array.isArray(
+                items.items
+            )
         ) {
 
-            renderStructuredModalItems(
-                parsed
+            renderModalItems(
+                items.items,
+                currency
             );
 
             return;
-
         }
 
 
-        if (
-            parsed &&
-            typeof parsed ===
-            "object"
-        ) {
-
-            renderStructuredModalItems(
-                [parsed]
-            );
-
-            return;
-
-        }
-
-    } catch {
-        // Continue to plain-text fallback.
-    }
-
-
-    // --------------------------------------
-    // Plain text fallback
-    // --------------------------------------
-
-    const textItems =
-        rawText
-            .split(
-                /\r?\n|,\s*(?=[A-Za-z])/
-            )
-            .map(
-                item =>
-                    item.trim()
-            )
-            .filter(Boolean);
-
-
-    if (
-        !textItems.length
-    ) {
-
-        showModalEmptyItems();
+        container.innerHTML =
+            `<div class="order-item-empty">
+                ${escapeHtml(
+                stringifyItems(items)
+            )}
+             </div>`;
 
         return;
-
     }
 
 
-    textItems.forEach(
-        itemText => {
+    // ---------------------------------------------------------
+    // String
+    // ---------------------------------------------------------
 
-            const row =
-                document.createElement(
-                    "div"
-                );
-
-
-            row.className =
-                "modal-item-row";
-
-
-            row.innerHTML = `
-
-                <div class="modal-item-info">
-
-                    <div class="modal-item-name">
-                        ${escapeHtml(
-                            itemText
-                        )}
-                    </div>
-
-                </div>
-
-            `;
-
-
-            modalItems.appendChild(
-                row
-            );
-
-        }
-    );
-
+    container.innerHTML =
+        `<div class="order-item-text">
+            ${escapeHtml(
+            String(items)
+        )}
+         </div>`;
 }
 
 
-// ==========================================
-// STRUCTURED MODAL ITEMS
-// ==========================================
+// =========================================================
+// CREATE MODAL ITEM
+// =========================================================
 
-function renderStructuredModalItems(
-    items
+function createModalItem(
+    item,
+    currency
 ) {
 
     if (
-        !Array.isArray(items) ||
-        !items.length
+        item === null ||
+        item === undefined
     ) {
 
-        showModalEmptyItems();
-
-        return;
-
+        return "";
     }
 
 
-    items.forEach(
-        item => {
+    if (
+        typeof item !== "object"
+    ) {
 
-            const itemName =
-                String(
-                    item?.name ??
-                    item?.itemName ??
-                    item?.ItemName ??
-                    item?.title ??
-                    item?.Title ??
-                    "Item"
-                );
-
-
-            const quantity =
-                toNumber(
-                    item?.quantity ??
-                    item?.qty ??
-                    item?.Quantity ??
-                    1
-                ) || 1;
-
-
-            const price =
-                toNumber(
-                    item?.price ??
-                    item?.Price ??
-                    0
-                );
-
-
-            const suppliedTotal =
-                item?.total ??
-                item?.Total;
-
-
-            const itemTotal =
-                suppliedTotal !== undefined &&
-                suppliedTotal !== null &&
-                suppliedTotal !== ""
-                    ? toNumber(
-                        suppliedTotal
-                    )
-                    : price * quantity;
-
-
-            const row =
-                document.createElement(
-                    "div"
-                );
-
-
-            row.className =
-                "modal-item-row";
-
-
-            row.innerHTML = `
-
-                <div class="modal-item-info">
-
-                    <div class="modal-item-name">
-                        ${escapeHtml(
-                            itemName
-                        )}
-                    </div>
-
-                    <div class="modal-item-quantity">
-                        Qty: ${escapeHtml(
-                            quantity
-                        )}
-                    </div>
-
+        return `
+            <div class="order-item-row">
+                <div class="order-item-name">
+                    ${escapeHtml(
+            String(item)
+        )}
                 </div>
-
-
-                <div class="modal-item-price">
-                    ${formatCurrency(
-                        itemTotal
-                    )}
-                </div>
-
-            `;
-
-
-            modalItems.appendChild(
-                row
-            );
-
-        }
-    );
-
-}
-
-
-// ==========================================
-// MODAL EMPTY ITEMS
-// ==========================================
-
-function showModalEmptyItems() {
-
-    if (!modalItems) {
-
-        return;
-
+            </div>
+        `;
     }
 
 
-    modalItems.innerHTML = `
-
-        <div class="modal-empty-items">
-            No item details available.
-        </div>
-
-    `;
-
-}
-
-
-// ==========================================
-// CLOSE ORDER MODAL
-// ==========================================
-
-function closeOrderModalHandler() {
-
-    if (orderModal) {
-
-        orderModal.classList.remove(
-            "active"
+    const name =
+        firstValue(
+            item.name,
+            item.itemName,
+            item.ItemName,
+            item.title,
+            item.Title,
+            item.productName,
+            item.ProductName,
+            "Item"
         );
 
 
-        // Required because HTML contains
-        // inline style="display:none".
-        orderModal.style.display =
-            "none";
-
-    }
-
-
-    document.body.classList.remove(
-        "modal-open"
-    );
-
-}
-
-
-// ==========================================
-// MODAL EVENTS
-// ==========================================
-
-if (closeOrderModal) {
-
-    closeOrderModal.addEventListener(
-        "click",
-        closeOrderModalHandler
-    );
-
-}
-
-
-if (modalCloseButton) {
-
-    modalCloseButton.addEventListener(
-        "click",
-        closeOrderModalHandler
-    );
-
-}
-
-
-// ==========================================
-// CLOSE ON OVERLAY CLICK
-// ==========================================
-
-if (orderModal) {
-
-    orderModal.addEventListener(
-        "click",
-        event => {
-
-            if (
-                event.target ===
-                orderModal
-            ) {
-
-                closeOrderModalHandler();
-
-            }
-
-        }
-    );
-
-}
-
-
-// ==========================================
-// CLOSE WITH ESCAPE
-// ==========================================
-
-document.addEventListener(
-    "keydown",
-    event => {
-
-        if (
-            event.key ===
-            "Escape" &&
-            orderModal?.classList.contains(
-                "active"
+    const quantity =
+        toNumber(
+            firstValue(
+                item.quantity,
+                item.Quantity,
+                item.qty,
+                item.Qty,
+                1
             )
-        ) {
+        );
 
-            closeOrderModalHandler();
 
+    const price =
+        toNumber(
+            firstValue(
+                item.price,
+                item.Price,
+                item.unitPrice,
+                item.UnitPrice,
+                0
+            )
+        );
+
+
+    const total =
+        toNumber(
+            firstValue(
+                item.total,
+                item.Total,
+                item.amount,
+                item.Amount,
+                price * quantity
+            )
+        );
+
+
+    return `
+        <div class="order-item-row">
+
+            <div class="order-item-main">
+
+                <div class="order-item-name">
+                    ${escapeHtml(
+        String(name)
+    )}
+                </div>
+
+                <div class="order-item-quantity">
+                    Qty: ${quantity}
+                </div>
+
+            </div>
+
+
+            <div class="order-item-price">
+
+                ${price > 0
+            ? `
+                            <div class="order-item-unit-price">
+                                ${formatCurrency(
+                price,
+                currency
+            )}
+                            </div>
+                          `
+            : ""
         }
 
-    }
-);
+                <strong>
+                    ${formatCurrency(
+            total,
+            currency
+        )}
+                </strong>
+
+            </div>
+
+        </div>
+    `;
+}
 
 
-// ==========================================
-// LOADING STATE
-// ==========================================
+// =========================================================
+// BRANCH FILTER
+// =========================================================
 
-function showLoadingState() {
+function populateBranchFilter(
+    orders
+) {
 
-    if (!ordersTableBody) {
+    const branchFilter =
+        document.getElementById(
+            "branchFilter"
+        );
 
+
+    if (!branchFilter) {
         return;
+    }
 
+
+    const currentValue =
+        branchFilter.value || "all";
+
+
+    const branches =
+        [
+            ...new Set(
+                orders
+                    .map(
+                        order =>
+                            order.branchOutlet
+                    )
+                    .filter(Boolean)
+            )
+        ]
+            .sort(
+                (a, b) =>
+                    String(a).localeCompare(
+                        String(b)
+                    )
+            );
+
+
+    branchFilter.innerHTML = `
+        <option value="all">
+            All Branches
+        </option>
+    `;
+
+
+    branches.forEach(branch => {
+
+        const option =
+            document.createElement(
+                "option"
+            );
+
+
+        option.value =
+            branch;
+
+        option.textContent =
+            branch;
+
+
+        branchFilter.appendChild(
+            option
+        );
+    });
+
+
+    const stillExists =
+        [
+            ...branchFilter.options
+        ].some(
+            option =>
+                option.value ===
+                currentValue
+        );
+
+
+    branchFilter.value =
+        stillExists
+            ? currentValue
+            : "all";
+}
+
+
+// =========================================================
+// RESET FILTERS
+// =========================================================
+
+function resetFilters() {
+
+    currentFilters = {
+        search: "",
+        branch: "all",
+        status: "all",
+        date: "all"
+    };
+
+
+    currentPage = 1;
+
+
+    const searchInput =
+        document.getElementById(
+            "orderSearch"
+        );
+
+
+    const branchFilter =
+        document.getElementById(
+            "branchFilter"
+        );
+
+
+    const statusFilter =
+        document.getElementById(
+            "statusFilter"
+        );
+
+
+    const dateFilter =
+        document.getElementById(
+            "dateFilter"
+        );
+
+
+    if (searchInput) {
+        searchInput.value = "";
+    }
+
+
+    if (branchFilter) {
+        branchFilter.value = "all";
+    }
+
+
+    if (statusFilter) {
+        statusFilter.value = "all";
+    }
+
+
+    if (dateFilter) {
+        dateFilter.value = "all";
+    }
+
+
+    applyFiltersAndRender();
+}
+
+
+// =========================================================
+// PAGINATION
+// =========================================================
+
+function updatePagination(
+    from,
+    to,
+    total
+) {
+
+    setText(
+        "ordersFrom",
+        total > 0 ? from : 0
+    );
+
+
+    setText(
+        "ordersTo",
+        total > 0 ? to : 0
+    );
+
+
+    setText(
+        "ordersTotal",
+        total
+    );
+
+
+    const totalPages =
+        Math.max(
+            1,
+            Math.ceil(
+                total /
+                ORDERS_PAGE_SIZE
+            )
+        );
+
+
+    const previousButton =
+        document.getElementById(
+            "previousPage"
+        );
+
+
+    const nextButton =
+        document.getElementById(
+            "nextPage"
+        );
+
+
+    if (previousButton) {
+
+        previousButton.disabled =
+            currentPage <= 1;
+    }
+
+
+    if (nextButton) {
+
+        nextButton.disabled =
+            currentPage >= totalPages;
+    }
+
+
+    renderPaginationPages(
+        totalPages
+    );
+}
+
+
+// =========================================================
+// PAGINATION PAGE NUMBERS
+// =========================================================
+
+function renderPaginationPages(
+    totalPages
+) {
+
+    const container =
+        document.getElementById(
+            "paginationPages"
+        );
+
+
+    if (!container) {
+        return;
+    }
+
+
+    container.innerHTML = "";
+
+
+    const maxVisiblePages = 5;
+
+
+    let startPage =
+        Math.max(
+            1,
+            currentPage -
+            Math.floor(
+                maxVisiblePages / 2
+            )
+        );
+
+
+    let endPage =
+        Math.min(
+            totalPages,
+            startPage +
+            maxVisiblePages -
+            1
+        );
+
+
+    if (
+        endPage - startPage + 1 <
+        maxVisiblePages
+    ) {
+
+        startPage =
+            Math.max(
+                1,
+                endPage -
+                maxVisiblePages +
+                1
+            );
+    }
+
+
+    for (
+        let page = startPage;
+        page <= endPage;
+        page++
+    ) {
+
+        const button =
+            document.createElement(
+                "button"
+            );
+
+
+        button.type = "button";
+
+        button.textContent =
+            page;
+
+
+        button.className =
+            page === currentPage
+                ? "active"
+                : "";
+
+
+        button.addEventListener(
+            "click",
+            () => {
+
+                currentPage =
+                    page;
+
+                renderOrdersTable();
+            }
+        );
+
+
+        container.appendChild(
+            button
+        );
+    }
+}
+
+
+// =========================================================
+// EMPTY STATE
+// =========================================================
+
+function showOrdersEmpty() {
+
+    const emptyState =
+        document.getElementById(
+            "ordersEmpty"
+        );
+
+
+    if (!emptyState) {
+        return;
+    }
+
+
+    const hasFilters =
+        Boolean(
+            currentFilters.search ||
+            currentFilters.branch !== "all" ||
+            currentFilters.status !== "all" ||
+            currentFilters.date !== "all"
+        );
+
+
+    const title =
+        emptyState.querySelector(
+            ".orders-empty-title"
+        );
+
+
+    const text =
+        emptyState.querySelector(
+            ".orders-empty-text"
+        );
+
+
+    if (title) {
+
+        title.textContent =
+            hasFilters
+                ? "No orders found"
+                : "No orders yet";
+    }
+
+
+    if (text) {
+
+        text.textContent =
+            hasFilters
+                ? "No orders match the selected filters. Try adjusting your search or filters."
+                : "New customer orders will appear here as soon as they are received.";
+    }
+
+
+    emptyState.style.display =
+        "";
+}
+
+
+function hideOrdersEmpty() {
+
+    const emptyState =
+        document.getElementById(
+            "ordersEmpty"
+        );
+
+
+    if (emptyState) {
+
+        emptyState.style.display =
+            "none";
+    }
+}
+
+
+// =========================================================
+// LOADING STATE
+// =========================================================
+
+function showOrdersLoading() {
+
+    const tableBody =
+        document.getElementById(
+            "ordersTableBody"
+        );
+
+
+    if (!tableBody) {
+        return;
     }
 
 
     hideOrdersEmpty();
 
 
-    ordersTableBody.innerHTML = `
-
+    tableBody.innerHTML = `
         <tr>
 
             <td
@@ -3023,124 +2015,33 @@ function showLoadingState() {
             </td>
 
         </tr>
-
     `;
-
-
-    updateOrdersFooter(
-        0,
-        0,
-        0
-    );
-
-
-    updateOrderMetrics(
-        []
-    );
-
 }
 
 
-// ==========================================
-// EMPTY STATE
-// ==========================================
-
-function showOrdersEmpty() {
-
-    if (ordersEmpty) {
-
-        ordersEmpty.style.display =
-            "flex";
-
-
-        const title =
-            ordersEmpty.querySelector(
-                ".orders-empty-title"
-            );
-
-
-        const text =
-            ordersEmpty.querySelector(
-                ".orders-empty-text"
-            );
-
-
-        const hasOrders =
-            allOrders.length > 0;
-
-
-        if (title) {
-
-            title.textContent =
-                hasOrders
-                    ? "No orders match your filters"
-                    : "No orders yet";
-
-        }
-
-
-        if (text) {
-
-            text.textContent =
-                hasOrders
-                    ? "Try adjusting the search, branch, status or period filter."
-                    : "New customer orders will appear here as soon as they are received.";
-
-        }
-
-    }
-
-
-    if (ordersTableBody) {
-
-        ordersTableBody.innerHTML =
-            "";
-
-    }
-
-
-    updateOrdersFooter(
-        0,
-        0,
-        0
-    );
-
-}
-
-
-function hideOrdersEmpty() {
-
-    if (ordersEmpty) {
-
-        ordersEmpty.style.display =
-            "none";
-
-    }
-
-}
-
-
-// ==========================================
+// =========================================================
 // ERROR STATE
-// ==========================================
+// =========================================================
 
 function showOrdersError(
-    message =
-        "Unable to load orders. Please try again."
+    message
 ) {
+
+    const tableBody =
+        document.getElementById(
+            "ordersTableBody"
+        );
+
+
+    if (!tableBody) {
+        return;
+    }
+
 
     hideOrdersEmpty();
 
 
-    if (!ordersTableBody) {
-
-        return;
-
-    }
-
-
-    ordersTableBody.innerHTML = `
-
+    tableBody.innerHTML = `
         <tr>
 
             <td
@@ -3148,158 +2049,327 @@ function showOrdersError(
                 class="orders-loading"
             >
 
-                <div class="orders-error">
-
-                    <div class="orders-error-icon">
-                        !
-                    </div>
-
-                    <div class="orders-error-title">
-                        Unable to load orders
-                    </div>
-
-                    <div class="orders-error-message">
-                        ${escapeHtml(
-                            message
-                        )}
-                    </div>
-
-                    <button
-                        type="button"
-                        class="orders-retry-btn"
-                        id="ordersRetryButton"
-                    >
-                        Try Again
-                    </button>
-
+                <div class="orders-loading-icon">
+                    !
                 </div>
+
+                <span>
+                    ${escapeHtml(message)}
+                </span>
 
             </td>
 
         </tr>
-
     `;
+}
 
 
-    const retryButton =
+// =========================================================
+// OWNER CONTEXT
+// =========================================================
+
+function updateOwnerContext(
+    data
+) {
+
+    const client =
+        data?.client || {};
+
+
+    const storedSession =
+        getStoredSession();
+
+
+    const ownerName =
+        firstValue(
+            client.ownerName,
+            client.OwnerName,
+            data?.ownerName,
+            data?.OwnerName,
+            storedSession?.ownerName,
+            storedSession?.OwnerName,
+            storedSession?.userName,
+            storedSession?.name,
+            "Owner"
+        );
+
+
+    const ownerRole =
+        firstValue(
+            data?.role,
+            client.role,
+            client.Role,
+            storedSession?.role,
+            storedSession?.Role,
+            "Owner"
+        );
+
+
+    const avatar =
         document.getElementById(
-            "ordersRetryButton"
+            "topbarUserAvatar"
         );
 
 
-    if (retryButton) {
-
-        retryButton.addEventListener(
-            "click",
-            () => {
-
-                loadOrders();
-
-            }
+    const nameElement =
+        document.getElementById(
+            "topbarUserName"
         );
 
+
+    const roleElement =
+        document.getElementById(
+            "topbarUserRole"
+        );
+
+
+    if (nameElement) {
+
+        nameElement.textContent =
+            ownerName;
     }
 
 
-    updateOrdersFooter(
-        0,
-        0,
-        0
-    );
+    if (roleElement) {
 
+        roleElement.textContent =
+            ownerRole;
+    }
+
+
+    if (avatar) {
+
+        avatar.textContent =
+            String(
+                ownerName
+            )
+                .trim()
+                .charAt(0)
+                .toUpperCase() || "O";
+    }
 }
 
 
-// ==========================================
-// SESSION EXPIRED
-// ==========================================
+// =========================================================
+// DATE FILTER
+// =========================================================
 
-function handleSessionExpired() {
-
-    console.warn(
-        "Orders session expired."
-    );
-
-
-    localStorage.removeItem(
-        SESSION_TOKEN_KEY
-    );
-
-
-    localStorage.removeItem(
-        SESSION_DATA_KEY
-    );
-
-
-    localStorage.removeItem(
-        VALIDATED_SESSION_KEY
-    );
-
-
-    redirectToLogin();
-
-}
-
-
-// ==========================================
-// REDIRECT TO LOGIN
-// ==========================================
-
-function redirectToLogin() {
-
-    window.location.href =
-        "../login/login.html";
-
-}
-
-
-// ==========================================
-// CURRENCY FORMAT
-// ==========================================
-
-function formatCurrency(
-    amount
+function matchesDateFilter(
+    dateValue,
+    filter
 ) {
 
-    const numericAmount =
-        toNumber(
-            amount
+    if (
+        !filter ||
+        filter === "all"
+    ) {
+
+        return true;
+    }
+
+
+    if (!dateValue) {
+        return false;
+    }
+
+
+    const orderDate =
+        getDubaiDateKey(
+            dateValue
         );
 
 
-    return `${currentCurrency} ${numericAmount.toLocaleString(
-        "en-AE",
-        {
-            minimumFractionDigits:
-                2,
+    if (!orderDate) {
+        return false;
+    }
 
-            maximumFractionDigits:
-                2
-        }
-    )}`;
 
+    const today =
+        getDubaiDateKey(
+            new Date()
+        );
+
+
+    if (filter === "today") {
+
+        return (
+            orderDate ===
+            today
+        );
+    }
+
+
+    const todayDate =
+        parseDateKey(today);
+
+
+    const orderDateObject =
+        parseDateKey(orderDate);
+
+
+    if (
+        !todayDate ||
+        !orderDateObject
+    ) {
+
+        return false;
+    }
+
+
+    const difference =
+        Math.floor(
+            (
+                todayDate -
+                orderDateObject
+            ) /
+            (
+                24 *
+                60 *
+                60 *
+                1000
+            )
+        );
+
+
+    if (filter === "7") {
+
+        return (
+            difference >= 0 &&
+            difference < 7
+        );
+    }
+
+
+    if (filter === "14") {
+
+        return (
+            difference >= 0 &&
+            difference < 14
+        );
+    }
+
+
+    if (filter === "30") {
+
+        return (
+            difference >= 0 &&
+            difference < 30
+        );
+    }
+
+
+    return true;
 }
 
 
-// ==========================================
-// DATE FORMAT
-// ==========================================
+// =========================================================
+// DATE HELPERS
+// =========================================================
 
-function formatOrderDate(
+function getDubaiDateKey(
     value
 ) {
 
+    try {
+
+        const date =
+            value instanceof Date
+                ? value
+                : new Date(value);
+
+
+        if (
+            Number.isNaN(
+                date.getTime()
+            )
+        ) {
+
+            return "";
+        }
+
+
+        const parts =
+            new Intl.DateTimeFormat(
+                "en-CA",
+                {
+                    timeZone:
+                        DUBAI_TIME_ZONE,
+
+                    year: "numeric",
+
+                    month: "2-digit",
+
+                    day: "2-digit"
+                }
+            )
+                .formatToParts(date);
+
+
+        const result = {};
+
+
+        parts.forEach(part => {
+
+            if (
+                part.type !==
+                "literal"
+            ) {
+
+                result[part.type] =
+                    part.value;
+            }
+        });
+
+
+        return `${result.year}-${result.month}-${result.day}`;
+
+    } catch {
+
+        return "";
+    }
+}
+
+
+function parseDateKey(
+    dateKey
+) {
+
+    const match =
+        /^(\d{4})-(\d{2})-(\d{2})$/
+            .exec(dateKey);
+
+
+    if (!match) {
+        return null;
+    }
+
+
+    return new Date(
+        Date.UTC(
+            Number(match[1]),
+            Number(match[2]) - 1,
+            Number(match[3])
+        )
+    );
+}
+
+
+// =========================================================
+// FORMAT ORDER DATE
+// =========================================================
+
+function formatOrderDate(
+    value,
+    includeDate = false
+) {
+
     if (!value) {
-
         return "—";
-
     }
 
 
     const date =
-        new Date(
-            value
-        );
+        new Date(value);
 
 
     if (
@@ -3308,8 +2378,7 @@ function formatOrderDate(
         )
     ) {
 
-        return "—";
-
+        return String(value);
     }
 
 
@@ -3318,45 +2387,524 @@ function formatOrderDate(
         return new Intl.DateTimeFormat(
             "en-AE",
             {
-
                 timeZone:
-                    RESTAURANT_TIMEZONE,
+                    DUBAI_TIME_ZONE,
 
                 day:
-                    "2-digit",
+                    includeDate
+                        ? "2-digit"
+                        : undefined,
 
                 month:
-                    "short",
+                    includeDate
+                        ? "short"
+                        : undefined,
 
                 year:
-                    "numeric",
+                    includeDate
+                        ? "numeric"
+                        : undefined,
 
-                hour:
-                    "2-digit",
+                hour: "2-digit",
 
-                minute:
-                    "2-digit",
+                minute: "2-digit",
 
-                hour12:
-                    true
-
+                hour12: true
             }
-        ).format(
-            date
-        );
+        ).format(date);
 
     } catch {
 
         return date.toLocaleString();
-
     }
-
 }
 
 
-// ==========================================
-// HTML ESCAPE
-// ==========================================
+// =========================================================
+// CURRENCY
+// =========================================================
+
+function getRestaurantCurrency() {
+
+    const session =
+        getStoredSession();
+
+
+    return firstValue(
+        session?.restaurant?.currency,
+        session?.currency,
+        "AED"
+    );
+}
+
+
+function formatCurrency(
+    amount,
+    currency = "AED"
+) {
+
+    const numericAmount =
+        toNumber(amount);
+
+
+    try {
+
+        return new Intl.NumberFormat(
+            "en-AE",
+            {
+                style: "currency",
+                currency:
+                    String(
+                        currency ||
+                        "AED"
+                    )
+                        .toUpperCase(),
+
+                minimumFractionDigits: 2,
+
+                maximumFractionDigits: 2
+            }
+        ).format(
+            numericAmount
+        );
+
+    } catch {
+
+        return `${currency} ${numericAmount.toFixed(2)}`;
+    }
+}
+
+
+// =========================================================
+// STATUS HELPERS
+// =========================================================
+
+function normalizeStatus(
+    status
+) {
+
+    const value =
+        String(
+            status || "pending"
+        )
+            .trim()
+            .toLowerCase();
+
+
+    if (
+        value === "cancelled" ||
+        value === "canceled"
+    ) {
+
+        return "cancelled";
+    }
+
+
+    if (
+        value === "in preparation" ||
+        value === "in_preparation" ||
+        value === "in-preparation"
+    ) {
+
+        return "preparing";
+    }
+
+
+    return value;
+}
+
+
+function formatStatusLabel(
+    status
+) {
+
+    const normalized =
+        normalizeStatus(status);
+
+
+    const labels = {
+
+        pending:
+            "Pending",
+
+        preparing:
+            "Preparing",
+
+        ready:
+            "Ready",
+
+        completed:
+            "Completed",
+
+        rejected:
+            "Rejected",
+
+        cancelled:
+            "Cancelled",
+
+        cancelled_by_customer:
+            "Cancelled",
+
+        accepted:
+            "Accepted"
+    };
+
+
+    return (
+        labels[normalized] ||
+        normalized
+            .replace(
+                /[_-]/g,
+                " "
+            )
+            .replace(
+                /\b\w/g,
+                letter =>
+                    letter.toUpperCase()
+            )
+    );
+}
+
+
+function countStatus(
+    orders,
+    status
+) {
+
+    return orders.filter(
+        order =>
+            normalizeStatus(
+                order.status
+            ) === status
+    ).length;
+}
+
+
+// =========================================================
+// ORDERED ITEMS HELPERS
+// =========================================================
+
+function normalizeOrderedItems(
+    value
+) {
+
+    if (
+        value === null ||
+        value === undefined
+    ) {
+
+        return [];
+    }
+
+
+    if (Array.isArray(value)) {
+
+        return value;
+    }
+
+
+    if (
+        typeof value === "object"
+    ) {
+
+        if (
+            Array.isArray(
+                value.items
+            )
+        ) {
+
+            return value.items;
+        }
+
+
+        return value;
+    }
+
+
+    if (
+        typeof value === "string"
+    ) {
+
+        const trimmed =
+            value.trim();
+
+
+        if (!trimmed) {
+            return [];
+        }
+
+
+        try {
+
+            const parsed =
+                JSON.parse(trimmed);
+
+
+            if (
+                Array.isArray(parsed)
+            ) {
+
+                return parsed;
+            }
+
+
+            if (
+                parsed &&
+                Array.isArray(
+                    parsed.items
+                )
+            ) {
+
+                return parsed.items;
+            }
+
+
+            return parsed;
+
+        } catch {
+
+            return trimmed;
+        }
+    }
+
+
+    return value;
+}
+
+
+function stringifyItems(
+    items
+) {
+
+    if (
+        items === null ||
+        items === undefined
+    ) {
+
+        return "";
+    }
+
+
+    if (
+        typeof items === "string"
+    ) {
+
+        return items;
+    }
+
+
+    if (Array.isArray(items)) {
+
+        return items
+            .map(item => {
+
+                if (
+                    typeof item !==
+                    "object"
+                ) {
+
+                    return String(item);
+                }
+
+
+                return firstValue(
+                    item.name,
+                    item.itemName,
+                    item.ItemName,
+                    item.title,
+                    item.Title,
+                    JSON.stringify(item)
+                );
+            })
+            .join(" ");
+    }
+
+
+    try {
+
+        return JSON.stringify(
+            items
+        );
+
+    } catch {
+
+        return String(items);
+    }
+}
+
+
+// =========================================================
+// SESSION HELPERS
+// =========================================================
+
+function getStoredSession() {
+
+    try {
+
+        const raw =
+            localStorage.getItem(
+                SESSION_DATA_KEY
+            );
+
+
+        if (!raw) {
+            return null;
+        }
+
+
+        return JSON.parse(raw);
+
+    } catch {
+
+        return null;
+    }
+}
+
+
+function handleSessionExpired() {
+
+    console.warn(
+        "[Orders] Session expired."
+    );
+
+
+    clearSession();
+
+
+    redirectToLogin();
+}
+
+
+function redirectToLogin() {
+
+    window.location.href =
+        "../../login/login.html";
+}
+
+
+// =========================================================
+// GENERIC HELPERS
+// =========================================================
+
+function firstValue(
+    ...values
+) {
+
+    for (const value of values) {
+
+        if (
+            value !== undefined &&
+            value !== null &&
+            String(value).trim() !== ""
+        ) {
+
+            return value;
+        }
+    }
+
+
+    return "";
+}
+
+
+function toNumber(
+    value
+) {
+
+    if (
+        typeof value ===
+        "number"
+    ) {
+
+        return Number.isFinite(value)
+            ? value
+            : 0;
+    }
+
+
+    if (
+        value === null ||
+        value === undefined ||
+        value === ""
+    ) {
+
+        return 0;
+    }
+
+
+    const cleaned =
+        String(value)
+            .replace(
+                /[^\d.-]/g,
+                ""
+            );
+
+
+    const number =
+        Number(cleaned);
+
+
+    return Number.isFinite(number)
+        ? number
+        : 0;
+}
+
+
+function getTimestamp(
+    value
+) {
+
+    if (!value) {
+        return 0;
+    }
+
+
+    const timestamp =
+        new Date(value).getTime();
+
+
+    return Number.isFinite(timestamp)
+        ? timestamp
+        : 0;
+}
+
+
+function formatNumber(
+    value,
+    decimals = 0
+) {
+
+    return Number(
+        value || 0
+    ).toLocaleString(
+        "en-AE",
+        {
+            minimumFractionDigits:
+                decimals,
+
+            maximumFractionDigits:
+                decimals
+        }
+    );
+}
+
+
+function setText(
+    id,
+    value
+) {
+
+    const element =
+        document.getElementById(id);
+
+
+    if (element) {
+
+        element.textContent =
+            value ?? "";
+    }
+}
+
 
 function escapeHtml(
     value
@@ -3385,6 +2933,4 @@ function escapeHtml(
             /'/g,
             "&#039;"
         );
-
 }
-
