@@ -361,8 +361,14 @@ async function loadOrders() {
             await response.json();
 
 
+        // =====================================================
+        // N8N RESPONSE NORMALIZATION
+        // =====================================================
+
         const ordersData =
-            result?.data || result;
+            Array.isArray(result)
+                ? result[0]
+                : result?.data || result;
 
 
         if (
@@ -752,9 +758,7 @@ function applyFiltersAndRender() {
         });
 
 
-    updateOrderMetrics(
-        filteredOrders
-    );
+    updateOrderMetrics();
 
 
     currentPage = Math.min(
