@@ -1,30 +1,33 @@
-/* ==========================================
-QR RESTAURANT SAAS
-PREMIUM OWNER ORDERS
-========================================== */
+// ==========================================
+// QR RESTAURANT SAAS
+// PREMIUM OWNER ORDERS
+// Dashboard / Reports Visual Language
+// ==========================================
 
-/* ==========================================
-CONFIGURATION
-========================================== */
+
+// ==========================================
+// CONFIGURATION
+// ==========================================
 
 const N8N_ORDERS_WEBHOOK =
-`${N8N_BASE_URL}/owner-orders`;
+    `${N8N_BASE_URL}/owner-orders`;
 
 const SESSION_TOKEN_KEY =
-"qro_session_token";
+    "qro_session_token";
 
 const SESSION_DATA_KEY =
-"qro_session_data";
+    "qro_session_data";
 
-const ORDERS_TIME_ZONE =
-"Asia/Dubai";
+const VALIDATED_SESSION_KEY =
+    "qro_validated_session";
 
-const ORDERS_PER_PAGE =
-10;
+const RESTAURANT_TIMEZONE =
+    "Asia/Dubai";
 
-/* ==========================================
-STATE
-========================================== */
+
+// ==========================================
+// STATE
+// ==========================================
 
 let allOrders = [];
 
@@ -32,303 +35,1037 @@ let filteredOrders = [];
 
 let currentPage = 1;
 
-let isLoadingOrders = false;
+const ordersPerPage = 10;
 
-/* ==========================================
-ELEMENTS
-========================================== */
+let currentCurrency = "AED";
 
-/* KPI */
+
+// ==========================================
+// ELEMENTS
+// ==========================================
+
+// KPI cards
 
 const totalOrdersEl =
-document.getElementById("totalOrders");
+    document.getElementById("totalOrders");
 
 const pendingOrdersEl =
-document.getElementById("pendingOrders");
+    document.getElementById("pendingOrders");
 
 const preparingOrdersEl =
-document.getElementById("preparingOrders");
+    document.getElementById("preparingOrders");
 
 const readyOrdersEl =
-document.getElementById("readyOrders");
+    document.getElementById("readyOrders");
 
 const completedOrdersEl =
-document.getElementById("completedOrders");
+    document.getElementById("completedOrders");
 
-const totalOrdersFooter =
-document.getElementById("totalOrdersFooter");
 
-/* Filters */
+// Business snapshot
+
+const ordersFilteredRevenueEl =
+    document.getElementById("ordersFilteredRevenue");
+
+const ordersAverageValueEl =
+    document.getElementById("ordersAverageValue");
+
+const ordersActiveCountEl =
+    document.getElementById("ordersActiveCount");
+
+const ordersCompletionRateEl =
+    document.getElementById("ordersCompletionRate");
+
+
+// Filters
 
 const orderSearch =
-document.getElementById("orderSearch");
+    document.getElementById("orderSearch");
 
 const branchFilter =
-document.getElementById("branchFilter");
+    document.getElementById("branchFilter");
 
 const statusFilter =
-document.getElementById("statusFilter");
+    document.getElementById("statusFilter");
 
 const dateFilter =
-document.getElementById("dateFilter");
+    document.getElementById("dateFilter");
 
 const resetFilters =
-document.getElementById("resetFilters");
+    document.getElementById("resetFilters");
 
-const refreshOrdersButton =
-document.getElementById("refreshOrdersButton");
 
-/* Table */
+// Table
 
 const ordersTableBody =
-document.getElementById("ordersTableBody");
+    document.getElementById("ordersTableBody");
 
 const ordersEmpty =
-document.getElementById("ordersEmpty");
+    document.getElementById("ordersEmpty");
 
-const ordersMonitoringText =
-document.getElementById(
-"ordersMonitoringText"
-);
 
-/* Footer */
+// Footer
 
 const ordersFrom =
-document.getElementById("ordersFrom");
+    document.getElementById("ordersFrom");
 
 const ordersTo =
-document.getElementById("ordersTo");
+    document.getElementById("ordersTo");
 
 const ordersTotal =
-document.getElementById("ordersTotal");
+    document.getElementById("ordersTotal");
 
-/* Pagination */
+
+// Pagination
 
 const previousPage =
-document.getElementById("previousPage");
+    document.getElementById("previousPage");
 
 const paginationPages =
-document.getElementById("paginationPages");
+    document.getElementById("paginationPages");
 
 const nextPage =
-document.getElementById("nextPage");
+    document.getElementById("nextPage");
 
-/* Modal */
+
+// Modal
 
 const orderModal =
-document.getElementById("orderModal");
+    document.getElementById("orderModal");
 
 const modalOrderId =
-document.getElementById("modalOrderId");
+    document.getElementById("modalOrderId");
 
 const modalOrderStatus =
-document.getElementById("modalOrderStatus");
+    document.getElementById("modalOrderStatus");
 
 const modalCustomer =
-document.getElementById("modalCustomer");
+    document.getElementById("modalCustomer");
 
 const modalMobile =
-document.getElementById("modalMobile");
+    document.getElementById("modalMobile");
 
 const modalBranch =
-document.getElementById("modalBranch");
+    document.getElementById("modalBranch");
 
 const modalTable =
-document.getElementById("modalTable");
+    document.getElementById("modalTable");
 
 const modalOrderTime =
-document.getElementById("modalOrderTime");
+    document.getElementById("modalOrderTime");
 
 const modalItems =
-document.getElementById("modalItems");
+    document.getElementById("modalItems");
 
 const modalRequestSection =
-document.getElementById("modalRequestSection");
+    document.getElementById("modalRequestSection");
 
 const modalRequest =
-document.getElementById("modalRequest");
+    document.getElementById("modalRequest");
 
 const modalSubtotal =
-document.getElementById("modalSubtotal");
+    document.getElementById("modalSubtotal");
 
 const modalTax =
-document.getElementById("modalTax");
+    document.getElementById("modalTax");
 
 const modalTotal =
-document.getElementById("modalTotal");
+    document.getElementById("modalTotal");
 
 const closeOrderModal =
-document.getElementById("closeOrderModal");
+    document.getElementById("closeOrderModal");
 
 const modalCloseButton =
-document.getElementById("modalCloseButton");
+    document.getElementById("modalCloseButton");
 
-const mobileMenuButton =
-document.getElementById("mobileMenuButton");
 
-const sidebar =
-document.querySelector(".sidebar");
-
-/* ==========================================
-INITIALIZE
-========================================== */
+// ==========================================
+// INITIALIZE
+// ==========================================
 
 document.addEventListener(
-"DOMContentLoaded",
-initializeOrdersPage
+    "DOMContentLoaded",
+    initializeOrdersPage
 );
 
-/* ==========================================
-INITIALIZE ORDERS PAGE
-========================================== */
+
+// ==========================================
+// TOPBAR OWNER
+// ==========================================
+
+function updateOrdersTopbarOwner(
+    ownerNameFromResponse = null
+) {
+
+    let sessionData = null;
+
+    try {
+
+        const storedSession =
+            localStorage.getItem(
+                SESSION_DATA_KEY
+            );
+
+        if (storedSession) {
+
+            sessionData =
+                JSON.parse(
+                    storedSession
+                );
+
+        }
+
+    } catch (error) {
+
+        console.warn(
+            "Unable to read session data:",
+            error
+        );
+
+    }
+
+
+    const ownerName =
+        String(
+            ownerNameFromResponse ||
+            sessionData?.ownerName ||
+            sessionData?.OwnerName ||
+            sessionData?.name ||
+            sessionData?.Name ||
+            "Owner"
+        ).trim() || "Owner";
+
+
+    const ownerRole =
+        String(
+            sessionData?.role ||
+            sessionData?.Role ||
+            "Owner"
+        ).trim() || "Owner";
+
+
+    const topbarUserName =
+        document.getElementById(
+            "topbarUserName"
+        );
+
+    if (topbarUserName) {
+
+        topbarUserName.textContent =
+            ownerName;
+
+    }
+
+
+    const topbarUserRole =
+        document.getElementById(
+            "topbarUserRole"
+        );
+
+    if (topbarUserRole) {
+
+        topbarUserRole.textContent =
+            ownerRole;
+
+    }
+
+
+    const topbarUserAvatar =
+        document.getElementById(
+            "topbarUserAvatar"
+        );
+
+    if (topbarUserAvatar) {
+
+        topbarUserAvatar.textContent =
+            ownerName
+                .charAt(0)
+                .toUpperCase();
+
+    }
+
+}
+
+
+// ==========================================
+// INITIALIZE PAGE
+// ==========================================
 
 async function initializeOrdersPage() {
 
+    try {
 
-try {
+        // ----------------------------------
+        // Authentication
+        // ----------------------------------
 
-    /* ----------------------------------
-       Mobile navigation
-    ---------------------------------- */
+        if (
+            typeof requireAuthentication ===
+            "function"
+        ) {
 
-    initializeMobileNavigation();
+            const authenticated =
+                await requireAuthentication();
+
+            if (authenticated === false) {
+
+                return;
+
+            }
+
+        }
 
 
-    /* ----------------------------------
-       Authentication
-    ---------------------------------- */
+        // ----------------------------------
+        // Load Orders
+        // ----------------------------------
+
+        await loadOrders();
+
+    } catch (error) {
+
+        console.error(
+            "Orders initialization failed:",
+            error
+        );
+
+        showOrdersError(
+            error?.message ||
+            "Unable to initialize the Orders page."
+        );
+
+    }
+
+}
+
+
+// ==========================================
+// LOAD ORDERS
+// ==========================================
+
+async function loadOrders() {
+
+    showLoadingState();
+
+    try {
+
+        const sessionToken =
+            localStorage.getItem(
+                SESSION_TOKEN_KEY
+            );
+
+
+        if (!sessionToken) {
+
+            redirectToLogin();
+
+            return;
+
+        }
+
+
+        const response =
+            await fetch(
+                N8N_ORDERS_WEBHOOK,
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body: JSON.stringify({
+
+                        // ----------------------------------
+                        // IMPORTANT:
+                        // Authorization remains session-based.
+                        // Do NOT send restaurantId from Clients.
+                        // ----------------------------------
+
+                        sessionToken
+
+                    })
+
+                }
+            );
+
+
+        // ----------------------------------
+        // HTTP SESSION FAILURE
+        // ----------------------------------
+
+        if (
+            response.status === 401 ||
+            response.status === 403
+        ) {
+
+            handleSessionExpired();
+
+            return;
+
+        }
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                `Orders API returned ${response.status}`
+            );
+
+        }
+
+
+        let rawData =
+            await response.json();
+
+
+        console.log(
+            "Orders API Response:",
+            rawData
+        );
+
+
+        // ----------------------------------
+        // Support n8n array/object response
+        // ----------------------------------
+
+        const data =
+            Array.isArray(rawData)
+                ? rawData[0]
+                : rawData;
+
+
+        if (
+            !data ||
+            data.success !== true
+        ) {
+
+            if (
+                data?.code ===
+                "INVALID_SESSION"
+            ) {
+
+                handleSessionExpired();
+
+                return;
+
+            }
+
+
+            throw new Error(
+                data?.message ||
+                "Unable to load orders."
+            );
+
+        }
+
+
+        // ==================================
+        // CURRENCY
+        // ==================================
+
+        currentCurrency =
+            String(
+                data.currency ||
+                data.settings?.currency ||
+                data.restaurant?.currency ||
+                data.restaurantSettings?.currency ||
+                "AED"
+            )
+                .trim()
+                .toUpperCase() ||
+            "AED";
+
+
+        // ==================================
+        // OWNER NAME
+        // Display only
+        // ==================================
+
+        updateOrdersTopbarOwner(
+
+            data.ownerName ||
+
+            data.OwnerName ||
+
+            data.client?.ownerName ||
+
+            data.client?.OwnerName ||
+
+            null
+
+        );
+
+
+        // ==================================
+        // ORDERS
+        // ==================================
+
+        allOrders =
+            Array.isArray(data.orders)
+                ? data.orders
+                    .map(normalizeOrder)
+                    .filter(order =>
+                        Boolean(
+                            order.orderId ||
+                            order.orderDate ||
+                            order.customerName
+                        )
+                    )
+                : [];
+
+
+        // ==================================
+        // NEWEST FIRST
+        // ==================================
+
+        allOrders.sort(
+            (a, b) => {
+
+                const dateA =
+                    new Date(
+                        a.orderDate
+                    ).getTime() || 0;
+
+                const dateB =
+                    new Date(
+                        b.orderDate
+                    ).getTime() || 0;
+
+                return dateB - dateA;
+
+            }
+        );
+
+
+        console.log(
+            "Normalized Orders:",
+            allOrders
+        );
+
+
+        console.log(
+            "Orders Count:",
+            allOrders.length
+        );
+
+
+        // ==================================
+        // BRANCH FILTER
+        // ==================================
+
+        populateBranchFilter();
+
+
+        // ==================================
+        // APPLY CURRENT FILTERS
+        // ==================================
+
+        applyFilters();
+
+
+    } catch (error) {
+
+        console.error(
+            "Failed to load orders:",
+            error
+        );
+
+        showOrdersError(
+            error?.message ||
+            "Unable to load orders. Please try again."
+        );
+
+    }
+
+}
+
+
+// ==========================================
+// NORMALIZE ORDER
+// ==========================================
+
+function normalizeOrder(order) {
+
+    const source =
+        order || {};
+
+
+    // --------------------------------------
+    // Preserve structured orderedItems
+    // --------------------------------------
+
+    let orderedItems =
+        source.orderedItems ??
+        source.OrderedItems ??
+        "";
+
 
     if (
-        typeof requireAuthentication ===
-        "function"
+        orderedItems === null ||
+        orderedItems === undefined
     ) {
 
-        const authenticated =
-            await requireAuthentication();
-
-        if (
-            authenticated === false
-        ) {
-
-            return;
-
-        }
+        orderedItems = "";
 
     }
 
 
-    /* ----------------------------------
-       Filter events
-    ---------------------------------- */
+    return {
 
-    initializeFilterEvents();
+        orderId:
+            String(
+                source.orderId ??
+                source.OrderId ??
+                source.id ??
+                source.ID ??
+                ""
+            ).trim(),
 
 
-    /* ----------------------------------
-       Load orders
-    ---------------------------------- */
+        restaurantId:
+            String(
+                source.restaurantId ??
+                source.RestaurantId ??
+                ""
+            ).trim(),
 
-    await loadOrders();
+
+        branchOutlet:
+            String(
+                source.branchOutlet ??
+                source.BranchOutlet ??
+                source.branch ??
+                source.Branch ??
+                ""
+            ).trim(),
+
+
+        customerName:
+            String(
+                source.customerName ??
+                source.CustomerName ??
+                source.customer ??
+                source.Customer ??
+                ""
+            ).trim(),
+
+
+        mobileNumber:
+            String(
+                source.mobileNumber ??
+                source.MobileNumber ??
+                source.mobile ??
+                source.Mobile ??
+                ""
+            ).trim(),
+
+
+        whatsappNumber:
+            String(
+                source.whatsappNumber ??
+                source.WhatsappNumber ??
+                source.WhatsAppNumber ??
+                ""
+            ).trim(),
+
+
+        orderedItems:
+            orderedItems,
+
+
+        customizedRequest:
+            String(
+                source.customizedRequest ??
+                source.CustomizedRequest ??
+                source.specialRequest ??
+                source.SpecialRequest ??
+                ""
+            ).trim(),
+
+
+        tableNumber:
+            String(
+                source.tableNumber ??
+                source.TableNumber ??
+                source.table ??
+                source.Table ??
+                ""
+            ).trim(),
+
+
+        deliveryAddress:
+            String(
+                source.deliveryAddress ??
+                source.DeliveryAddress ??
+                ""
+            ).trim(),
+
+
+        subTotal:
+            toNumber(
+                source.subTotal ??
+                source.SubTotal ??
+                source.subtotal ??
+                source.Subtotal
+            ),
+
+
+        taxTotal:
+            toNumber(
+                source.taxTotal ??
+                source.TaxTotal ??
+                source.tax ??
+                source.Tax
+            ),
+
+
+        total:
+            toNumber(
+                source.total ??
+                source.Total ??
+                source.orderTotal ??
+                source.OrderTotal
+            ),
+
+
+        taxDetails:
+            String(
+                source.taxDetails ??
+                source.TaxDetails ??
+                ""
+            ).trim(),
+
+
+        status:
+            String(
+                source.status ??
+                source.Status ??
+                ""
+            )
+                .trim()
+                .toLowerCase(),
+
+
+        orderDate:
+            source.orderDate ??
+            source.OrderDate ??
+            source.createdAt ??
+            source.CreatedAt ??
+            ""
+
+    };
 
 }
 
-catch (error) {
 
-    console.error(
-        "Orders initialization failed:",
-        error
-    );
+// ==========================================
+// NUMBER NORMALIZATION
+// ==========================================
 
-    showOrdersError();
+function toNumber(value) {
+
+    if (
+        value === null ||
+        value === undefined ||
+        value === ""
+    ) {
+
+        return 0;
+
+    }
+
+
+    if (
+        typeof value === "number"
+    ) {
+
+        return Number.isFinite(value)
+            ? value
+            : 0;
+
+    }
+
+
+    const cleaned =
+        String(value)
+            .replace(
+                /[^0-9.-]/g,
+                ""
+            );
+
+
+    const number =
+        Number(cleaned);
+
+
+    return Number.isFinite(number)
+        ? number
+        : 0;
 
 }
 
 
-}
+// ==========================================
+// KPI METRICS
+// ==========================================
 
-/* ==========================================
-MOBILE NAVIGATION
-========================================== */
-
-function initializeMobileNavigation() {
-
-
-if (
-    !mobileMenuButton ||
-    !sidebar
+function updateOrderMetrics(
+    orders = filteredOrders
 ) {
 
-    return;
+    const source =
+        Array.isArray(orders)
+            ? orders
+            : [];
+
+
+    const total =
+        source.length;
+
+
+    const pending =
+        source.filter(
+            order =>
+                order.status === "pending"
+        ).length;
+
+
+    const preparing =
+        source.filter(
+            order =>
+                order.status === "preparing"
+        ).length;
+
+
+    const ready =
+        source.filter(
+            order =>
+                order.status === "ready"
+        ).length;
+
+
+    const completed =
+        source.filter(
+            order =>
+                order.status === "completed"
+        ).length;
+
+
+    const active =
+        pending +
+        preparing +
+        ready;
+
+
+    const revenue =
+        source.reduce(
+            (sum, order) =>
+                sum +
+                toNumber(order.total),
+            0
+        );
+
+
+    const averageOrderValue =
+        total > 0
+            ? revenue / total
+            : 0;
+
+
+    const completionRate =
+        total > 0
+            ? (
+                completed /
+                total
+            ) * 100
+            : 0;
+
+
+    if (totalOrdersEl) {
+
+        totalOrdersEl.textContent =
+            total;
+
+    }
+
+
+    if (pendingOrdersEl) {
+
+        pendingOrdersEl.textContent =
+            pending;
+
+    }
+
+
+    if (preparingOrdersEl) {
+
+        preparingOrdersEl.textContent =
+            preparing;
+
+    }
+
+
+    if (readyOrdersEl) {
+
+        readyOrdersEl.textContent =
+            ready;
+
+    }
+
+
+    if (completedOrdersEl) {
+
+        completedOrdersEl.textContent =
+            completed;
+
+    }
+
+
+    if (ordersFilteredRevenueEl) {
+
+        ordersFilteredRevenueEl.textContent =
+            formatCurrency(
+                revenue
+            );
+
+    }
+
+
+    if (ordersAverageValueEl) {
+
+        ordersAverageValueEl.textContent =
+            formatCurrency(
+                averageOrderValue
+            );
+
+    }
+
+
+    if (ordersActiveCountEl) {
+
+        ordersActiveCountEl.textContent =
+            active;
+
+    }
+
+
+    if (ordersCompletionRateEl) {
+
+        ordersCompletionRateEl.textContent =
+            `${completionRate.toFixed(1)}%`;
+
+    }
 
 }
 
 
-mobileMenuButton.addEventListener(
-    "click",
-    () => {
+// ==========================================
+// BRANCH FILTER
+// ==========================================
 
-        sidebar.classList.toggle(
-            "open"
-        );
+function populateBranchFilter() {
 
-    }
-);
+    if (!branchFilter) {
 
-
-document.addEventListener(
-    "click",
-    event => {
-
-        if (
-            window.innerWidth > 760
-        ) {
-
-            return;
-
-        }
-
-
-        if (
-            !sidebar.classList.contains(
-                "open"
-            )
-        ) {
-
-            return;
-
-        }
-
-
-        if (
-            sidebar.contains(
-                event.target
-            ) ||
-            mobileMenuButton.contains(
-                event.target
-            )
-        ) {
-
-            return;
-
-        }
-
-
-        sidebar.classList.remove(
-            "open"
-        );
+        return;
 
     }
-);
 
+
+    const currentValue =
+        branchFilter.value;
+
+
+    const branches =
+        [
+            ...new Set(
+                allOrders
+                    .map(
+                        order =>
+                            order.branchOutlet
+                    )
+                    .filter(Boolean)
+            )
+        ]
+            .sort(
+                (a, b) =>
+                    a.localeCompare(b)
+            );
+
+
+    branchFilter.innerHTML = "";
+
+
+    const allOption =
+        document.createElement(
+            "option"
+        );
+
+
+    allOption.value =
+        "all";
+
+
+    allOption.textContent =
+        "All Branches";
+
+
+    branchFilter.appendChild(
+        allOption
+    );
+
+
+    branches.forEach(
+        branch => {
+
+            const option =
+                document.createElement(
+                    "option"
+                );
+
+
+            option.value =
+                branch;
+
+
+            option.textContent =
+                branch;
+
+
+            branchFilter.appendChild(
+                option
+            );
+
+        }
+    );
+
+
+    if (
+        currentValue &&
+        currentValue !== "all" &&
+        branches.includes(
+            currentValue
+        )
+    ) {
+
+        branchFilter.value =
+            currentValue;
+
+    } else {
+
+        branchFilter.value =
+            "all";
+
+    }
 
 }
 
-/* ==========================================
-FILTER EVENTS
-========================================== */
 
-function initializeFilterEvents() {
-
+// ==========================================
+// FILTER EVENTS
+// ==========================================
 
 if (orderSearch) {
 
@@ -380,27 +1117,1137 @@ if (resetFilters) {
 }
 
 
-if (refreshOrdersButton) {
+function handleFilterChange() {
 
-    refreshOrdersButton.addEventListener(
-        "click",
-        async () => {
+    currentPage = 1;
+
+    applyFilters();
+
+}
+
+
+// ==========================================
+// APPLY FILTERS
+// ==========================================
+
+function applyFilters() {
+
+    const search =
+        String(
+            orderSearch?.value ||
+            ""
+        )
+            .trim()
+            .toLowerCase();
+
+
+    const branch =
+        String(
+            branchFilter?.value ||
+            "all"
+        ).trim();
+
+
+    const status =
+        String(
+            statusFilter?.value ||
+            "all"
+        )
+            .trim()
+            .toLowerCase();
+
+
+    const dateRange =
+        String(
+            dateFilter?.value ||
+            "today"
+        )
+            .trim()
+            .toLowerCase();
+
+
+    filteredOrders =
+        allOrders.filter(
+            order => {
+
+                // ----------------------------------
+                // SEARCH
+                // ----------------------------------
+
+                if (search) {
+
+                    const searchableText =
+                        [
+
+                            order.orderId,
+
+                            order.customerName,
+
+                            order.mobileNumber,
+
+                            order.whatsappNumber,
+
+                            order.branchOutlet,
+
+                            order.tableNumber,
+
+                            getOrderedItemsSearchText(
+                                order.orderedItems
+                            ),
+
+                            order.customizedRequest
+
+                        ]
+                            .join(" ")
+                            .toLowerCase();
+
+
+                    if (
+                        !searchableText.includes(
+                            search
+                        )
+                    ) {
+
+                        return false;
+
+                    }
+
+                }
+
+
+                // ----------------------------------
+                // BRANCH
+                // ----------------------------------
+
+                if (
+                    branch &&
+                    branch !== "all" &&
+                    order.branchOutlet !==
+                    branch
+                ) {
+
+                    return false;
+
+                }
+
+
+                // ----------------------------------
+                // STATUS
+                // ----------------------------------
+
+                if (
+                    status &&
+                    status !== "all" &&
+                    order.status !==
+                    status
+                ) {
+
+                    return false;
+
+                }
+
+
+                // ----------------------------------
+                // DATE
+                // ----------------------------------
+
+                if (
+                    !matchesDateFilter(
+                        order,
+                        dateRange
+                    )
+                ) {
+
+                    return false;
+
+                }
+
+
+                return true;
+
+            }
+        );
+
+
+    // --------------------------------------
+    // BUSINESS METRICS
+    // --------------------------------------
+
+    updateOrderMetrics(
+        filteredOrders
+    );
+
+
+    // --------------------------------------
+    // RENDER
+    // --------------------------------------
+
+    renderOrders();
+
+}
+
+
+// ==========================================
+// ORDER ITEM SEARCH TEXT
+// ==========================================
+
+function getOrderedItemsSearchText(
+    items
+) {
+
+    if (
+        items === null ||
+        items === undefined
+    ) {
+
+        return "";
+
+    }
+
+
+    if (
+        Array.isArray(items)
+    ) {
+
+        return items
+            .map(
+                item =>
+                    [
+
+                        item?.name,
+
+                        item?.itemName,
+
+                        item?.ItemName,
+
+                        item?.title,
+
+                        item?.Title
+
+                    ]
+                        .filter(Boolean)
+                        .join(" ")
+            )
+            .join(" ");
+
+    }
+
+
+    if (
+        typeof items === "object"
+    ) {
+
+        return JSON.stringify(
+            items
+        );
+
+    }
+
+
+    return String(items);
+
+}
+
+
+// ==========================================
+// DATE FILTER
+// ==========================================
+
+function matchesDateFilter(
+    order,
+    filter
+) {
+
+    if (
+        !filter ||
+        filter === "all"
+    ) {
+
+        return true;
+
+    }
+
+
+    const orderDate =
+        new Date(
+            order.orderDate
+        );
+
+
+    if (
+        Number.isNaN(
+            orderDate.getTime()
+        )
+    ) {
+
+        return false;
+
+    }
+
+
+    const todayKey =
+        getDubaiDateKey(
+            new Date()
+        );
+
+
+    const orderKey =
+        getDubaiDateKey(
+            orderDate
+        );
+
+
+    // --------------------------------------
+    // TODAY
+    // --------------------------------------
+
+    if (
+        filter === "today"
+    ) {
+
+        return (
+            orderKey ===
+            todayKey
+        );
+
+    }
+
+
+    // --------------------------------------
+    // ROLLING RANGES
+    // --------------------------------------
+
+    const days =
+        filter === "7"
+            ? 7
+            : filter === "14"
+                ? 14
+                : filter === "30"
+                    ? 30
+                    : null;
+
+
+    if (!days) {
+
+        return true;
+
+    }
+
+
+    const startKey =
+        shiftDubaiDateKey(
+            todayKey,
+            -(days - 1)
+        );
+
+
+    return (
+        orderKey >= startKey &&
+        orderKey <= todayKey
+    );
+
+}
+
+
+// ==========================================
+// DUBAI DATE KEY
+// ==========================================
+
+function getDubaiDateKey(
+    date
+) {
+
+    try {
+
+        const parts =
+            new Intl.DateTimeFormat(
+                "en-CA",
+                {
+                    timeZone:
+                        RESTAURANT_TIMEZONE,
+
+                    year:
+                        "numeric",
+
+                    month:
+                        "2-digit",
+
+                    day:
+                        "2-digit"
+                }
+            )
+                .formatToParts(
+                    date
+                );
+
+
+        const values = {};
+
+
+        parts.forEach(
+            part => {
+
+                if (
+                    part.type !==
+                    "literal"
+                ) {
+
+                    values[
+                        part.type
+                    ] =
+                        part.value;
+
+                }
+
+            }
+        );
+
+
+        return (
+            `${values.year}-${values.month}-${values.day}`
+        );
+
+    } catch (error) {
+
+        console.warn(
+            "Unable to create Dubai date key:",
+            error
+        );
+
+        return "";
+
+    }
+
+}
+
+
+// ==========================================
+// SHIFT DUBAI DATE KEY
+// ==========================================
+
+function shiftDubaiDateKey(
+    dateKey,
+    offsetDays
+) {
+
+    const [
+        year,
+        month,
+        day
+    ] =
+        String(
+            dateKey
+        )
+            .split("-")
+            .map(Number);
+
+
+    const date =
+        new Date(
+            Date.UTC(
+                year,
+                month - 1,
+                day
+            )
+        );
+
+
+    date.setUTCDate(
+        date.getUTCDate() +
+        offsetDays
+    );
+
+
+    return [
+
+        date.getUTCFullYear(),
+
+        String(
+            date.getUTCMonth() + 1
+        ).padStart(
+            2,
+            "0"
+        ),
+
+        String(
+            date.getUTCDate()
+        ).padStart(
+            2,
+            "0"
+        )
+
+    ].join("-");
+
+}
+
+
+// ==========================================
+// RESET FILTERS
+// ==========================================
+
+function resetAllFilters() {
+
+    if (orderSearch) {
+
+        orderSearch.value =
+            "";
+
+    }
+
+
+    if (branchFilter) {
+
+        branchFilter.value =
+            "all";
+
+    }
+
+
+    if (statusFilter) {
+
+        statusFilter.value =
+            "all";
+
+    }
+
+
+    if (dateFilter) {
+
+        // Match HTML default.
+        dateFilter.value =
+            "today";
+
+    }
+
+
+    currentPage = 1;
+
+    applyFilters();
+
+}
+
+
+// ==========================================
+// RENDER ORDERS
+// ==========================================
+
+function renderOrders() {
+
+    if (!ordersTableBody) {
+
+        return;
+
+    }
+
+
+    ordersTableBody.innerHTML =
+        "";
+
+
+    // --------------------------------------
+    // EMPTY STATE
+    // --------------------------------------
+
+    if (
+        !filteredOrders.length
+    ) {
+
+        showOrdersEmpty();
+
+        updatePagination(
+            0
+        );
+
+        updateOrdersFooter(
+            0,
+            0,
+            0
+        );
+
+        return;
+
+    }
+
+
+    hideOrdersEmpty();
+
+
+    // --------------------------------------
+    // PAGINATION
+    // --------------------------------------
+
+    const totalPages =
+        Math.max(
+            1,
+            Math.ceil(
+                filteredOrders.length /
+                ordersPerPage
+            )
+        );
+
+
+    if (
+        currentPage >
+        totalPages
+    ) {
+
+        currentPage =
+            totalPages;
+
+    }
+
+
+    const startIndex =
+        (
+            currentPage -
+            1
+        ) *
+        ordersPerPage;
+
+
+    const endIndex =
+        Math.min(
+            startIndex +
+            ordersPerPage,
+            filteredOrders.length
+        );
+
+
+    const pageOrders =
+        filteredOrders.slice(
+            startIndex,
+            endIndex
+        );
+
+
+    // --------------------------------------
+    // RENDER ROWS
+    // --------------------------------------
+
+    pageOrders.forEach(
+        order => {
+
+            const row =
+                document.createElement(
+                    "tr"
+                );
+
+
+            const statusClass =
+                normalizeStatusClass(
+                    order.status
+                );
+
+
+            const statusLabel =
+                capitalizeStatus(
+                    order.status
+                );
+
+
+            row.innerHTML = `
+
+                <td>
+                    <div class="order-id-cell">
+                        ${escapeHtml(
+                            order.orderId ||
+                            "—"
+                        )}
+                    </div>
+                </td>
+
+
+                <td>
+                    <div class="customer-cell">
+
+                        <div class="customer-name">
+                            ${escapeHtml(
+                                order.customerName ||
+                                "Guest"
+                            )}
+                        </div>
+
+                        ${
+                            order.mobileNumber ||
+                            order.whatsappNumber
+                                ? `
+                                    <div class="customer-contact">
+                                        ${escapeHtml(
+                                            order.mobileNumber ||
+                                            order.whatsappNumber
+                                        )}
+                                    </div>
+                                  `
+                                : ""
+                        }
+
+                    </div>
+                </td>
+
+
+                <td>
+                    <span class="branch-name">
+                        ${escapeHtml(
+                            order.branchOutlet ||
+                            "—"
+                        )}
+                    </span>
+                </td>
+
+
+                <td>
+                    <span class="table-number">
+                        ${
+                            order.tableNumber
+                                ? `Table ${escapeHtml(
+                                    order.tableNumber
+                                )}`
+                                : "—"
+                        }
+                    </span>
+                </td>
+
+
+                <td>
+                    <span class="order-amount">
+                        ${formatCurrency(
+                            order.total
+                        )}
+                    </span>
+                </td>
+
+
+                <td>
+                    <span class="status-badge status-${statusClass}">
+                        ${escapeHtml(
+                            statusLabel
+                        )}
+                    </span>
+                </td>
+
+
+                <td>
+                    <span class="order-time">
+                        ${formatOrderDate(
+                            order.orderDate
+                        )}
+                    </span>
+                </td>
+
+
+                <td>
+                    <button
+                        type="button"
+                        class="order-view-btn"
+                        data-order-id="${escapeHtml(
+                            order.orderId
+                        )}"
+                    >
+                        View
+                    </button>
+                </td>
+
+            `;
+
+
+            ordersTableBody.appendChild(
+                row
+            );
+
+        }
+    );
+
+
+    // --------------------------------------
+    // VIEW BUTTONS
+    // --------------------------------------
+
+    ordersTableBody
+        .querySelectorAll(
+            ".order-view-btn"
+        )
+        .forEach(
+            button => {
+
+                button.addEventListener(
+                    "click",
+                    () => {
+
+                        openOrderModal(
+                            button.dataset.orderId
+                        );
+
+                    }
+                );
+
+            }
+        );
+
+
+    // --------------------------------------
+    // FOOTER
+    // --------------------------------------
+
+    updateOrdersFooter(
+        startIndex,
+        endIndex,
+        filteredOrders.length
+    );
+
+
+    // --------------------------------------
+    // PAGINATION
+    // --------------------------------------
+
+    updatePagination(
+        totalPages
+    );
+
+}
+
+
+// ==========================================
+// STATUS CLASS
+// ==========================================
+
+function normalizeStatusClass(
+    status
+) {
+
+    const normalized =
+        String(
+            status || ""
+        )
+            .trim()
+            .toLowerCase();
+
+
+    const allowed = [
+
+        "pending",
+
+        "preparing",
+
+        "ready",
+
+        "completed",
+
+        "rejected",
+
+        "cancelled",
+
+        "canceled"
+
+    ];
+
+
+    if (
+        allowed.includes(
+            normalized
+        )
+    ) {
+
+        return normalized;
+
+    }
+
+
+    return "unknown";
+
+}
+
+
+// ==========================================
+// CAPITALIZE STATUS
+// ==========================================
+
+function capitalizeStatus(
+    status
+) {
+
+    const value =
+        String(
+            status || ""
+        )
+            .trim()
+            .toLowerCase();
+
+
+    if (!value) {
+
+        return "Unknown";
+
+    }
+
+
+    return (
+        value
+            .charAt(0)
+            .toUpperCase() +
+        value.slice(1)
+    );
+
+}
+
+
+// ==========================================
+// UPDATE ORDERS FOOTER
+// ==========================================
+
+function updateOrdersFooter(
+    startIndex,
+    endIndex,
+    total
+) {
+
+    if (ordersFrom) {
+
+        ordersFrom.textContent =
+            total > 0
+                ? startIndex + 1
+                : 0;
+
+    }
+
+
+    if (ordersTo) {
+
+        ordersTo.textContent =
+            total > 0
+                ? endIndex
+                : 0;
+
+    }
+
+
+    if (ordersTotal) {
+
+        ordersTotal.textContent =
+            total;
+
+    }
+
+}
+
+
+// ==========================================
+// PAGINATION
+// ==========================================
+
+function updatePagination(
+    totalPages
+) {
+
+    if (!paginationPages) {
+
+        return;
+
+    }
+
+
+    paginationPages.innerHTML =
+        "";
+
+
+    const safeTotalPages =
+        Math.max(
+            1,
+            Number(totalPages) || 1
+        );
+
+
+    if (previousPage) {
+
+        previousPage.disabled =
+            currentPage <= 1;
+
+    }
+
+
+    if (nextPage) {
+
+        nextPage.disabled =
+            currentPage >=
+            safeTotalPages;
+
+    }
+
+
+    const pages =
+        buildPaginationPages(
+            currentPage,
+            safeTotalPages
+        );
+
+
+    pages.forEach(
+        page => {
 
             if (
-                isLoadingOrders
+                page === "..."
             ) {
+
+                const ellipsis =
+                    document.createElement(
+                        "span"
+                    );
+
+
+                ellipsis.className =
+                    "pagination-ellipsis";
+
+
+                ellipsis.textContent =
+                    "…";
+
+
+                paginationPages.appendChild(
+                    ellipsis
+                );
+
 
                 return;
 
             }
 
-            await loadOrders();
+
+            const button =
+                document.createElement(
+                    "button"
+                );
+
+
+            button.type =
+                "button";
+
+
+            button.className =
+                "pagination-page";
+
+
+            if (
+                page === currentPage
+            ) {
+
+                button.classList.add(
+                    "active"
+                );
+
+            }
+
+
+            button.textContent =
+                page;
+
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    currentPage =
+                        page;
+
+                    renderOrders();
+
+                }
+            );
+
+
+            paginationPages.appendChild(
+                button
+            );
 
         }
     );
 
 }
 
+
+// ==========================================
+// BUILD PAGINATION
+// ==========================================
+
+function buildPaginationPages(
+    current,
+    total
+) {
+
+    if (
+        total <= 7
+    ) {
+
+        return Array.from(
+            {
+                length: total
+            },
+            (_, index) =>
+                index + 1
+        );
+
+    }
+
+
+    const pages = [];
+
+
+    pages.push(1);
+
+
+    if (
+        current > 4
+    ) {
+
+        pages.push("...");
+
+    }
+
+
+    const start =
+        Math.max(
+            2,
+            current - 1
+        );
+
+
+    const end =
+        Math.min(
+            total - 1,
+            current + 1
+        );
+
+
+    for (
+        let page = start;
+        page <= end;
+        page++
+    ) {
+
+        pages.push(page);
+
+    }
+
+
+    if (
+        current <
+        total - 3
+    ) {
+
+        pages.push("...");
+
+    }
+
+
+    pages.push(total);
+
+
+    return pages;
+
+}
+
+
+// ==========================================
+// PAGINATION EVENTS
+// ==========================================
 
 if (previousPage) {
 
@@ -409,14 +2256,17 @@ if (previousPage) {
         () => {
 
             if (
-                currentPage > 1
+                currentPage <= 1
             ) {
 
-                currentPage--;
-
-                renderOrders();
+                return;
 
             }
+
+
+            currentPage--;
+
+            renderOrders();
 
         }
     );
@@ -431,22 +2281,28 @@ if (nextPage) {
         () => {
 
             const totalPages =
-                Math.ceil(
-                    filteredOrders.length /
-                    ORDERS_PER_PAGE
+                Math.max(
+                    1,
+                    Math.ceil(
+                        filteredOrders.length /
+                        ordersPerPage
+                    )
                 );
 
 
             if (
-                currentPage <
+                currentPage >=
                 totalPages
             ) {
 
-                currentPage++;
-
-                renderOrders();
+                return;
 
             }
+
+
+            currentPage++;
+
+            renderOrders();
 
         }
     );
@@ -454,11 +2310,619 @@ if (nextPage) {
 }
 
 
+// ==========================================
+// ORDER MODAL
+// ==========================================
+
+function openOrderModal(
+    orderId
+) {
+
+    const order =
+        allOrders.find(
+            item =>
+                String(
+                    item.orderId
+                ) ===
+                String(
+                    orderId
+                )
+        );
+
+
+    if (!order) {
+
+        console.warn(
+            "Order not found:",
+            orderId
+        );
+
+        return;
+
+    }
+
+
+    // --------------------------------------
+    // ORDER ID
+    // --------------------------------------
+
+    if (modalOrderId) {
+
+        modalOrderId.textContent =
+            order.orderId ||
+            "Order";
+
+    }
+
+
+    // --------------------------------------
+    // STATUS
+    // --------------------------------------
+
+    if (modalOrderStatus) {
+
+        const statusClass =
+            normalizeStatusClass(
+                order.status
+            );
+
+
+        const statusLabel =
+            capitalizeStatus(
+                order.status
+            );
+
+
+        modalOrderStatus.className =
+            `modal-order-status status-badge status-${statusClass}`;
+
+
+        modalOrderStatus.textContent =
+            statusLabel;
+
+    }
+
+
+    // --------------------------------------
+    // CUSTOMER
+    // --------------------------------------
+
+    if (modalCustomer) {
+
+        modalCustomer.textContent =
+            order.customerName ||
+            "Guest";
+
+    }
+
+
+    // --------------------------------------
+    // MOBILE
+    // --------------------------------------
+
+    if (modalMobile) {
+
+        modalMobile.textContent =
+            order.mobileNumber ||
+            order.whatsappNumber ||
+            "—";
+
+    }
+
+
+    // --------------------------------------
+    // BRANCH
+    // --------------------------------------
+
+    if (modalBranch) {
+
+        modalBranch.textContent =
+            order.branchOutlet ||
+            "—";
+
+    }
+
+
+    // --------------------------------------
+    // TABLE
+    // --------------------------------------
+
+    if (modalTable) {
+
+        modalTable.textContent =
+            order.tableNumber
+                ? `Table ${order.tableNumber}`
+                : "—";
+
+    }
+
+
+    // --------------------------------------
+    // ORDER TIME
+    // --------------------------------------
+
+    if (modalOrderTime) {
+
+        modalOrderTime.textContent =
+            formatOrderDate(
+                order.orderDate
+            );
+
+    }
+
+
+    // --------------------------------------
+    // ITEMS
+    // --------------------------------------
+
+    renderModalItems(
+        order
+    );
+
+
+    // --------------------------------------
+    // SPECIAL REQUEST
+    // --------------------------------------
+
+    if (modalRequestSection) {
+
+        const hasRequest =
+            Boolean(
+                String(
+                    order.customizedRequest ||
+                    ""
+                ).trim()
+            );
+
+
+        modalRequestSection.style.display =
+            hasRequest
+                ? ""
+                : "none";
+
+    }
+
+
+    if (modalRequest) {
+
+        modalRequest.textContent =
+            order.customizedRequest ||
+            "";
+
+    }
+
+
+    // --------------------------------------
+    // BILLING
+    // --------------------------------------
+
+    if (modalSubtotal) {
+
+        modalSubtotal.textContent =
+            formatCurrency(
+                order.subTotal
+            );
+
+    }
+
+
+    if (modalTax) {
+
+        modalTax.textContent =
+            formatCurrency(
+                order.taxTotal
+            );
+
+    }
+
+
+    if (modalTotal) {
+
+        modalTotal.textContent =
+            formatCurrency(
+                order.total
+            );
+
+    }
+
+
+    // --------------------------------------
+    // SHOW MODAL
+    // IMPORTANT:
+    // HTML has inline display:none.
+    // Therefore we explicitly override it.
+    // --------------------------------------
+
+    if (orderModal) {
+
+        orderModal.style.display =
+            "flex";
+
+
+        orderModal.classList.add(
+            "active"
+        );
+
+
+        document.body.classList.add(
+            "modal-open"
+        );
+
+    }
+
+}
+
+
+// ==========================================
+// RENDER MODAL ITEMS
+// ==========================================
+
+function renderModalItems(
+    order
+) {
+
+    if (!modalItems) {
+
+        return;
+
+    }
+
+
+    modalItems.innerHTML =
+        "";
+
+
+    const rawItems =
+        order?.orderedItems;
+
+
+    if (
+        rawItems === null ||
+        rawItems === undefined ||
+        rawItems === ""
+    ) {
+
+        showModalEmptyItems();
+
+        return;
+
+    }
+
+
+    // --------------------------------------
+    // Already structured array
+    // --------------------------------------
+
+    if (
+        Array.isArray(rawItems)
+    ) {
+
+        renderStructuredModalItems(
+            rawItems
+        );
+
+        return;
+
+    }
+
+
+    // --------------------------------------
+    // Already structured object
+    // --------------------------------------
+
+    if (
+        typeof rawItems ===
+        "object"
+    ) {
+
+        renderStructuredModalItems(
+            [rawItems]
+        );
+
+        return;
+
+    }
+
+
+    const rawText =
+        String(
+            rawItems
+        ).trim();
+
+
+    if (!rawText) {
+
+        showModalEmptyItems();
+
+        return;
+
+    }
+
+
+    // --------------------------------------
+    // Try JSON string
+    // --------------------------------------
+
+    try {
+
+        const parsed =
+            JSON.parse(
+                rawText
+            );
+
+
+        if (
+            Array.isArray(parsed)
+        ) {
+
+            renderStructuredModalItems(
+                parsed
+            );
+
+            return;
+
+        }
+
+
+        if (
+            parsed &&
+            typeof parsed ===
+            "object"
+        ) {
+
+            renderStructuredModalItems(
+                [parsed]
+            );
+
+            return;
+
+        }
+
+    } catch {
+        // Continue to plain-text fallback.
+    }
+
+
+    // --------------------------------------
+    // Plain text fallback
+    // --------------------------------------
+
+    const textItems =
+        rawText
+            .split(
+                /\r?\n|,\s*(?=[A-Za-z])/
+            )
+            .map(
+                item =>
+                    item.trim()
+            )
+            .filter(Boolean);
+
+
+    if (
+        !textItems.length
+    ) {
+
+        showModalEmptyItems();
+
+        return;
+
+    }
+
+
+    textItems.forEach(
+        itemText => {
+
+            const row =
+                document.createElement(
+                    "div"
+                );
+
+
+            row.className =
+                "modal-item-row";
+
+
+            row.innerHTML = `
+
+                <div class="modal-item-info">
+
+                    <div class="modal-item-name">
+                        ${escapeHtml(
+                            itemText
+                        )}
+                    </div>
+
+                </div>
+
+            `;
+
+
+            modalItems.appendChild(
+                row
+            );
+
+        }
+    );
+
+}
+
+
+// ==========================================
+// STRUCTURED MODAL ITEMS
+// ==========================================
+
+function renderStructuredModalItems(
+    items
+) {
+
+    if (
+        !Array.isArray(items) ||
+        !items.length
+    ) {
+
+        showModalEmptyItems();
+
+        return;
+
+    }
+
+
+    items.forEach(
+        item => {
+
+            const itemName =
+                String(
+                    item?.name ??
+                    item?.itemName ??
+                    item?.ItemName ??
+                    item?.title ??
+                    item?.Title ??
+                    "Item"
+                );
+
+
+            const quantity =
+                toNumber(
+                    item?.quantity ??
+                    item?.qty ??
+                    item?.Quantity ??
+                    1
+                ) || 1;
+
+
+            const price =
+                toNumber(
+                    item?.price ??
+                    item?.Price ??
+                    0
+                );
+
+
+            const suppliedTotal =
+                item?.total ??
+                item?.Total;
+
+
+            const itemTotal =
+                suppliedTotal !== undefined &&
+                suppliedTotal !== null &&
+                suppliedTotal !== ""
+                    ? toNumber(
+                        suppliedTotal
+                    )
+                    : price * quantity;
+
+
+            const row =
+                document.createElement(
+                    "div"
+                );
+
+
+            row.className =
+                "modal-item-row";
+
+
+            row.innerHTML = `
+
+                <div class="modal-item-info">
+
+                    <div class="modal-item-name">
+                        ${escapeHtml(
+                            itemName
+                        )}
+                    </div>
+
+                    <div class="modal-item-quantity">
+                        Qty: ${escapeHtml(
+                            quantity
+                        )}
+                    </div>
+
+                </div>
+
+
+                <div class="modal-item-price">
+                    ${formatCurrency(
+                        itemTotal
+                    )}
+                </div>
+
+            `;
+
+
+            modalItems.appendChild(
+                row
+            );
+
+        }
+    );
+
+}
+
+
+// ==========================================
+// MODAL EMPTY ITEMS
+// ==========================================
+
+function showModalEmptyItems() {
+
+    if (!modalItems) {
+
+        return;
+
+    }
+
+
+    modalItems.innerHTML = `
+
+        <div class="modal-empty-items">
+            No item details available.
+        </div>
+
+    `;
+
+}
+
+
+// ==========================================
+// CLOSE ORDER MODAL
+// ==========================================
+
+function closeOrderModalHandler() {
+
+    if (orderModal) {
+
+        orderModal.classList.remove(
+            "active"
+        );
+
+
+        // Required because HTML contains
+        // inline style="display:none".
+        orderModal.style.display =
+            "none";
+
+    }
+
+
+    document.body.classList.remove(
+        "modal-open"
+    );
+
+}
+
+
+// ==========================================
+// MODAL EVENTS
+// ==========================================
+
 if (closeOrderModal) {
 
     closeOrderModal.addEventListener(
         "click",
-        closeOrderDetails
+        closeOrderModalHandler
     );
 
 }
@@ -468,11 +2932,15 @@ if (modalCloseButton) {
 
     modalCloseButton.addEventListener(
         "click",
-        closeOrderDetails
+        closeOrderModalHandler
     );
 
 }
 
+
+// ==========================================
+// CLOSE ON OVERLAY CLICK
+// ==========================================
 
 if (orderModal) {
 
@@ -485,7 +2953,7 @@ if (orderModal) {
                 orderModal
             ) {
 
-                closeOrderDetails();
+                closeOrderModalHandler();
 
             }
 
@@ -494,6 +2962,10 @@ if (orderModal) {
 
 }
 
+
+// ==========================================
+// CLOSE WITH ESCAPE
+// ==========================================
 
 document.addEventListener(
     "keydown",
@@ -501,2088 +2973,146 @@ document.addEventListener(
 
         if (
             event.key ===
-            "Escape"
-        ) {
-
-            closeOrderDetails();
-
-        }
-
-    }
-);
-
-
-}
-
-/* ==========================================
-FILTER CHANGE
-========================================== */
-
-function handleFilterChange() {
-
-
-currentPage = 1;
-
-applyFilters();
-
-
-}
-
-/* ==========================================
-LOAD ORDERS
-========================================== */
-
-async function loadOrders() {
-
-
-if (
-    isLoadingOrders
-) {
-
-    return;
-
-}
-
-
-isLoadingOrders = true;
-
-
-showLoadingState();
-
-setRefreshButtonLoading(
-    true
-);
-
-
-try {
-
-    const sessionToken =
-        localStorage.getItem(
-            SESSION_TOKEN_KEY
-        );
-
-
-    if (!sessionToken) {
-
-        redirectToLogin();
-
-        return;
-
-    }
-
-
-    const response =
-        await fetch(
-            N8N_ORDERS_WEBHOOK,
-            {
-                method: "POST",
-
-                headers: {
-                    "Content-Type":
-                        "application/json"
-                },
-
-                body: JSON.stringify({
-                    sessionToken
-                })
-            }
-        );
-
-
-    if (
-        response.status ===
-        401
-    ) {
-
-        handleSessionExpired();
-
-        return;
-
-    }
-
-
-    if (
-        !response.ok
-    ) {
-
-        throw new Error(
-            `Orders API returned ${response.status}`
-        );
-
-    }
-
-
-    const data =
-        await response.json();
-
-
-    console.log(
-        "Orders API Response:",
-        data
-    );
-
-
-    if (
-        !data ||
-        data.success !== true
-    ) {
-
-        if (
-            data?.code ===
-            "INVALID_SESSION"
-        ) {
-
-            handleSessionExpired();
-
-            return;
-
-        }
-
-
-        throw new Error(
-            data?.message ||
-            "Unable to load orders."
-        );
-
-    }
-
-
-    /* ----------------------------------
-       Owner display only
-       ----------------------------------
-
-       IMPORTANT:
-       ownerName is used only for UI.
-
-       It is NOT used for authorization.
-       Authorization remains based on the
-       validated session.
-    ---------------------------------- */
-
-    updateOrdersTopbarOwner(
-        data.ownerName ||
-        data.OwnerName ||
-        null
-    );
-
-
-    /* ----------------------------------
-       Normalize orders
-    ---------------------------------- */
-
-    allOrders =
-        Array.isArray(
-            data.orders
-        )
-            ? data.orders.map(
-                normalizeOrder
-            )
-            : [];
-
-
-    /* ----------------------------------
-       Sort newest first
-    ---------------------------------- */
-
-    allOrders.sort(
-        (a, b) => {
-
-            const dateA =
-                new Date(
-                    a.orderDate
-                ).getTime() || 0;
-
-            const dateB =
-                new Date(
-                    b.orderDate
-                ).getTime() || 0;
-
-            return dateB - dateA;
-
-        }
-    );
-
-
-    console.log(
-        "Normalized Orders:",
-        allOrders
-    );
-
-
-    /* ----------------------------------
-       Populate branches
-    ---------------------------------- */
-
-    populateBranchFilter();
-
-
-    /* ----------------------------------
-       Apply current filters
-    ---------------------------------- */
-
-    applyFilters();
-
-
-    if (
-        ordersMonitoringText
-    ) {
-
-        ordersMonitoringText.textContent =
-            allOrders.length
-                ? `${allOrders.length} Orders`
-                : "Monitoring";
-
-    }
-
-}
-
-catch (error) {
-
-    console.error(
-        "Failed to load orders:",
-        error
-    );
-
-    showOrdersError();
-
-}
-
-finally {
-
-    isLoadingOrders = false;
-
-    setRefreshButtonLoading(
-        false
-    );
-
-}
-
-
-}
-
-/* ==========================================
-REFRESH BUTTON STATE
-========================================== */
-
-function setRefreshButtonLoading(
-loading
-) {
-
-
-if (
-    !refreshOrdersButton
-) {
-
-    return;
-
-}
-
-
-refreshOrdersButton.disabled =
-    loading;
-
-
-if (loading) {
-
-    refreshOrdersButton.classList.add(
-        "loading"
-    );
-
-    refreshOrdersButton.innerHTML = `
-        <span class="refresh-icon refresh-spinning">
-            ↻
-        </span>
-        Refreshing
-    `;
-
-}
-
-else {
-
-    refreshOrdersButton.classList.remove(
-        "loading"
-    );
-
-    refreshOrdersButton.innerHTML = `
-        <span class="refresh-icon">
-            ↻
-        </span>
-        Refresh
-    `;
-
-}
-
-
-}
-
-/* ==========================================
-TOPBAR OWNER
-========================================== */
-
-function updateOrdersTopbarOwner(
-ownerNameFromResponse = null
-) {
-
-
-let sessionData = null;
-
-
-try {
-
-    const storedSession =
-        localStorage.getItem(
-            SESSION_DATA_KEY
-        );
-
-
-    if (
-        storedSession
-    ) {
-
-        sessionData =
-            JSON.parse(
-                storedSession
-            );
-
-    }
-
-}
-
-catch (error) {
-
-    console.warn(
-        "Unable to read session data:",
-        error
-    );
-
-}
-
-
-const ownerName =
-    String(
-        ownerNameFromResponse ||
-        sessionData?.ownerName ||
-        sessionData?.OwnerName ||
-        sessionData?.name ||
-        sessionData?.Name ||
-        "Owner"
-    ).trim() ||
-    "Owner";
-
-
-const ownerRole =
-    String(
-        sessionData?.role ||
-        sessionData?.Role ||
-        "Owner"
-    ).trim() ||
-    "Owner";
-
-
-const topbarUserName =
-    document.getElementById(
-        "topbarUserName"
-    );
-
-
-if (
-    topbarUserName
-) {
-
-    topbarUserName.textContent =
-        ownerName;
-
-}
-
-
-const topbarUserRole =
-    document.getElementById(
-        "topbarUserRole"
-    );
-
-
-if (
-    topbarUserRole
-) {
-
-    topbarUserRole.textContent =
-        ownerRole;
-
-}
-
-
-const topbarUserAvatar =
-    document.getElementById(
-        "topbarUserAvatar"
-    );
-
-
-if (
-    topbarUserAvatar
-) {
-
-    topbarUserAvatar.textContent =
-        getInitials(
-            ownerName
-        );
-
-}
-
-
-}
-
-/* ==========================================
-GET INITIALS
-========================================== */
-
-function getInitials(
-name
-) {
-
-
-const cleanName =
-    String(
-        name ||
-        "Owner"
-    ).trim();
-
-
-if (
-    !cleanName
-) {
-
-    return "O";
-
-}
-
-
-const parts =
-    cleanName
-        .split(/\s+/)
-        .filter(Boolean);
-
-
-if (
-    parts.length === 1
-) {
-
-    return parts[0]
-        .charAt(0)
-        .toUpperCase();
-
-}
-
-
-return (
-    parts[0].charAt(0) +
-    parts[parts.length - 1]
-        .charAt(0)
-).toUpperCase();
-
-
-}
-
-/* ==========================================
-NORMALIZE ORDER
-========================================== */
-
-function normalizeOrder(
-order
-) {
-
-
-return {
-
-    orderId:
-        String(
-            order?.orderId ||
-            ""
-        ).trim(),
-
-    restaurantId:
-        String(
-            order?.restaurantId ||
-            ""
-        ).trim(),
-
-    branchOutlet:
-        String(
-            order?.branchOutlet ||
-            ""
-        ).trim(),
-
-    customerName:
-        String(
-            order?.customerName ||
-            ""
-        ).trim(),
-
-    mobileNumber:
-        String(
-            order?.mobileNumber ||
-            ""
-        ).trim(),
-
-    whatsappNumber:
-        String(
-            order?.whatsappNumber ||
-            ""
-        ).trim(),
-
-    orderedItems:
-        String(
-            order?.orderedItems ||
-            ""
-        ).trim(),
-
-    customizedRequest:
-        String(
-            order?.customizedRequest ||
-            ""
-        ).trim(),
-
-    tableNumber:
-        String(
-            order?.tableNumber ||
-            ""
-        ).trim(),
-
-    deliveryAddress:
-        String(
-            order?.deliveryAddress ||
-            ""
-        ).trim(),
-
-    subTotal:
-        Number(
-            order?.subTotal
-        ) || 0,
-
-    taxTotal:
-        Number(
-            order?.taxTotal
-        ) || 0,
-
-    total:
-        Number(
-            order?.total
-        ) || 0,
-
-    taxDetails:
-        String(
-            order?.taxDetails ||
-            ""
-        ).trim(),
-
-    status:
-        String(
-            order?.status ||
-            ""
-        )
-            .trim()
-            .toLowerCase(),
-
-    orderDate:
-        order?.orderDate ||
-        ""
-
-};
-
-
-}
-
-/* ==========================================
-BRANCH FILTER
-========================================== */
-
-function populateBranchFilter() {
-
-
-if (
-    !branchFilter
-) {
-
-    return;
-
-}
-
-
-const currentValue =
-    branchFilter.value;
-
-
-const branches =
-    [
-        ...new Set(
-            allOrders
-                .map(
-                    order =>
-                        order.branchOutlet
-                )
-                .filter(Boolean)
-        )
-    ]
-        .sort(
-            (a, b) =>
-                a.localeCompare(
-                    b
-                )
-        );
-
-
-branchFilter.innerHTML = "";
-
-
-const allOption =
-    document.createElement(
-        "option"
-    );
-
-
-allOption.value =
-    "";
-
-
-allOption.textContent =
-    "All Branches";
-
-
-branchFilter.appendChild(
-    allOption
-);
-
-
-branches.forEach(
-    branch => {
-
-        const option =
-            document.createElement(
-                "option"
-            );
-
-
-        option.value =
-            branch;
-
-
-        option.textContent =
-            branch;
-
-
-        branchFilter.appendChild(
-            option
-        );
-
-    }
-);
-
-
-if (
-    branches.includes(
-        currentValue
-    )
-) {
-
-    branchFilter.value =
-        currentValue;
-
-}
-
-
-}
-
-/* ==========================================
-APPLY FILTERS
-========================================== */
-
-function applyFilters() {
-
-
-const search =
-    String(
-        orderSearch?.value ||
-        ""
-    )
-        .trim()
-        .toLowerCase();
-
-
-const branch =
-    String(
-        branchFilter?.value ||
-        ""
-    ).trim();
-
-
-const status =
-    String(
-        statusFilter?.value ||
-        ""
-    )
-        .trim()
-        .toLowerCase();
-
-
-const dateRange =
-    String(
-        dateFilter?.value ||
-        "today"
-    )
-        .trim()
-        .toLowerCase();
-
-
-filteredOrders =
-    allOrders.filter(
-        order => {
-
-            /* SEARCH */
-
-            if (
-                search
-            ) {
-
-                const searchableText =
-                    [
-                        order.orderId,
-                        order.customerName,
-                        order.mobileNumber,
-                        order.whatsappNumber,
-                        order.branchOutlet,
-                        order.tableNumber,
-                        order.orderedItems,
-                        order.customizedRequest
-                    ]
-                        .join(" ")
-                        .toLowerCase();
-
-
-                if (
-                    !searchableText.includes(
-                        search
-                    )
-                ) {
-
-                    return false;
-
-                }
-
-            }
-
-
-            /* BRANCH */
-
-            if (
-                branch &&
-                branch !== "all" &&
-                order.branchOutlet !==
-                branch
-            ) {
-
-                return false;
-
-            }
-
-
-            /* STATUS */
-
-            if (
-                status &&
-                status !== "all" &&
-                order.status !==
-                status
-            ) {
-
-                return false;
-
-            }
-
-
-            /* DATE */
-
-            if (
-                !matchesDateFilter(
-                    order,
-                    dateRange
-                )
-            ) {
-
-                return false;
-
-            }
-
-
-            return true;
-
-        }
-    );
-
-
-updateOrderMetrics(
-    filteredOrders
-);
-
-
-updateFilterSummary();
-
-
-renderOrders();
-
-
-}
-
-/* ==========================================
-UPDATE KPI METRICS
-========================================== */
-
-function updateOrderMetrics(
-orders
-) {
-
-
-const source =
-    Array.isArray(
-        orders
-    )
-        ? orders
-        : [];
-
-
-const total =
-    source.length;
-
-
-const pending =
-    source.filter(
-        order =>
-            order.status ===
-            "pending"
-    ).length;
-
-
-const preparing =
-    source.filter(
-        order =>
-            order.status ===
-            "preparing"
-    ).length;
-
-
-const ready =
-    source.filter(
-        order =>
-            order.status ===
-            "ready"
-    ).length;
-
-
-const completed =
-    source.filter(
-        order =>
-            order.status ===
-            "completed"
-    ).length;
-
-
-if (
-    totalOrdersEl
-) {
-
-    totalOrdersEl.textContent =
-        total;
-
-}
-
-
-if (
-    pendingOrdersEl
-) {
-
-    pendingOrdersEl.textContent =
-        pending;
-
-}
-
-
-if (
-    preparingOrdersEl
-) {
-
-    preparingOrdersEl.textContent =
-        preparing;
-
-}
-
-
-if (
-    readyOrdersEl
-) {
-
-    readyOrdersEl.textContent =
-        ready;
-
-}
-
-
-if (
-    completedOrdersEl
-) {
-
-    completedOrdersEl.textContent =
-        completed;
-
-}
-
-
-}
-
-/* ==========================================
-FILTER SUMMARY
-========================================== */
-
-function updateFilterSummary() {
-
-
-if (
-    !totalOrdersFooter
-) {
-
-    return;
-
-}
-
-
-const date =
-    dateFilter?.value ||
-    "today";
-
-
-const branch =
-    branchFilter?.value ||
-    "";
-
-
-const status =
-    statusFilter?.value ||
-    "";
-
-
-const hasSearch =
-    Boolean(
-        orderSearch?.value?.trim()
-    );
-
-
-if (
-    hasSearch ||
-    branch ||
-    status
-) {
-
-    totalOrdersFooter.textContent =
-        "Orders matching current filters";
-
-    return;
-
-}
-
-
-const labels = {
-
-    today:
-        "Orders today",
-
-    "7":
-        "Orders in last 7 days",
-
-    "14":
-        "Orders in last 14 days",
-
-    "30":
-        "Orders in last 30 days",
-
-    all:
-        "Orders across all time"
-
-};
-
-
-totalOrdersFooter.textContent =
-    labels[date] ||
-    "Orders in selected period";
-
-
-}
-
-/* ==========================================
-DATE FILTER
-========================================== */
-
-function matchesDateFilter(
-order,
-filter
-) {
-
-
-if (
-    !filter ||
-    filter === "all"
-) {
-
-    return true;
-
-}
-
-
-const orderDate =
-    new Date(
-        order.orderDate
-    );
-
-
-if (
-    Number.isNaN(
-        orderDate.getTime()
-    )
-) {
-
-    return false;
-
-}
-
-
-const todayKey =
-    getDubaiDateKey(
-        new Date()
-    );
-
-
-const orderKey =
-    getDubaiDateKey(
-        orderDate
-    );
-
-
-/* TODAY */
-
-if (
-    filter === "today"
-) {
-
-    return (
-        orderKey ===
-        todayKey
-    );
-
-}
-
-
-/* ROLLING PERIOD */
-
-const now =
-    new Date();
-
-
-const start =
-    new Date(
-        now
-    );
-
-
-const days =
-    Number(
-        filter
-    );
-
-
-if (
-    !Number.isFinite(
-        days
-    ) ||
-    days <= 0
-) {
-
-    return true;
-
-}
-
-
-start.setDate(
-    start.getDate() -
-    (days - 1)
-);
-
-
-const startKey =
-    getDubaiDateKey(
-        start
-    );
-
-
-return (
-    orderKey >=
-    startKey &&
-    orderKey <=
-    todayKey
-);
-
-
-}
-
-/* ==========================================
-DUBAI DATE KEY
-========================================== */
-
-function getDubaiDateKey(
-date
-) {
-
-
-return new Intl.DateTimeFormat(
-    "en-CA",
-    {
-        timeZone:
-            ORDERS_TIME_ZONE,
-
-        year:
-            "numeric",
-
-        month:
-            "2-digit",
-
-        day:
-            "2-digit"
-    }
-).format(
-    date
-);
-
-
-}
-
-/* ==========================================
-RENDER ORDERS
-========================================== */
-
-function renderOrders() {
-
-
-if (
-    !ordersTableBody
-) {
-
-    return;
-
-}
-
-
-ordersTableBody.innerHTML =
-    "";
-
-
-if (
-    !Array.isArray(
-        filteredOrders
-    ) ||
-    filteredOrders.length === 0
-) {
-
-    showEmptyState();
-
-    updatePagination();
-
-    return;
-
-}
-
-
-hideEmptyState();
-
-
-const totalPages =
-    Math.ceil(
-        filteredOrders.length /
-        ORDERS_PER_PAGE
-    );
-
-
-if (
-    currentPage >
-    totalPages
-) {
-
-    currentPage =
-        totalPages;
-
-}
-
-
-if (
-    currentPage <
-    1
-) {
-
-    currentPage =
-        1;
-
-}
-
-
-const startIndex =
-    (
-        currentPage -
-        1
-    ) *
-    ORDERS_PER_PAGE;
-
-
-const endIndex =
-    Math.min(
-        startIndex +
-        ORDERS_PER_PAGE,
-        filteredOrders.length
-    );
-
-
-const pageOrders =
-    filteredOrders.slice(
-        startIndex,
-        endIndex
-    );
-
-
-pageOrders.forEach(
-    order => {
-
-        ordersTableBody.appendChild(
-            createOrderRow(
-                order
-            )
-        );
-
-    }
-);
-
-
-updatePagination();
-
-
-}
-
-/* ==========================================
-CREATE ORDER ROW
-========================================== */
-
-function createOrderRow(
-order
-) {
-
-
-const row =
-    document.createElement(
-        "tr"
-    );
-
-
-/* ORDER */
-
-const orderCell =
-    document.createElement(
-        "td"
-    );
-
-
-orderCell.innerHTML = `
-    <div class="order-id-cell">
-        <span class="order-id">
-            ${escapeHtml(
-                order.orderId ||
-                "—"
-            )}
-        </span>
-    </div>
-`;
-
-
-/* CUSTOMER */
-
-const customerCell =
-    document.createElement(
-        "td"
-    );
-
-
-const customerName =
-    order.customerName ||
-    "Walk-in Customer";
-
-
-const avatarLetter =
-    customerName
-        .charAt(0)
-        .toUpperCase();
-
-
-const mobile =
-    order.mobileNumber ||
-    order.whatsappNumber ||
-    "";
-
-
-customerCell.innerHTML = `
-    <div class="customer-cell">
-
-        <div class="customer-avatar">
-            ${escapeHtml(
-                avatarLetter
-            )}
-        </div>
-
-        <div class="customer-info">
-
-            <span class="customer-name">
-                ${escapeHtml(
-                    customerName
-                )}
-            </span>
-
-            ${
-                mobile
-                    ? `
-                        <span class="customer-mobile">
-                            ${escapeHtml(
-                                mobile
-                            )}
-                        </span>
-                      `
-                    : ""
-            }
-
-        </div>
-
-    </div>
-`;
-
-
-/* BRANCH */
-
-const branchCell =
-    document.createElement(
-        "td"
-    );
-
-
-branchCell.innerHTML = `
-    <span class="branch-name">
-        ${escapeHtml(
-            order.branchOutlet ||
-            "—"
-        )}
-    </span>
-`;
-
-
-/* TABLE */
-
-const tableCell =
-    document.createElement(
-        "td"
-    );
-
-
-tableCell.innerHTML = `
-    <span class="table-number">
-        ${
-            order.tableNumber
-                ? `Table ${escapeHtml(
-                    order.tableNumber
-                )}`
-                : "—"
-        }
-    </span>
-`;
-
-
-/* AMOUNT */
-
-const amountCell =
-    document.createElement(
-        "td"
-    );
-
-
-amountCell.innerHTML = `
-    <span class="order-amount">
-        ${formatCurrency(
-            order.total
-        )}
-    </span>
-`;
-
-
-/* STATUS */
-
-const statusCell =
-    document.createElement(
-        "td"
-    );
-
-
-statusCell.innerHTML =
-    createStatusBadge(
-        order.status
-    );
-
-
-/* TIME */
-
-const timeCell =
-    document.createElement(
-        "td"
-    );
-
-
-timeCell.innerHTML = `
-    <span class="order-time">
-        ${formatOrderDate(
-            order.orderDate
-        )}
-    </span>
-`;
-
-
-/* ACTION */
-
-const actionCell =
-    document.createElement(
-        "td"
-    );
-
-
-const viewButton =
-    document.createElement(
-        "button"
-    );
-
-
-viewButton.type =
-    "button";
-
-
-viewButton.className =
-    "order-view-btn";
-
-
-viewButton.innerHTML =
-    "View";
-
-
-viewButton.addEventListener(
-    "click",
-    () =>
-        openOrderModal(
-            order
-        )
-);
-
-
-actionCell.appendChild(
-    viewButton
-);
-
-
-/* APPEND */
-
-row.appendChild(
-    orderCell
-);
-
-row.appendChild(
-    customerCell
-);
-
-row.appendChild(
-    branchCell
-);
-
-row.appendChild(
-    tableCell
-);
-
-row.appendChild(
-    amountCell
-);
-
-row.appendChild(
-    statusCell
-);
-
-row.appendChild(
-    timeCell
-);
-
-row.appendChild(
-    actionCell
-);
-
-
-return row;
-
-
-}
-
-/* ==========================================
-STATUS BADGE
-========================================== */
-
-function createStatusBadge(
-status
-) {
-
-
-const normalized =
-    String(
-        status ||
-        ""
-    )
-        .trim()
-        .toLowerCase();
-
-
-const label =
-    normalized
-        ? capitalizeStatus(
-            normalized
-        )
-        : "Unknown";
-
-
-return `
-    <span class="
-        status-badge
-        status-${escapeHtml(
-            normalized ||
-            "unknown"
-        )}
-    ">
-        <span class="status-dot"></span>
-
-        ${escapeHtml(
-            label
-        )}
-
-    </span>
-`;
-
-
-}
-
-function capitalizeStatus(
-status
-) {
-
-
-return status
-    .charAt(0)
-    .toUpperCase() +
-    status.slice(1);
-
-
-}
-
-/* ==========================================
-PAGINATION
-========================================== */
-
-function updatePagination() {
-
-
-const total =
-    filteredOrders.length;
-
-
-const totalPages =
-    Math.max(
-        1,
-        Math.ceil(
-            total /
-            ORDERS_PER_PAGE
-        )
-    );
-
-
-if (
-    currentPage >
-    totalPages
-) {
-
-    currentPage =
-        totalPages;
-
-}
-
-
-const start =
-    total === 0
-        ? 0
-        : (
-            (
-                currentPage -
-                1
-            ) *
-            ORDERS_PER_PAGE
-        ) + 1;
-
-
-const end =
-    total === 0
-        ? 0
-        : Math.min(
-            currentPage *
-            ORDERS_PER_PAGE,
-            total
-        );
-
-
-if (
-    ordersFrom
-) {
-
-    ordersFrom.textContent =
-        start;
-
-}
-
-
-if (
-    ordersTo
-) {
-
-    ordersTo.textContent =
-        end;
-
-}
-
-
-if (
-    ordersTotal
-) {
-
-    ordersTotal.textContent =
-        total;
-
-}
-
-
-if (
-    previousPage
-) {
-
-    previousPage.disabled =
-        currentPage <= 1 ||
-        total === 0;
-
-}
-
-
-if (
-    nextPage
-) {
-
-    nextPage.disabled =
-        currentPage >=
-        totalPages ||
-        total === 0;
-
-}
-
-
-if (
-    !paginationPages
-) {
-
-    return;
-
-}
-
-
-paginationPages.innerHTML =
-    "";
-
-
-if (
-    total === 0
-) {
-
-    return;
-
-}
-
-
-const pages =
-    getPaginationPages(
-        currentPage,
-        totalPages
-    );
-
-
-pages.forEach(
-    page => {
-
-        if (
-            page === "..."
-        ) {
-
-            const ellipsis =
-                document.createElement(
-                    "span"
-                );
-
-
-            ellipsis.className =
-                "pagination-ellipsis";
-
-
-            ellipsis.textContent =
-                "…";
-
-
-            paginationPages.appendChild(
-                ellipsis
-            );
-
-
-            return;
-
-        }
-
-
-        const button =
-            document.createElement(
-                "button"
-            );
-
-
-        button.type =
-            "button";
-
-
-        button.className =
-            "pagination-page";
-
-
-        if (
-            page ===
-            currentPage
-        ) {
-
-            button.classList.add(
+            "Escape" &&
+            orderModal?.classList.contains(
                 "active"
+            )
+        ) {
+
+            closeOrderModalHandler();
+
+        }
+
+    }
+);
+
+
+// ==========================================
+// LOADING STATE
+// ==========================================
+
+function showLoadingState() {
+
+    if (!ordersTableBody) {
+
+        return;
+
+    }
+
+
+    hideOrdersEmpty();
+
+
+    ordersTableBody.innerHTML = `
+
+        <tr>
+
+            <td
+                colspan="8"
+                class="orders-loading"
+            >
+
+                <div class="orders-loading-icon">
+                    ◌
+                </div>
+
+                <span>
+                    Loading orders...
+                </span>
+
+            </td>
+
+        </tr>
+
+    `;
+
+
+    updateOrdersFooter(
+        0,
+        0,
+        0
+    );
+
+
+    updateOrderMetrics(
+        []
+    );
+
+}
+
+
+// ==========================================
+// EMPTY STATE
+// ==========================================
+
+function showOrdersEmpty() {
+
+    if (ordersEmpty) {
+
+        ordersEmpty.style.display =
+            "flex";
+
+
+        const title =
+            ordersEmpty.querySelector(
+                ".orders-empty-title"
             );
+
+
+        const text =
+            ordersEmpty.querySelector(
+                ".orders-empty-text"
+            );
+
+
+        const hasOrders =
+            allOrders.length > 0;
+
+
+        if (title) {
+
+            title.textContent =
+                hasOrders
+                    ? "No orders match your filters"
+                    : "No orders yet";
 
         }
 
 
-        button.textContent =
-            page;
+        if (text) {
 
+            text.textContent =
+                hasOrders
+                    ? "Try adjusting the search, branch, status or period filter."
+                    : "New customer orders will appear here as soon as they are received.";
 
-        button.addEventListener(
-            "click",
-            () => {
-
-                currentPage =
-                    page;
-
-                renderOrders();
-
-            }
-        );
-
-
-        paginationPages.appendChild(
-            button
-        );
+        }
 
     }
-);
 
 
-}
+    if (ordersTableBody) {
 
-/* ==========================================
-PAGINATION RANGE
-========================================== */
-
-function getPaginationPages(
-current,
-total
-) {
-
-
-if (
-    total <= 7
-) {
-
-    return Array.from(
-        {
-            length: total
-        },
-        (_, index) =>
-            index + 1
-    );
-
-}
-
-
-const pages = [];
-
-
-pages.push(1);
-
-
-if (
-    current > 4
-) {
-
-    pages.push("...");
-
-}
-
-
-const start =
-    Math.max(
-        2,
-        current - 1
-    );
-
-
-const end =
-    Math.min(
-        total - 1,
-        current + 1
-    );
-
-
-for (
-    let page = start;
-    page <= end;
-    page++
-) {
-
-    pages.push(
-        page
-    );
-
-}
-
-
-if (
-    current <
-    total - 3
-) {
-
-    pages.push("...");
-
-}
-
-
-pages.push(
-    total
-);
-
-
-return pages;
-
-
-}
-
-/* ==========================================
-RESET FILTERS
-========================================== */
-
-function resetAllFilters() {
-
-
-if (
-    orderSearch
-) {
-
-    orderSearch.value =
-        "";
-
-}
-
-
-if (
-    branchFilter
-) {
-
-    branchFilter.value =
-        "";
-
-}
-
-
-if (
-    statusFilter
-) {
-
-    statusFilter.value =
-        "";
-
-}
-
-
-if (
-    dateFilter
-) {
-
-    dateFilter.value =
-        "today";
-
-}
-
-
-currentPage =
-    1;
-
-
-applyFilters();
-
-
-}
-
-/* ==========================================
-ORDER MODAL
-========================================== */
-
-function openOrderModal(
-order
-) {
-
-
-if (
-    !orderModal
-) {
-
-    return;
-
-}
-
-
-if (
-    modalOrderId
-) {
-
-    modalOrderId.textContent =
-        order.orderId ||
-        "—";
-
-}
-
-
-if (
-    modalOrderStatus
-) {
-
-    modalOrderStatus.innerHTML =
-        createStatusBadge(
-            order.status
-        );
-
-}
-
-
-if (
-    modalCustomer
-) {
-
-    modalCustomer.textContent =
-        order.customerName ||
-        "Walk-in Customer";
-
-}
-
-
-if (
-    modalMobile
-) {
-
-    modalMobile.textContent =
-        order.mobileNumber ||
-        order.whatsappNumber ||
-        "—";
-
-}
-
-
-if (
-    modalBranch
-) {
-
-    modalBranch.textContent =
-        order.branchOutlet ||
-        "—";
-
-}
-
-
-if (
-    modalTable
-) {
-
-    modalTable.textContent =
-        order.tableNumber
-            ? `Table ${order.tableNumber}`
-            : "—";
-
-}
-
-
-if (
-    modalOrderTime
-) {
-
-    modalOrderTime.textContent =
-        formatOrderDate(
-            order.orderDate,
-            true
-        );
-
-}
-
-
-renderModalItems(
-    order.orderedItems
-);
-
-
-if (
-    modalRequestSection &&
-    modalRequest
-) {
-
-    if (
-        order.customizedRequest
-    ) {
-
-        modalRequest.textContent =
-            order.customizedRequest;
-
-
-        modalRequestSection.style.display =
+        ordersTableBody.innerHTML =
             "";
 
     }
 
-    else {
 
-        modalRequest.textContent =
-            "";
+    updateOrdersFooter(
+        0,
+        0,
+        0
+    );
+
+}
 
 
-        modalRequestSection.style.display =
+function hideOrdersEmpty() {
+
+    if (ordersEmpty) {
+
+        ordersEmpty.style.display =
             "none";
 
     }
@@ -2590,602 +3120,271 @@ if (
 }
 
 
-if (
-    modalSubtotal
+// ==========================================
+// ERROR STATE
+// ==========================================
+
+function showOrdersError(
+    message =
+        "Unable to load orders. Please try again."
 ) {
 
-    modalSubtotal.textContent =
-        formatCurrency(
-            order.subTotal
-        );
-
-}
+    hideOrdersEmpty();
 
 
-if (
-    modalTax
-) {
+    if (!ordersTableBody) {
 
-    modalTax.textContent =
-        formatCurrency(
-            order.taxTotal
-        );
+        return;
 
-}
+    }
 
 
-if (
-    modalTotal
-) {
+    ordersTableBody.innerHTML = `
 
-    modalTotal.textContent =
-        formatCurrency(
-            order.total
-        );
+        <tr>
 
-}
+            <td
+                colspan="8"
+                class="orders-loading"
+            >
 
+                <div class="orders-error">
 
-orderModal.style.display =
-    "flex";
+                    <div class="orders-error-icon">
+                        !
+                    </div>
 
+                    <div class="orders-error-title">
+                        Unable to load orders
+                    </div>
 
-orderModal.classList.add(
-    "open"
-);
+                    <div class="orders-error-message">
+                        ${escapeHtml(
+                            message
+                        )}
+                    </div>
 
+                    <button
+                        type="button"
+                        class="orders-retry-btn"
+                        id="ordersRetryButton"
+                    >
+                        Try Again
+                    </button>
 
-document.body.classList.add(
-    "modal-open"
-);
+                </div>
 
+            </td>
 
-}
+        </tr>
 
-/* ==========================================
-RENDER MODAL ITEMS
-========================================== */
-
-function renderModalItems(
-itemsText
-) {
-
-
-if (
-    !modalItems
-) {
-
-    return;
-
-}
-
-
-modalItems.innerHTML =
-    "";
-
-
-if (
-    !itemsText
-) {
-
-    modalItems.innerHTML = `
-        <div class="modal-item-empty">
-            No item details available.
-        </div>
     `;
 
-    return;
 
-}
-
-
-const lines =
-    String(
-        itemsText
-    )
-        .split(
-            /\r?\n|;/
-        )
-        .map(
-            item =>
-                item.trim()
-        )
-        .filter(Boolean);
+    const retryButton =
+        document.getElementById(
+            "ordersRetryButton"
+        );
 
 
-if (
-    lines.length === 0
-) {
+    if (retryButton) {
 
-    modalItems.innerHTML = `
-        <div class="modal-item-empty">
-            No item details available.
-        </div>
-    `;
+        retryButton.addEventListener(
+            "click",
+            () => {
 
-    return;
+                loadOrders();
 
-}
-
-
-lines.forEach(
-    line => {
-
-        const item =
-            document.createElement(
-                "div"
-            );
-
-
-        item.className =
-            "modal-order-item";
-
-
-        item.textContent =
-            line;
-
-
-        modalItems.appendChild(
-            item
+            }
         );
 
     }
-);
 
 
-}
-
-/* ==========================================
-CLOSE MODAL
-========================================== */
-
-function closeOrderDetails() {
-
-
-if (
-    !orderModal
-) {
-
-    return;
-
-}
-
-
-orderModal.classList.remove(
-    "open"
-);
-
-
-orderModal.style.display =
-    "none";
-
-
-document.body.classList.remove(
-    "modal-open"
-);
-
-
-}
-
-/* ==========================================
-FORMAT CURRENCY
-========================================== */
-
-function formatCurrency(
-amount
-) {
-
-
-const value =
-    Number(
-        amount
-    ) || 0;
-
-
-return `AED ${new Intl.NumberFormat(
-    "en-IN",
-    {
-        minimumFractionDigits:
-            2,
-
-        maximumFractionDigits:
-            2
-    }
-).format(value)}`;
-
-
-}
-
-/* ==========================================
-FORMAT ORDER DATE
-========================================== */
-
-function formatOrderDate(
-value,
-detailed = false
-) {
-
-
-if (
-    !value
-) {
-
-    return "—";
-
-}
-
-
-const date =
-    new Date(
-        value
-    );
-
-
-if (
-    Number.isNaN(
-        date.getTime()
-    )
-) {
-
-    return "—";
-
-}
-
-
-if (
-    detailed
-) {
-
-    return new Intl.DateTimeFormat(
-        "en-GB",
-        {
-            timeZone:
-                ORDERS_TIME_ZONE,
-
-            day:
-                "2-digit",
-
-            month:
-                "short",
-
-            year:
-                "numeric",
-
-            hour:
-                "2-digit",
-
-            minute:
-                "2-digit",
-
-            hour12:
-                true
-        }
-    ).format(
-        date
+    updateOrdersFooter(
+        0,
+        0,
+        0
     );
 
 }
 
 
-return new Intl.DateTimeFormat(
-    "en-GB",
-    {
-        timeZone:
-            ORDERS_TIME_ZONE,
-
-        day:
-            "2-digit",
-
-        month:
-            "short",
-
-        hour:
-            "2-digit",
-
-        minute:
-            "2-digit",
-
-        hour12:
-            true
-    }
-).format(
-    date
-);
-
-
-}
-
-/* ==========================================
-LOADING STATE
-========================================== */
-
-function showLoadingState() {
-
-
-if (
-    !ordersTableBody
-) {
-
-    return;
-
-}
-
-
-hideEmptyState();
-
-
-ordersTableBody.innerHTML = `
-    <tr>
-
-        <td
-            colspan="8"
-            class="orders-loading">
-
-            <div class="loading-spinner"></div>
-
-            <span>
-                Loading customer orders...
-            </span>
-
-        </td>
-
-    </tr>
-`;
-
-
-}
-
-/* ==========================================
-EMPTY STATE
-========================================== */
-
-function showEmptyState() {
-
-
-if (
-    ordersEmpty
-) {
-
-    ordersEmpty.style.display =
-        "";
-
-    ordersEmpty.hidden =
-        false;
-
-
-    const title =
-        ordersEmpty.querySelector(
-            ".orders-empty-title"
-        );
-
-
-    const message =
-        ordersEmpty.querySelector(
-            ".orders-empty-text"
-        );
-
-
-    const hasFilters =
-        Boolean(
-            orderSearch?.value?.trim() ||
-            branchFilter?.value ||
-            statusFilter?.value
-        );
-
-
-    if (
-        title
-    ) {
-
-        title.textContent =
-            hasFilters
-                ? "No matching orders"
-                : "No orders found";
-
-    }
-
-
-    if (
-        message
-    ) {
-
-        message.textContent =
-            hasFilters
-                ? "Try adjusting your search or filters to find the order you need."
-                : "New customer orders will appear here as soon as they are received.";
-
-    }
-
-}
-
-
-if (
-    ordersTableBody
-) {
-
-    ordersTableBody.innerHTML =
-        "";
-
-}
-
-
-}
-
-function hideEmptyState() {
-
-
-if (
-    !ordersEmpty
-) {
-
-    return;
-
-}
-
-
-ordersEmpty.style.display =
-    "none";
-
-
-ordersEmpty.hidden =
-    true;
-
-
-}
-
-/* ==========================================
-ERROR STATE
-========================================== */
-
-function showOrdersError() {
-
-
-if (
-    ordersMonitoringText
-) {
-
-    ordersMonitoringText.textContent =
-        "Connection issue";
-
-}
-
-
-if (
-    ordersEmpty
-) {
-
-    ordersEmpty.style.display =
-        "";
-
-    ordersEmpty.hidden =
-        false;
-
-
-    const title =
-        ordersEmpty.querySelector(
-            ".orders-empty-title"
-        );
-
-
-    const message =
-        ordersEmpty.querySelector(
-            ".orders-empty-text"
-        );
-
-
-    if (
-        title
-    ) {
-
-        title.textContent =
-            "Unable to load orders";
-
-    }
-
-
-    if (
-        message
-    ) {
-
-        message.textContent =
-            "Please refresh the page and try again.";
-
-    }
-
-}
-
-
-if (
-    ordersTableBody
-) {
-
-    ordersTableBody.innerHTML =
-        "";
-
-}
-
-
-updatePagination();
-
-
-}
-
-/* ==========================================
-SESSION EXPIRED
-========================================== */
+// ==========================================
+// SESSION EXPIRED
+// ==========================================
 
 function handleSessionExpired() {
 
-
-console.warn(
-    "Restaurant session expired."
-);
-
-
-localStorage.removeItem(
-    SESSION_TOKEN_KEY
-);
+    console.warn(
+        "Orders session expired."
+    );
 
 
-localStorage.removeItem(
-    SESSION_DATA_KEY
-);
+    localStorage.removeItem(
+        SESSION_TOKEN_KEY
+    );
 
 
-localStorage.removeItem(
-    "qro_validated_session"
-);
+    localStorage.removeItem(
+        SESSION_DATA_KEY
+    );
 
 
-redirectToLogin();
+    localStorage.removeItem(
+        VALIDATED_SESSION_KEY
+    );
 
+
+    redirectToLogin();
 
 }
 
-/* ==========================================
-REDIRECT LOGIN
-========================================== */
+
+// ==========================================
+// REDIRECT TO LOGIN
+// ==========================================
 
 function redirectToLogin() {
 
-
-window.location.href =
-    "../login/login.html";
-
+    window.location.href =
+        "../login/login.html";
 
 }
 
-/* ==========================================
-HTML ESCAPE
-========================================== */
 
-function escapeHtml(
-value
+// ==========================================
+// CURRENCY FORMAT
+// ==========================================
+
+function formatCurrency(
+    amount
 ) {
 
+    const numericAmount =
+        toNumber(
+            amount
+        );
 
-return String(
-    value ?? ""
-)
-    .replace(
-        /&/g,
-        "&amp;"
-    )
-    .replace(
-        /</g,
-        "&lt;"
-    )
-    .replace(
-        />/g,
-        "&gt;"
-    )
-    .replace(
-        /"/g,
-        "&quot;"
-    )
-    .replace(
-        /'/g,
-        "&#039;"
-    );
+
+    return `${currentCurrency} ${numericAmount.toLocaleString(
+        "en-AE",
+        {
+            minimumFractionDigits:
+                2,
+
+            maximumFractionDigits:
+                2
+        }
+    )}`;
 
 }
+
+
+// ==========================================
+// DATE FORMAT
+// ==========================================
+
+function formatOrderDate(
+    value
+) {
+
+    if (!value) {
+
+        return "—";
+
+    }
+
+
+    const date =
+        new Date(
+            value
+        );
+
+
+    if (
+        Number.isNaN(
+            date.getTime()
+        )
+    ) {
+
+        return "—";
+
+    }
+
+
+    try {
+
+        return new Intl.DateTimeFormat(
+            "en-AE",
+            {
+
+                timeZone:
+                    RESTAURANT_TIMEZONE,
+
+                day:
+                    "2-digit",
+
+                month:
+                    "short",
+
+                year:
+                    "numeric",
+
+                hour:
+                    "2-digit",
+
+                minute:
+                    "2-digit",
+
+                hour12:
+                    true
+
+            }
+        ).format(
+            date
+        );
+
+    } catch {
+
+        return date.toLocaleString();
+
+    }
+
+}
+
+
+// ==========================================
+// HTML ESCAPE
+// ==========================================
+
+function escapeHtml(
+    value
+) {
+
+    return String(
+        value ?? ""
+    )
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+        .replace(
+            /</g,
+            "&lt;"
+        )
+        .replace(
+            />/g,
+            "&gt;"
+        )
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+
+}
+
