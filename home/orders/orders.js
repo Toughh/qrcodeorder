@@ -776,15 +776,19 @@ function applyFiltersAndRender() {
     renderOrdersTable();
 }
 
-// ==========================================
+// =========================================================
 // KPI METRICS
-// ==========================================
+// =========================================================
 // Customer Orders KPIs are RESTAURANT-WIDE.
-// They are NOT affected by Order Management filters.
+//
+// They are NOT affected by:
+// - Search
+// - Branch
+// - Status
+// - Date
 //
 // allOrders = complete restaurant order history
-// filteredOrders = only the currently filtered table records
-// ==========================================
+// =========================================================
 
 function updateOrderMetrics() {
 
@@ -797,36 +801,79 @@ function updateOrderMetrics() {
             ? allOrders
             : [];
 
+
     const total =
         source.length;
+
 
     const pending =
         source.filter(
             order =>
-                order.status === "pending"
+                normalizeStatus(order.status) ===
+                "pending"
         ).length;
+
 
     const preparing =
         source.filter(
             order =>
-                order.status === "preparing"
+                normalizeStatus(order.status) ===
+                "preparing"
         ).length;
+
 
     const ready =
         source.filter(
             order =>
-                order.status === "ready"
+                normalizeStatus(order.status) ===
+                "ready"
         ).length;
+
 
     const completed =
         source.filter(
             order =>
-                order.status === "completed"
+                normalizeStatus(order.status) ===
+                "completed"
         ).length;
 
 
     // --------------------------------------
-    // UPDATE CUSTOMER ORDERS KPI CARDS
+    // GET KPI ELEMENTS
+    // --------------------------------------
+
+    const totalOrdersEl =
+        document.getElementById(
+            "totalOrders"
+        );
+
+
+    const pendingOrdersEl =
+        document.getElementById(
+            "pendingOrders"
+        );
+
+
+    const preparingOrdersEl =
+        document.getElementById(
+            "preparingOrders"
+        );
+
+
+    const readyOrdersEl =
+        document.getElementById(
+            "readyOrders"
+        );
+
+
+    const completedOrdersEl =
+        document.getElementById(
+            "completedOrders"
+        );
+
+
+    // --------------------------------------
+    // UPDATE KPI CARDS
     // --------------------------------------
 
     if (totalOrdersEl) {
@@ -836,12 +883,14 @@ function updateOrderMetrics() {
 
     }
 
+
     if (pendingOrdersEl) {
 
         pendingOrdersEl.textContent =
             pending;
 
     }
+
 
     if (preparingOrdersEl) {
 
@@ -850,12 +899,14 @@ function updateOrderMetrics() {
 
     }
 
+
     if (readyOrdersEl) {
 
         readyOrdersEl.textContent =
             ready;
 
     }
+
 
     if (completedOrdersEl) {
 
@@ -864,6 +915,17 @@ function updateOrderMetrics() {
 
     }
 
+
+    console.log(
+        "[Orders] Customer KPI:",
+        {
+            total,
+            pending,
+            preparing,
+            ready,
+            completed
+        }
+    );
 }
 
 // =========================================================
