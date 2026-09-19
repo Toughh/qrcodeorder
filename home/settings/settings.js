@@ -345,11 +345,6 @@ async function loadSettings() {
 
 }
 
-
-// ==========================================
-// POPULATE SETTINGS
-// ==========================================
-
 function populateSettings(data) {
 
     const profile =
@@ -385,23 +380,22 @@ function populateSettings(data) {
         getInitial(ownerName)
     );
 
-    // --------------------------------------
-    // STATUS
-    // --------------------------------------
 
     // --------------------------------------
     // STATUS
     // --------------------------------------
 
+    // Restaurant.status is the authoritative
+    // restaurant account status.
     const status =
-        String(
-            restaurant.status ||
-            profile.status ||
-            "Active"
-        ).trim();
+        restaurant.status ||
+        profile.status ||
+        "Active";
 
     const normalizedStatus =
-        status.toLowerCase();
+        String(status)
+            .trim()
+            .toLowerCase();
 
     const deactivateButton =
         $("deactivateRestaurantBtn");
@@ -426,8 +420,9 @@ function populateSettings(data) {
         }
         else {
 
-            // Unknown/loading status
-            deactivateButton.disabled = true;
+            // Trial / unknown status should NOT
+            // automatically mean deactivated.
+            deactivateButton.disabled = false;
 
             deactivateButton.textContent =
                 "Deactivate Restaurant";
@@ -452,10 +447,30 @@ function populateSettings(data) {
 
         statusDot.classList.toggle(
             "inactive",
-            normalizedStatus !== "active"
+            normalizedStatus === "inactive"
         );
 
     }
+
+
+    // --------------------------------------
+    // PLAN
+    // --------------------------------------
+
+    const plan =
+        profile.plan ||
+        restaurant.planId ||
+        "Starter";
+
+    setText(
+        "planName",
+        plan
+    );
+
+    setText(
+        "subscriptionPlan",
+        plan
+    );
 
 
     // --------------------------------------
@@ -515,32 +530,38 @@ function populateSettings(data) {
 
     setValue(
         "ownerName",
-        profile.ownerName
+        profile.ownerName ||
+        ""
     );
 
     setValue(
         "ownerEmail",
-        profile.email
+        profile.email ||
+        ""
     );
 
     setValue(
         "ownerMobile",
-        profile.mobile
+        profile.mobile ||
+        ""
     );
 
     setValue(
         "businessType",
-        profile.businessType
+        profile.businessType ||
+        ""
     );
 
     setValue(
         "city",
-        profile.city
+        profile.city ||
+        ""
     );
 
     setValue(
         "website",
-        profile.website
+        profile.website ||
+        ""
     );
 
 
