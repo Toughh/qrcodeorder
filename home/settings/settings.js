@@ -321,11 +321,11 @@ async function loadSettings() {
 
         settingsData = data;
 
+        console.log("SETTINGS API RESPONSE:", data);
+
         populateSettings(data);
 
         hideLoadingState();
-
-        console.log("SETTINGS API RESPONSE:", data);
 
     }
     catch (error) {
@@ -384,7 +384,6 @@ function populateSettings(data) {
         "userAvatar",
         getInitial(ownerName)
     );
-
 
     // --------------------------------------
     // STATUS
