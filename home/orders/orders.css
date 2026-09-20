@@ -3639,3 +3639,1644 @@ body {
             920px;
     }
 }
+
+/* =========================================================
+   DASHBOARD-ALIGNED PREMIUM THEME
+   QR ORDER SAAS — OWNER PORTAL ORDERS
+   ========================================================= */
+
+
+/* =========================================================
+   THEME TOKENS
+   ========================================================= */
+
+:root {
+
+    --orders-navy:
+        #111827;
+
+    --orders-navy-dark:
+        #0f172a;
+
+    --orders-navy-soft:
+        #1e293b;
+
+    --orders-purple:
+        #6366f1;
+
+    --orders-purple-dark:
+        #5b21b6;
+
+    --orders-purple-light:
+        #8b5cf6;
+
+    --orders-purple-soft:
+        #f3f0ff;
+
+    --orders-page-bg:
+        #f5f7fb;
+
+    --orders-card-border:
+        #e7ebf2;
+
+    --orders-soft-border:
+        #edf0f5;
+
+    --orders-text:
+        #172033;
+
+    --orders-muted:
+        #718096;
+
+    --orders-light-muted:
+        #94a3b8;
+}
+
+
+/* =========================================================
+   PAGE BACKGROUND
+   Match Dashboard's soft application background
+   ========================================================= */
+
+body {
+
+    background:
+        linear-gradient(
+            135deg,
+            #f8fafc 0%,
+            #f3f6fb 55%,
+            #eef2f8 100%
+        );
+
+    color:
+        var(--orders-text);
+}
+
+
+/* =========================================================
+   SIDEBAR
+   Keep Dashboard's dark navy foundation
+   ========================================================= */
+
+.sidebar {
+
+    background:
+        linear-gradient(
+            180deg,
+            #0f172a 0%,
+            #111827 100%
+        );
+
+    border-right:
+        1px solid
+        rgba(255, 255, 255, 0.04);
+}
+
+
+/* =========================================================
+   BRAND
+   QR Order / SaaS remains unchanged
+   ========================================================= */
+
+.brand-logo {
+
+    background:
+        linear-gradient(
+            135deg,
+            #6366f1,
+            #8b5cf6
+        );
+
+    border:
+        none;
+
+    box-shadow:
+        0 8px 22px
+        rgba(99, 102, 241, 0.28);
+}
+
+.brand-name {
+
+    color:
+        #ffffff;
+}
+
+.brand-subtitle {
+
+    color:
+        #94a3b8;
+}
+
+
+/* =========================================================
+   SIDEBAR NAVIGATION
+   Dashboard and Orders use same purple active state
+   ========================================================= */
+
+.nav-item {
+
+    color:
+        #cbd5e1;
+}
+
+.nav-item:hover {
+
+    background:
+        rgba(255, 255, 255, 0.06);
+
+    color:
+        #ffffff;
+
+    transform:
+        translateX(2px);
+}
+
+.nav-item.active {
+
+    background:
+        linear-gradient(
+            135deg,
+            #6366f1,
+            #7c3aed
+        );
+
+    color:
+        #ffffff;
+
+    box-shadow:
+        0 8px 25px
+        rgba(79, 70, 229, 0.25);
+}
+
+
+/* =========================================================
+   TOPBAR
+   ========================================================= */
+
+.topbar {
+
+    background:
+        rgba(255, 255, 255, 0.94);
+
+    border-bottom:
+        1px solid
+        #e7ebf2;
+
+    box-shadow:
+        0 1px 0
+        rgba(15, 23, 42, 0.02);
+}
+
+.topbar-eyebrow {
+
+    color:
+        #6366f1;
+}
+
+.topbar h1 {
+
+    color:
+        #172033;
+}
+
+
+/* =========================================================
+   OWNER PROFILE
+   Match Dashboard's purple owner avatar
+   ========================================================= */
+
+.topbar-owner-avatar {
+
+    background:
+        linear-gradient(
+            135deg,
+            #6366f1,
+            #8b5cf6
+        );
+
+    border:
+        none;
+
+    box-shadow:
+        0 6px 16px
+        rgba(99, 102, 241, 0.18);
+}
+
+.topbar-owner-name {
+
+    color:
+        #334155;
+}
+
+.topbar-owner-role {
+
+    color:
+        #94a3b8;
+}
+
+
+/* =========================================================
+   LIVE INDICATOR
+   ========================================================= */
+
+.topbar-live {
+
+    color:
+        #708095;
+}
+
+.topbar-live-dot {
+
+    background:
+        #27a66f;
+
+    box-shadow:
+        0 0 0 3px
+        rgba(39, 166, 111, 0.10);
+}
+
+
+/* =========================================================
+   PAGE CONTAINER
+   ========================================================= */
+
+.page-container {
+
+    padding:
+        27px 30px 42px;
+}
+
+
+/* =========================================================
+   PAGE INTRO
+   OWNER PORTAL / Orders
+   ========================================================= */
+
+.page-intro {
+
+    margin-bottom:
+        22px;
+}
+
+.page-eyebrow {
+
+    color:
+        #6366f1;
+
+    font-size:
+        9px;
+
+    font-weight:
+        800;
+
+    letter-spacing:
+        1.35px;
+}
+
+.page-intro h2 {
+
+    color:
+        #172033;
+
+    font-size:
+        24px;
+
+    font-weight:
+        750;
+
+    letter-spacing:
+        -0.55px;
+}
+
+.page-intro p {
+
+    color:
+        #718096;
+
+    font-size:
+        12px;
+}
+
+
+/* =========================================================
+   LIVE ORDERS BADGE
+   ========================================================= */
+
+.orders-live-badge {
+
+    border:
+        1px solid
+        #dcefe5;
+
+    background:
+        #f4fbf7;
+
+    color:
+        #39745b;
+
+    box-shadow:
+        0 2px 8px
+        rgba(22, 132, 91, 0.04);
+}
+
+.orders-live-dot {
+
+    background:
+        #22a06b;
+
+    box-shadow:
+        0 0 0 3px
+        rgba(34, 160, 107, 0.10);
+}
+
+
+/* =========================================================
+   KPI SUMMARY CARDS
+   Match Dashboard Live Order Analysis cards
+   ========================================================= */
+
+.order-summary-grid {
+
+    gap:
+        12px;
+
+    margin-bottom:
+        20px;
+}
+
+.order-summary-card {
+
+    padding:
+        17px 17px 15px;
+
+    background:
+        #ffffff;
+
+    border:
+        1px solid
+        #e7ebf2;
+
+    border-radius:
+        12px;
+
+    box-shadow:
+        0 4px 14px
+        rgba(15, 23, 42, 0.035);
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.order-summary-card:hover {
+
+    transform:
+        translateY(-1px);
+
+    border-color:
+        #dfe4ec;
+
+    box-shadow:
+        0 8px 22px
+        rgba(15, 23, 42, 0.065);
+}
+
+
+/* =========================================================
+   KPI LABEL
+   ========================================================= */
+
+.summary-label {
+
+    color:
+        #8290a2;
+
+    font-size:
+        8px;
+
+    font-weight:
+        800;
+
+    letter-spacing:
+        0.85px;
+}
+
+
+/* =========================================================
+   KPI ICONS
+   Dashboard-style soft colored icons
+   ========================================================= */
+
+.summary-icon {
+
+    width:
+        28px;
+
+    height:
+        28px;
+
+    border-radius:
+        8px;
+
+    font-size:
+        12px;
+}
+
+.summary-icon.total {
+
+    color:
+        #a87916;
+
+    background:
+        #fff7e7;
+}
+
+.summary-icon.pending {
+
+    color:
+        #c2761b;
+
+    background:
+        #fff6e8;
+}
+
+.summary-icon.preparing {
+
+    color:
+        #3b6fb6;
+
+    background:
+        #eef5ff;
+}
+
+.summary-icon.ready,
+.summary-icon.completed {
+
+    color:
+        #16845b;
+
+    background:
+        #ecf8f2;
+}
+
+
+/* =========================================================
+   KPI VALUES
+   ========================================================= */
+
+.summary-value {
+
+    margin-top:
+        11px;
+}
+
+.summary-value strong {
+
+    color:
+        #172033;
+
+    font-size:
+        24px;
+
+    font-weight:
+        750;
+
+    letter-spacing:
+        -0.65px;
+}
+
+.summary-footer {
+
+    margin-top:
+        8px;
+
+    color:
+        #94a3b8;
+
+    font-size:
+        8px;
+}
+
+
+/* =========================================================
+   ORDERS MANAGEMENT CARD
+   Same visual language as Dashboard Live Order Analysis
+   ========================================================= */
+
+.orders-card {
+
+    background:
+        #ffffff;
+
+    border:
+        1px solid
+        #e7ebf2;
+
+    border-radius:
+        16px;
+
+    box-shadow:
+        0 8px 26px
+        rgba(15, 23, 42, 0.055);
+}
+
+
+/* =========================================================
+   ORDERS CARD HEADER
+   ========================================================= */
+
+.orders-card-header {
+
+    padding:
+        22px 22px 17px;
+
+    background:
+        #ffffff;
+
+    border-bottom:
+        1px solid
+        #edf0f5;
+}
+
+.section-eyebrow {
+
+    color:
+        #6366f1;
+
+    font-size:
+        8px;
+
+    font-weight:
+        800;
+
+    letter-spacing:
+        1.15px;
+}
+
+.orders-card-header h2 {
+
+    color:
+        #172033;
+
+    font-size:
+        16px;
+
+    font-weight:
+        750;
+
+    letter-spacing:
+        -0.2px;
+}
+
+.orders-card-header p {
+
+    color:
+        #718096;
+
+    font-size:
+        10px;
+}
+
+
+/* =========================================================
+   MONITORING STATUS
+   ========================================================= */
+
+.orders-header-status {
+
+    border:
+        1px solid
+        #e1e7ee;
+
+    background:
+        #f8fafc;
+
+    color:
+        #718096;
+
+    box-shadow:
+        none;
+}
+
+.header-status-dot {
+
+    background:
+        #22a06b;
+
+    box-shadow:
+        0 0 0 3px
+        rgba(34, 160, 107, 0.09);
+}
+
+
+/* =========================================================
+   FILTER TOOLBAR
+   ========================================================= */
+
+.orders-toolbar {
+
+    padding:
+        15px 22px;
+
+    background:
+        #f8fafc;
+
+    border-bottom:
+        1px solid
+        #edf0f5;
+}
+
+
+/* =========================================================
+   SEARCH
+   ========================================================= */
+
+.order-search input {
+
+    height:
+        38px;
+
+    border:
+        1px solid
+        #dfe5ec;
+
+    border-radius:
+        8px;
+
+    background:
+        #ffffff;
+
+    color:
+        #172033;
+}
+
+.order-search input:focus {
+
+    border-color:
+        #a5a8f3;
+
+    box-shadow:
+        0 0 0 3px
+        rgba(99, 102, 241, 0.08);
+}
+
+.order-search input::placeholder {
+
+    color:
+        #a0aab8;
+}
+
+.search-icon {
+
+    color:
+        #a0aab8;
+}
+
+
+/* =========================================================
+   FILTER LABELS
+   ========================================================= */
+
+.filter-control label {
+
+    color:
+        #8290a2;
+
+    font-size:
+        8px;
+}
+
+
+/* =========================================================
+   FILTER SELECTS
+   ========================================================= */
+
+.filter-control select {
+
+    height:
+        38px;
+
+    border:
+        1px solid
+        #dfe5ec;
+
+    border-radius:
+        8px;
+
+    background:
+        #ffffff;
+
+    color:
+        #526176;
+}
+
+.filter-control select:focus {
+
+    border-color:
+        #a5a8f3;
+
+    box-shadow:
+        0 0 0 3px
+        rgba(99, 102, 241, 0.08);
+}
+
+
+/* =========================================================
+   RESET BUTTON
+   ========================================================= */
+
+.reset-filter-button {
+
+    height:
+        38px;
+
+    border:
+        1px solid
+        #dfe5ec;
+
+    background:
+        #ffffff;
+
+    color:
+        #68768a;
+
+    border-radius:
+        8px;
+}
+
+.reset-filter-button:hover {
+
+    border-color:
+        #b8b9f2;
+
+    background:
+        #f7f7ff;
+
+    color:
+        #6366f1;
+}
+
+
+/* =========================================================
+   TABLE WRAPPER
+   ========================================================= */
+
+.orders-table-wrapper {
+
+    border:
+        1px solid
+        #e6eaf0;
+
+    border-radius:
+        12px;
+
+    background:
+        #ffffff;
+
+    box-shadow:
+        none;
+}
+
+
+/* =========================================================
+   TABLE
+   ========================================================= */
+
+.orders-table {
+
+    background:
+        #ffffff;
+}
+
+
+/* =========================================================
+   TABLE HEADER
+   ========================================================= */
+
+.orders-table thead {
+
+    background:
+        #f8fafc;
+}
+
+.orders-table th {
+
+    padding:
+        10px 15px;
+
+    color:
+        #718096;
+
+    font-size:
+        8px;
+
+    font-weight:
+        800;
+
+    letter-spacing:
+        0.75px;
+
+    border-bottom:
+        1px solid
+        #e7ebf1;
+}
+
+
+/* =========================================================
+   TABLE BODY
+   ========================================================= */
+
+.orders-table tbody tr {
+
+    background:
+        #ffffff;
+}
+
+.orders-table tbody tr:hover {
+
+    background:
+        #fafbff;
+}
+
+.orders-table td {
+
+    padding:
+        14px 16px;
+
+    color:
+        #526176;
+
+    border-bottom:
+        1px solid
+        #edf0f4;
+}
+
+
+/* =========================================================
+   ORDER ID
+   ========================================================= */
+
+.orders-table td:first-child,
+.order-id-cell {
+
+    color:
+        #172033;
+
+    font-size:
+        12px;
+
+    font-weight:
+        750;
+}
+
+.order-id-cell strong {
+
+    color:
+        #172033;
+}
+
+
+/* =========================================================
+   CUSTOMER
+   ========================================================= */
+
+.orders-table td:nth-child(2) {
+
+    color:
+        #526176;
+}
+
+.customer-name {
+
+    color:
+        #263b55;
+
+    font-size:
+        11px;
+
+    font-weight:
+        700;
+}
+
+.customer-contact {
+
+    color:
+        #94a3b8;
+
+    font-size:
+        9px;
+}
+
+
+/* =========================================================
+   BRANCH / TABLE
+   ========================================================= */
+
+.orders-table td:nth-child(3),
+.branch-name,
+.orders-table td:nth-child(4),
+.table-number {
+
+    color:
+        #526176;
+
+    font-size:
+        10px;
+
+    font-weight:
+        600;
+}
+
+
+/* =========================================================
+   AMOUNT
+   ========================================================= */
+
+.orders-table td:nth-child(5),
+.order-amount {
+
+    color:
+        #172033;
+
+    font-size:
+        12px;
+
+    font-weight:
+        800;
+}
+
+
+/* =========================================================
+   STATUS BADGES
+   Keep semantic colors, Dashboard-style softness
+   ========================================================= */
+
+.status-badge {
+
+    min-width:
+        78px;
+
+    height:
+        25px;
+
+    padding:
+        0 9px;
+
+    font-size:
+        8px;
+
+    font-weight:
+        750;
+}
+
+.status-badge.status-pending {
+
+    color:
+        #a25f0b;
+
+    background:
+        #fff7e8;
+
+    border-color:
+        #f0d7a8;
+}
+
+.status-badge.status-preparing {
+
+    color:
+        #35659d;
+
+    background:
+        #eef5ff;
+
+    border-color:
+        #c8d9ef;
+}
+
+.status-badge.status-ready,
+.status-badge.status-completed {
+
+    color:
+        #27704b;
+
+    background:
+        #edf9f3;
+
+    border-color:
+        #c3e3d0;
+}
+
+.status-badge.status-accepted {
+
+    color:
+        #806021;
+
+    background:
+        #fff9ed;
+
+    border-color:
+        #ead6a8;
+}
+
+.status-badge.status-rejected {
+
+    color:
+        #a34848;
+
+    background:
+        #fff1f1;
+
+    border-color:
+        #efc9c9;
+}
+
+.status-badge.status-cancelled {
+
+    color:
+        #64748b;
+
+    background:
+        #f4f6f8;
+
+    border-color:
+        #dce1e7;
+}
+
+
+/* =========================================================
+   TIME
+   ========================================================= */
+
+.orders-table td:nth-child(7),
+.order-time {
+
+    color:
+        #7b8798;
+
+    font-size:
+        10px;
+}
+
+
+/* =========================================================
+   VIEW BUTTON
+   Purple Dashboard language
+   ========================================================= */
+
+.order-view-btn,
+.orders-table td:nth-child(8) button,
+.orders-table .action-btn {
+
+    min-width:
+        60px;
+
+    min-height:
+        28px;
+
+    padding:
+        5px 10px;
+
+    border:
+        1px solid
+        #d9dcfa;
+
+    border-radius:
+        7px;
+
+    background:
+        #f7f7ff;
+
+    color:
+        #6366f1;
+
+    font-size:
+        8px;
+
+    font-weight:
+        750;
+}
+
+.order-view-btn:hover,
+.orders-table td:nth-child(8) button:hover,
+.orders-table .action-btn:hover {
+
+    border-color:
+        #b9baf4;
+
+    background:
+        #eeeeff;
+
+    color:
+        #4f46e5;
+
+    box-shadow:
+        0 4px 12px
+        rgba(99, 102, 241, 0.10);
+
+    transform:
+        translateY(-1px);
+}
+
+.order-view-btn:focus-visible,
+.orders-table td:nth-child(8) button:focus-visible {
+
+    outline:
+        none;
+
+    box-shadow:
+        0 0 0 3px
+        rgba(99, 102, 241, 0.10);
+}
+
+
+/* =========================================================
+   CARD FOOTER
+   ========================================================= */
+
+.orders-card-footer {
+
+    padding:
+        14px 22px;
+
+    background:
+        #fbfcfe;
+
+    border-top:
+        1px solid
+        #edf0f5;
+}
+
+.orders-result-count {
+
+    color:
+        #94a3b8;
+
+    font-size:
+        9px;
+}
+
+.orders-result-count strong {
+
+    color:
+        #5f6f83;
+}
+
+
+/* =========================================================
+   PAGINATION
+   Dashboard-style purple
+   ========================================================= */
+
+.pagination-button,
+.pagination-page,
+#paginationPages button {
+
+    width:
+        29px;
+
+    height:
+        29px;
+
+    border:
+        1px solid
+        #dfe4ec;
+
+    border-radius:
+        7px;
+
+    background:
+        #ffffff;
+
+    color:
+        #778497;
+}
+
+.pagination-button:hover:not(:disabled),
+.pagination-page:hover,
+#paginationPages button:hover {
+
+    border-color:
+        #bfc1f4;
+
+    background:
+        #f7f7ff;
+
+    color:
+        #6366f1;
+}
+
+.pagination-page.active,
+#paginationPages button.active {
+
+    border-color:
+        #6366f1;
+
+    background:
+        linear-gradient(
+            135deg,
+            #6366f1,
+            #7c3aed
+        );
+
+    color:
+        #ffffff;
+
+    box-shadow:
+        0 4px 10px
+        rgba(99, 102, 241, 0.20);
+}
+
+
+/* =========================================================
+   LOADING STATE
+   ========================================================= */
+
+.orders-loading-icon {
+
+    background:
+        linear-gradient(
+            135deg,
+            #6366f1,
+            #7c3aed
+        );
+
+    color:
+        #ffffff;
+
+    box-shadow:
+        0 8px 20px
+        rgba(99, 102, 241, 0.20);
+}
+
+
+/* =========================================================
+   EMPTY STATE
+   ========================================================= */
+
+.orders-empty {
+
+    border-color:
+        #dfe5ed;
+
+    background:
+        linear-gradient(
+            145deg,
+            #fbfcff,
+            #f7f9fc
+        );
+}
+
+.orders-empty-icon {
+
+    border-color:
+        #dedffc;
+
+    background:
+        #f3f3ff;
+
+    color:
+        #6366f1;
+}
+
+.orders-empty-title {
+
+    color:
+        #172033;
+}
+
+.orders-empty-text {
+
+    color:
+        #94a3b8;
+}
+
+
+/* =========================================================
+   MODAL
+   Match Dashboard application language
+   ========================================================= */
+
+.order-modal {
+
+    background:
+        linear-gradient(
+            145deg,
+            #ffffff 0%,
+            #fbfcff 100%
+        );
+
+    border:
+        1px solid
+        #e1e6ee;
+
+    box-shadow:
+        0 28px 70px
+        rgba(15, 23, 42, 0.18),
+        0 8px 24px
+        rgba(15, 23, 42, 0.07);
+}
+
+.order-modal::before {
+
+    background:
+        linear-gradient(
+            90deg,
+            #6366f1,
+            #8b5cf6,
+            #6366f1
+        );
+}
+
+.modal-eyebrow {
+
+    color:
+        #6366f1;
+}
+
+.order-modal-header h2 {
+
+    color:
+        #172033;
+}
+
+.modal-close:hover {
+
+    border-color:
+        #c7c9f5;
+
+    color:
+        #6366f1;
+
+    background:
+        #f7f7ff;
+}
+
+
+/* =========================================================
+   MODAL STATUS
+   ========================================================= */
+
+.modal-status-row {
+
+    background:
+        #f8fafc;
+
+    border-bottom:
+        1px solid
+        #edf0f5;
+}
+
+.modal-status-label {
+
+    color:
+        #8290a2;
+}
+
+
+/* =========================================================
+   MODAL SECTIONS
+   ========================================================= */
+
+.modal-section {
+
+    border-bottom:
+        1px solid
+        #edf0f5;
+}
+
+.modal-section-title {
+
+    color:
+        #526176;
+}
+
+.modal-info-item {
+
+    border:
+        1px solid
+        #e4e8ee;
+
+    background:
+        #ffffff;
+}
+
+.modal-info-item:hover {
+
+    border-color:
+        #cfd1f5;
+
+    box-shadow:
+        0 5px 14px
+        rgba(15, 23, 42, 0.045);
+}
+
+.modal-info-item span {
+
+    color:
+        #98a3b1;
+}
+
+.modal-info-item strong {
+
+    color:
+        #465468;
+}
+
+
+/* =========================================================
+   MODAL ITEMS
+   ========================================================= */
+
+.modal-items {
+
+    border:
+        1px solid
+        #e4e8ee;
+
+    background:
+        #ffffff;
+}
+
+.order-item-row {
+
+    border-bottom:
+        1px solid
+        #edf0f4;
+}
+
+.order-item-name {
+
+    color:
+        #172033;
+}
+
+.order-item-quantity,
+.order-item-unit-price {
+
+    color:
+        #8a94a6;
+}
+
+.order-item-price {
+
+    color:
+        #172033;
+}
+
+.order-item-empty,
+.order-item-text {
+
+    background:
+        #f8fafc;
+
+    color:
+        #7a8496;
+}
+
+
+/* =========================================================
+   MODAL REQUEST
+   ========================================================= */
+
+.modal-request {
+
+    border:
+        1px solid
+        #e1e2fa;
+
+    background:
+        #f8f8ff;
+
+    color:
+        #68718a;
+}
+
+
+/* =========================================================
+   BILLING
+   ========================================================= */
+
+.modal-billing {
+
+    background:
+        #f8fafc;
+}
+
+.billing-row {
+
+    color:
+        #8792a0;
+}
+
+.billing-row strong {
+
+    color:
+        #586678;
+}
+
+.billing-total {
+
+    border-top:
+        1px solid
+        #e5e9ed;
+
+    color:
+        #475569;
+}
+
+.billing-total strong {
+
+    color:
+        #6366f1;
+}
+
+
+/* =========================================================
+   MODAL SECONDARY BUTTON
+   ========================================================= */
+
+.modal-secondary-button {
+
+    border:
+        1px solid
+        #dfe4ec;
+
+    background:
+        #ffffff;
+
+    color:
+        #68768a;
+}
+
+.modal-secondary-button:hover {
+
+    border-color:
+        #bfc1f4;
+
+    background:
+        #f7f7ff;
+
+    color:
+        #6366f1;
+}
+
+
+/* =========================================================
+   MOBILE — KEEP DASHBOARD FEEL
+   ========================================================= */
+
+@media (max-width: 760px) {
+
+    .page-container {
+
+        padding:
+            22px 18px 34px;
+    }
+
+    .order-summary-grid {
+
+        gap:
+            10px;
+    }
+
+    .orders-card {
+
+        border-radius:
+            14px;
+    }
+}
+
+
+@media (max-width: 520px) {
+
+    .page-container {
+
+        padding:
+            19px 13px 28px;
+    }
+
+    .order-summary-card {
+
+        border-radius:
+            11px;
+    }
+
+    .orders-card-header {
+
+        padding:
+            19px 17px 17px;
+    }
+
+    .orders-toolbar {
+
+        padding:
+            14px 17px;
+    }
+
+    .orders-card-footer {
+
+        padding:
+            14px 17px;
+    }
+}

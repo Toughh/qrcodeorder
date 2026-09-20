@@ -37,7 +37,7 @@ let currentFilters = {
     search: "",
     branch: "all",
     status: "all",
-    date: "all"
+    date: "today"
 };
 
 let selectedOrder = null;
@@ -1735,11 +1735,11 @@ function populateBranchFilter(
 function resetFilters() {
 
     currentFilters = {
-        search: "",
-        branch: "all",
-        status: "all",
-        date: "all"
-    };
+    search: "",
+    branch: "all",
+    status: "all",
+    date: "today"
+};
 
 
     currentPage = 1;
@@ -1785,7 +1785,7 @@ function resetFilters() {
 
 
     if (dateFilter) {
-        dateFilter.value = "all";
+        dateFilter.value = "today";
     }
 
 
