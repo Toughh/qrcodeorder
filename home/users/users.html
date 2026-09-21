@@ -10,9 +10,7 @@
         content="width=device-width, initial-scale=1.0"
     >
 
-    <title>
-        QR Order SaaS — Users
-    </title>
+    <title>Users | Restaurant SaaS</title>
 
     <script src="../../config/config.js"></script>
 
@@ -26,8 +24,7 @@
 
 <body>
 
-
-<div class="app-shell">
+<div class="app">
 
 
     <!-- ==========================================
@@ -45,11 +42,11 @@
             <div>
 
                 <div class="brand-name">
-                    QR Order
+                    Restaurant SaaS
                 </div>
 
                 <div class="brand-subtitle">
-                    SaaS
+                    OWNER PORTAL
                 </div>
 
             </div>
@@ -63,7 +60,7 @@
                 href="../dashboard/dashboard.html"
                 class="nav-item"
             >
-                <span>📊</span>
+                <span>▦</span>
                 Dashboard
             </a>
 
@@ -72,7 +69,7 @@
                 href="../restaurant/restaurant.html"
                 class="nav-item"
             >
-                <span>🏪</span>
+                <span>⌂</span>
                 Restaurant
             </a>
 
@@ -81,7 +78,7 @@
                 href="../branches/branches.html"
                 class="nav-item"
             >
-                <span>🏢</span>
+                <span>⌖</span>
                 Branches
             </a>
 
@@ -90,7 +87,7 @@
                 href="../menu/menu.html"
                 class="nav-item"
             >
-                <span>🍽️</span>
+                <span>☰</span>
                 Menu
             </a>
 
@@ -99,7 +96,7 @@
                 href="#"
                 class="nav-item active"
             >
-                <span>👥</span>
+                <span>♙</span>
                 Users
             </a>
 
@@ -108,7 +105,7 @@
                 href="../orders/orders.html"
                 class="nav-item"
             >
-                <span>📦</span>
+                <span>▣</span>
                 Orders
             </a>
 
@@ -117,7 +114,7 @@
                 href="../reports/reports.html"
                 class="nav-item"
             >
-                <span>📈</span>
+                <span>◈</span>
                 Reports
             </a>
 
@@ -126,7 +123,7 @@
                 href="../settings/settings.html"
                 class="nav-item"
             >
-                <span>⚙️</span>
+                <span>⚙</span>
                 Settings
             </a>
 
@@ -136,10 +133,11 @@
         <div class="sidebar-footer">
 
             <button
+                type="button"
                 id="logoutBtn"
                 class="logout-btn"
             >
-                🚪 Logout
+                ⇥ Logout
             </button>
 
         </div>
@@ -152,7 +150,7 @@
          MAIN
     =========================================== -->
 
-    <main class="main-content">
+    <main class="main">
 
 
         <!-- ======================================
@@ -165,17 +163,16 @@
 
                 <button
                     type="button"
-                    class="mobile-menu-button"
                     id="mobileMenuButton"
+                    class="mobile-menu-button"
                 >
                     ☰
                 </button>
 
-
                 <div>
 
-                    <span class="topbar-eyebrow">
-                        OWNER PORTAL
+                    <span class="page-label">
+                        ACCESS MANAGEMENT
                     </span>
 
                     <h1>
@@ -187,38 +184,29 @@
             </div>
 
 
-            <div class="topbar-right">
+            <div class="user-area">
 
-                <div class="topbar-live">
-
-                    <span class="topbar-live-dot"></span>
-
-                    <span>
-                        System Live
-                    </span>
-
+                <div
+                    id="userAvatar"
+                    class="user-avatar"
+                >
+                    O
                 </div>
 
-
-                <div class="topbar-owner">
+                <div>
 
                     <div
-                        class="topbar-owner-avatar"
-                        id="topbarUserAvatar"
+                        id="userName"
+                        class="user-name"
                     >
-                        O
+                        Owner
                     </div>
 
-                    <div class="topbar-owner-info">
-
-                        <strong id="topbarUserName">
-                            Owner
-                        </strong>
-
-                        <span id="topbarUserRole">
-                            Owner
-                        </span>
-
+                    <div
+                        id="userRole"
+                        class="user-role"
+                    >
+                        Owner
                     </div>
 
                 </div>
@@ -233,199 +221,142 @@
              INTRO
         ======================================= -->
 
-        <section class="page-intro">
+        <section class="intro-section">
 
             <div>
 
-                <span class="section-eyebrow">
-                    ACCESS & WORKFORCE
+                <span class="intro-eyebrow">
+                    TEAM & ACCESS
                 </span>
 
                 <h2>
-                    User Management
+                    Manage Restaurant Access
                 </h2>
 
                 <p>
-                    Monitor your restaurant team,
-                    account activation and access
-                    posture from one place.
+                    Give trusted restaurant managers
+                    operational access without exposing
+                    owner-level business controls.
                 </p>
 
             </div>
 
 
-            <div class="intro-badge">
-
-                <span class="intro-badge-dot"></span>
-
-                <div>
-
-                    <strong>
-                        Access Control
-                    </strong>
-
-                    <small>
-                        Restaurant workforce
-                    </small>
-
-                </div>
-
-            </div>
+            <button
+                type="button"
+                id="addManagerButton"
+                class="primary-button"
+            >
+                <span>＋</span>
+                Add Restaurant Manager
+            </button>
 
         </section>
 
 
 
         <!-- ======================================
-             EXECUTIVE USER SNAPSHOT
+             ACCESS SUMMARY
         ======================================= -->
 
-        <section
-            class="user-kpi-grid"
-            aria-label="User access summary"
-        >
+        <section class="summary-grid">
 
+            <div class="summary-card summary-primary">
 
-            <div class="user-kpi-card">
+                <div class="summary-top">
 
-                <div class="user-kpi-top">
-
-                    <span class="user-kpi-label">
+                    <span>
                         TOTAL USERS
                     </span>
 
-                    <span class="user-kpi-icon">
-                        ◈
+                    <span class="summary-icon">
+                        ♙
                     </span>
 
                 </div>
 
-                <div
-                    class="user-kpi-value"
-                    id="totalUsers"
-                >
+                <strong id="totalUsers">
                     0
-                </div>
+                </strong>
 
-                <div class="user-kpi-caption">
-                    Restaurant workforce
-                </div>
+                <p>
+                    Authorized restaurant users
+                </p>
 
             </div>
 
 
+            <div class="summary-card">
 
-            <div class="user-kpi-card active-card">
+                <div class="summary-top">
 
-                <div class="user-kpi-top">
-
-                    <span class="user-kpi-label">
-                        ACTIVE USERS
+                    <span>
+                        OWNERS
                     </span>
 
-                    <span class="user-kpi-icon active">
+                    <span class="summary-icon">
+                        ◆
+                    </span>
+
+                </div>
+
+                <strong id="ownerCount">
+                    0
+                </strong>
+
+                <p>
+                    Full business access
+                </p>
+
+            </div>
+
+
+            <div class="summary-card">
+
+                <div class="summary-top">
+
+                    <span>
+                        MANAGERS
+                    </span>
+
+                    <span class="summary-icon">
+                        ◇
+                    </span>
+
+                </div>
+
+                <strong id="managerCount">
+                    0
+                </strong>
+
+                <p>
+                    Operational access
+                </p>
+
+            </div>
+
+
+            <div class="summary-card">
+
+                <div class="summary-top">
+
+                    <span>
+                        PENDING
+                    </span>
+
+                    <span class="summary-icon pending">
                         ●
                     </span>
 
                 </div>
 
-                <div
-                    class="user-kpi-value"
-                    id="activeUsers"
-                >
+                <strong id="pendingCount">
                     0
-                </div>
+                </strong>
 
-                <div class="user-kpi-caption">
-                    Accounts currently enabled
-                </div>
-
-            </div>
-
-
-
-            <div class="user-kpi-card pending-card">
-
-                <div class="user-kpi-top">
-
-                    <span class="user-kpi-label">
-                        PENDING ACTIVATION
-                    </span>
-
-                    <span class="user-kpi-icon pending">
-                        ◷
-                    </span>
-
-                </div>
-
-                <div
-                    class="user-kpi-value"
-                    id="pendingUsers"
-                >
-                    0
-                </div>
-
-                <div class="user-kpi-caption">
-                    Accounts awaiting onboarding
-                </div>
-
-            </div>
-
-
-
-            <div class="user-kpi-card">
-
-                <div class="user-kpi-top">
-
-                    <span class="user-kpi-label">
-                        VERIFIED USERS
-                    </span>
-
-                    <span class="user-kpi-icon verified">
-                        ✓
-                    </span>
-
-                </div>
-
-                <div
-                    class="user-kpi-value"
-                    id="verifiedUsers"
-                >
-                    0
-                </div>
-
-                <div class="user-kpi-caption">
-                    Email verification complete
-                </div>
-
-            </div>
-
-
-
-            <div class="user-kpi-card privileged-card">
-
-                <div class="user-kpi-top">
-
-                    <span class="user-kpi-label">
-                        PRIVILEGED ACCESS
-                    </span>
-
-                    <span class="user-kpi-icon privileged">
-                        ◆
-                    </span>
-
-                </div>
-
-                <div
-                    class="user-kpi-value"
-                    id="privilegedUsers"
-                >
-                    0
-                </div>
-
-                <div class="user-kpi-caption">
-                    Owner, Admin and Manager roles
-                </div>
+                <p>
+                    Awaiting activation
+                </p>
 
             </div>
 
@@ -434,656 +365,420 @@
 
 
         <!-- ======================================
-             ACCESS INTELLIGENCE
+             ACCESS MODEL
         ======================================= -->
 
-        <section class="intelligence-grid">
+        <section class="content-card">
+
+            <div class="section-heading">
+
+                <div>
+
+                    <span class="section-eyebrow">
+                        ACCESS MODEL
+                    </span>
+
+                    <h2>
+                        Two simple roles
+                    </h2>
+
+                    <p>
+                        Keep restaurant operations simple
+                        while protecting owner-level controls.
+                    </p>
+
+                </div>
+
+            </div>
 
 
-            <div class="intelligence-card">
+            <div class="role-grid">
 
-                <div class="intelligence-header">
 
-                    <div>
+                <div class="role-card owner-role">
 
-                        <span class="section-eyebrow">
-                            ROLE STRUCTURE
-                        </span>
-
-                        <h3>
-                            Access Distribution
-                        </h3>
-
-                    </div>
-
-                    <span class="intelligence-mark">
+                    <div class="role-icon">
                         ◆
-                    </span>
-
-                </div>
-
-
-                <div
-                    id="roleDistribution"
-                    class="distribution-list"
-                >
-
-                    <div class="distribution-empty">
-                        Loading role structure...
                     </div>
-
-                </div>
-
-            </div>
-
-
-
-            <div class="intelligence-card">
-
-                <div class="intelligence-header">
 
                     <div>
 
-                        <span class="section-eyebrow">
-                            ACCOUNT HEALTH
+                        <span class="role-label">
+                            OWNER
                         </span>
 
                         <h3>
-                            Workforce Readiness
+                            Full Business Control
                         </h3>
-
-                    </div>
-
-                    <span class="intelligence-mark">
-                        ◈
-                    </span>
-
-                </div>
-
-
-                <div class="health-metrics">
-
-                    <div class="health-metric">
-
-                        <div>
-
-                            <span>
-                                Verification Rate
-                            </span>
-
-                            <strong id="verificationRate">
-                                0%
-                            </strong>
-
-                        </div>
-
-                        <div class="health-track">
-
-                            <div
-                                id="verificationBar"
-                                class="health-fill"
-                            ></div>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="health-metric">
-
-                        <div>
-
-                            <span>
-                                Activation Rate
-                            </span>
-
-                            <strong id="activationRate">
-                                0%
-                            </strong>
-
-                        </div>
-
-                        <div class="health-track">
-
-                            <div
-                                id="activationBar"
-                                class="health-fill activation"
-                            ></div>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-
-                <div class="health-note">
-
-                    <span class="health-note-icon">
-                        ✓
-                    </span>
-
-                    <div>
-
-                        <strong>
-                            Access posture
-                        </strong>
-
-                        <span>
-                            Review pending or unverified
-                            accounts before granting
-                            operational access.
-                        </span>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </section>
-
-
-
-        <!-- ======================================
-             USER DIRECTORY
-        ======================================= -->
-
-        <section class="users-section">
-
-            <div class="users-card">
-
-
-                <div class="users-card-header">
-
-                    <div>
-
-                        <span class="section-eyebrow">
-                            USER DIRECTORY
-                        </span>
-
-                        <h2>
-                            Restaurant Users
-                        </h2>
 
                         <p>
-                            Manage visibility of team
-                            accounts and access status.
+                            Complete access to restaurant
+                            operations, configuration,
+                            users and subscription.
                         </p>
 
                     </div>
 
 
-                    <div class="directory-status">
+                    <div class="role-permissions">
 
-                        <span class="directory-status-dot"></span>
+                        <span>Dashboard</span>
+                        <span>Orders</span>
+                        <span>Menu</span>
+                        <span>Reports</span>
+                        <span>Users</span>
+                        <span>Settings</span>
 
-                        <span>
-                            Secure Directory
+                    </div>
+
+                </div>
+
+
+
+                <div class="role-card manager-role">
+
+                    <div class="role-icon">
+                        ◇
+                    </div>
+
+                    <div>
+
+                        <span class="role-label">
+                            RESTAURANT MANAGER
                         </span>
 
-                    </div>
+                        <h3>
+                            Restaurant Operations
+                        </h3>
 
-                </div>
-
-
-
-                <!-- FILTER TOOLBAR -->
-
-                <div class="users-toolbar">
-
-
-                    <div class="search-wrapper">
-
-                        <span class="search-icon">
-                            ⌕
-                        </span>
-
-                        <input
-                            type="search"
-                            id="userSearch"
-                            placeholder="Search by name, email, mobile or user ID..."
-                            autocomplete="off"
-                        >
+                        <p>
+                            Manage daily restaurant activity,
+                            customer orders and menu operations.
+                        </p>
 
                     </div>
 
 
-                    <select id="roleFilter">
+                    <div class="role-permissions">
 
-                        <option value="all">
-                            All Roles
-                        </option>
+                        <span>Dashboard</span>
+                        <span>Orders</span>
+                        <span>Menu</span>
+                        <span>Reports</span>
 
-                    </select>
-
-
-                    <select id="statusFilter">
-
-                        <option value="all">
-                            All Statuses
-                        </option>
-
-                    </select>
-
-
-                    <select id="verificationFilter">
-
-                        <option value="all">
-                            All Verification
-                        </option>
-
-                        <option value="verified">
-                            Verified
-                        </option>
-
-                        <option value="unverified">
-                            Unverified
-                        </option>
-
-                    </select>
-
-
-                    <button
-                        type="button"
-                        id="resetFilters"
-                        class="reset-button"
-                    >
-                        Reset
-                    </button>
-
-                </div>
-
-
-
-                <!-- TABLE -->
-
-                <div class="users-table-wrapper">
-
-                    <table class="users-table">
-
-                        <thead>
-
-                            <tr>
-
-                                <th>
-                                    USER
-                                </th>
-
-                                <th>
-                                    CONTACT
-                                </th>
-
-                                <th>
-                                    ROLE
-                                </th>
-
-                                <th>
-                                    STATUS
-                                </th>
-
-                                <th>
-                                    VERIFICATION
-                                </th>
-
-                                <th>
-                                    CREATED
-                                </th>
-
-                                <th>
-                                    ACTION
-                                </th>
-
-                            </tr>
-
-                        </thead>
-
-
-                        <tbody id="usersTableBody">
-
-                            <tr>
-
-                                <td
-                                    colspan="7"
-                                    class="users-loading"
-                                >
-
-                                    <div class="loading-mark">
-                                        ◌
-                                    </div>
-
-                                    Loading users...
-
-                                </td>
-
-                            </tr>
-
-                        </tbody>
-
-                    </table>
-
-                </div>
-
-
-
-                <!-- EMPTY -->
-
-                <div
-                    id="usersEmpty"
-                    class="users-empty"
-                    style="display:none;"
-                >
-
-                    <div class="users-empty-icon">
-                        ✦
                     </div>
 
-                    <h3>
-                        No users found
-                    </h3>
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- ======================================
+             USERS DIRECTORY
+        ======================================= -->
+
+        <section class="content-card">
+
+            <div class="section-heading directory-heading">
+
+                <div>
+
+                    <span class="section-eyebrow">
+                        USER DIRECTORY
+                    </span>
+
+                    <h2>
+                        Authorized Users
+                    </h2>
 
                     <p>
-                        Try adjusting your search or
-                        access filters.
+                        People who can access this restaurant portal.
                     </p>
 
                 </div>
 
 
+                <div class="directory-status">
 
-                <!-- FOOTER -->
+                    <span class="status-dot"></span>
 
-                <div class="users-card-footer">
-
-                    <div class="result-count">
-
-                        Showing
-
-                        <strong id="usersFrom">
-                            0
-                        </strong>
-
-                        –
-
-                        <strong id="usersTo">
-                            0
-                        </strong>
-
-                        of
-
-                        <strong id="usersTotal">
-                            0
-                        </strong>
-
-                        users
-
-                    </div>
-
-
-                    <div class="pagination">
-
-                        <button
-                            type="button"
-                            id="previousPage"
-                            class="pagination-button"
-                            disabled
-                        >
-                            ‹
-                        </button>
-
-
-                        <div
-                            id="paginationPages"
-                            class="pagination-pages"
-                        ></div>
-
-
-                        <button
-                            type="button"
-                            id="nextPage"
-                            class="pagination-button"
-                            disabled
-                        >
-                            ›
-                        </button>
-
-                    </div>
+                    <span>
+                        Access controlled
+                    </span>
 
                 </div>
+
+            </div>
+
+
+
+            <div
+                id="usersLoading"
+                class="state-box"
+            >
+                Loading users...
+            </div>
+
+
+            <div
+                id="usersError"
+                class="state-box error-state hidden"
+            ></div>
+
+
+            <div
+                id="usersEmpty"
+                class="state-box hidden"
+            >
+                No users found.
+            </div>
+
+
+            <div
+                id="usersTableWrapper"
+                class="table-wrapper hidden"
+            >
+
+                <table class="users-table">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                USER
+                            </th>
+
+                            <th>
+                                ROLE
+                            </th>
+
+                            <th>
+                                STATUS
+                            </th>
+
+                            <th>
+                                ACCESS
+                            </th>
+
+                            <th>
+                                CREATED
+                            </th>
+
+                            <th>
+                                ACTION
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody id="usersTableBody">
+                    </tbody>
+
+                </table>
 
             </div>
 
         </section>
 
-
-
-        <!-- ======================================
-             USER DETAILS MODAL
-        ======================================= -->
-
-        <div
-            class="user-modal-overlay"
-            id="userModal"
-            aria-hidden="true"
-        >
-
-            <div class="user-modal">
-
-
-                <div class="user-modal-header">
-
-                    <div>
-
-                        <span class="modal-eyebrow">
-                            USER PROFILE
-                        </span>
-
-                        <h2 id="modalUserName">
-                            User
-                        </h2>
-
-                        <span
-                            id="modalUserId"
-                            class="modal-user-id"
-                        >
-                            —
-                        </span>
-
-                    </div>
-
-
-                    <button
-                        type="button"
-                        id="closeUserModal"
-                        class="modal-close"
-                    >
-                        ×
-                    </button>
-
-                </div>
-
-
-
-                <div class="modal-profile">
-
-                    <div
-                        id="modalAvatar"
-                        class="modal-avatar"
-                    >
-                        U
-                    </div>
-
-                    <div>
-
-                        <strong id="modalEmail">
-                            —
-                        </strong>
-
-                        <span id="modalRole">
-                            —
-                        </span>
-
-                    </div>
-
-                </div>
-
-
-
-                <div class="modal-status-grid">
-
-                    <div class="modal-status-box">
-
-                        <span>
-                            ACCOUNT STATUS
-                        </span>
-
-                        <strong id="modalStatus">
-                            —
-                        </strong>
-
-                    </div>
-
-
-                    <div class="modal-status-box">
-
-                        <span>
-                            EMAIL VERIFICATION
-                        </span>
-
-                        <strong id="modalVerification">
-                            —
-                        </strong>
-
-                    </div>
-
-                </div>
-
-
-
-                <div class="modal-section">
-
-                    <div class="modal-section-title">
-                        Contact Information
-                    </div>
-
-                    <div class="modal-info-grid">
-
-                        <div class="modal-info-item">
-
-                            <span>
-                                Mobile
-                            </span>
-
-                            <strong id="modalMobile">
-                                —
-                            </strong>
-
-                        </div>
-
-                        <div class="modal-info-item">
-
-                            <span>
-                                Role
-                            </span>
-
-                            <strong id="modalRoleDetail">
-                                —
-                            </strong>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-
-
-                <div class="modal-section">
-
-                    <div class="modal-section-title">
-                        Account Timeline
-                    </div>
-
-                    <div class="modal-info-grid">
-
-                        <div class="modal-info-item">
-
-                            <span>
-                                Created
-                            </span>
-
-                            <strong id="modalCreated">
-                                —
-                            </strong>
-
-                        </div>
-
-                        <div class="modal-info-item">
-
-                            <span>
-                                Last Updated
-                            </span>
-
-                            <strong id="modalUpdated">
-                                —
-                            </strong>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-
-
-                <div class="modal-security-note">
-
-                    <span>
-                        ◆
-                    </span>
-
-                    <div>
-
-                        <strong>
-                            Access governance
-                        </strong>
-
-                        <p>
-                            Account credentials and
-                            authentication secrets are
-                            never exposed in the owner
-                            interface.
-                        </p>
-
-                    </div>
-
-                </div>
-
-
-
-                <div class="modal-actions">
-
-                    <button
-                        type="button"
-                        id="modalCloseButton"
-                        class="secondary-button"
-                    >
-                        Close
-                    </button>
-
-                </div>
-
-            </div>
-
-        </div>
 
     </main>
 
 </div>
 
 
-<script src="../auth/auth.js"></script>
 
+<!-- ==========================================
+     ADD MANAGER MODAL
+=========================================== -->
+
+<div
+    id="managerModal"
+    class="modal-overlay"
+    aria-hidden="true"
+>
+
+    <div class="modal-card">
+
+        <div class="modal-header">
+
+            <span class="modal-eyebrow">
+                TEAM ACCESS
+            </span>
+
+            <h2>
+                Add Restaurant Manager
+            </h2>
+
+            <p>
+                Invite a trusted manager to handle
+                daily restaurant operations.
+            </p>
+
+        </div>
+
+
+        <div
+            id="managerFormError"
+            class="form-error"
+        ></div>
+
+
+        <div class="form-grid">
+
+            <div class="form-field">
+
+                <label for="managerName">
+                    Full Name
+                </label>
+
+                <input
+                    type="text"
+                    id="managerName"
+                    placeholder="e.g. Rahul Sharma"
+                    autocomplete="name"
+                >
+
+            </div>
+
+
+            <div class="form-field">
+
+                <label for="managerEmail">
+                    Email Address
+                </label>
+
+                <input
+                    type="email"
+                    id="managerEmail"
+                    placeholder="manager@example.com"
+                    autocomplete="email"
+                >
+
+            </div>
+
+
+            <div class="form-field">
+
+                <label for="managerMobile">
+                    Mobile
+                </label>
+
+                <input
+                    type="text"
+                    id="managerMobile"
+                    placeholder="+971..."
+                    autocomplete="tel"
+                >
+
+            </div>
+
+
+            <div class="form-field">
+
+                <label>
+                    Role
+                </label>
+
+                <div class="role-readonly">
+                    Restaurant Manager
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="invitation-note">
+
+            <span class="note-icon">
+                ◈
+            </span>
+
+            <div>
+
+                <strong>
+                    Secure invitation
+                </strong>
+
+                <p>
+                    A one-time activation link will be
+                    generated for this manager. The owner
+                    can copy and share the link securely.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div
+            id="invitationResult"
+            class="invitation-result hidden"
+        >
+
+            <div class="invitation-result-title">
+                Invitation Created
+            </div>
+
+            <p>
+                Copy this secure link and send it to the manager.
+            </p>
+
+            <div class="invitation-link-row">
+
+                <input
+                    type="text"
+                    id="invitationLink"
+                    readonly
+                >
+
+                <button
+                    type="button"
+                    id="copyInvitationButton"
+                    class="copy-button"
+                >
+                    Copy
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <div class="modal-actions">
+
+            <button
+                type="button"
+                id="cancelManagerButton"
+                class="secondary-button"
+            >
+                Cancel
+            </button>
+
+            <button
+                type="button"
+                id="createManagerButton"
+                class="primary-button"
+            >
+                Create Invitation
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<script src="../auth/auth.js"></script>
+<script src="../../js/role-guard.js"></script>
 <script src="users.js"></script>
 
 </body>
