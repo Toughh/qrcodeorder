@@ -1,88 +1,496 @@
 <!DOCTYPE html>
+
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <title>Activate Manager Account | QR Order SaaS</title>
-    <link rel="stylesheet" href="manager-activate.css">
+
+
+<title>Activate Manager Account | QR Order SaaS</title>
+
+<link rel="stylesheet" href="manager-activate.css">
+
+
 </head>
 
 <body>
-    <main class="activation-shell">
-        <section class="brand-panel">
-            <div class="brand-mark">QR</div>
-            <div class="brand-name">QR Order</div>
-            <div class="brand-subtitle">RESTAURANT SAAS</div>
-            <div class="brand-copy">
-                <span class="eyebrow">MANAGER PORTAL</span>
-                <h1>Run the restaurant.<br><span>With confidence.</span></h1>
-                <p>Your restaurant manager account gives you access to the operational tools you need to manage menus,
-                    orders and day-to-day restaurant activity.</p>
+
+
+<main class="activation-shell">
+
+    <!-- =====================================================
+         BRAND PANEL
+    ====================================================== -->
+
+    <section class="brand-panel">
+
+        <div class="brand-mark">
+            QR
+        </div>
+
+        <div class="brand-name">
+            QR Order
+        </div>
+
+        <div class="brand-subtitle">
+            RESTAURANT SAAS
+        </div>
+
+        <div class="brand-copy">
+
+            <span class="eyebrow">
+                MANAGER PORTAL
+            </span>
+
+            <h1>
+                Run the restaurant.<br>
+                <span>With confidence.</span>
+            </h1>
+
+            <p>
+                Your restaurant manager account gives you access
+                to the operational tools you need to manage menus,
+                orders and day-to-day restaurant activity.
+            </p>
+
+        </div>
+
+        <div class="security-note">
+
+            <b>✓</b>
+
+            <div>
+
+                <strong>
+                    Secure account activation
+                </strong>
+
+                <small>
+                    Your invitation link is valid for a limited time.
+                </small>
+
             </div>
-            <div class="security-note"><b>✓</b>
-                <div><strong>Secure account activation</strong><small>Your invitation link is valid for a limited
-                        time.</small></div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         FORM PANEL
+    ====================================================== -->
+
+    <section class="form-panel">
+
+        <div class="form-card">
+
+
+            <!-- =================================================
+                 MOBILE BRAND
+            ================================================== -->
+
+            <div class="mobile-brand">
+
+                <div class="brand-mark small">
+                    QR
+                </div>
+
+                <div>
+
+                    <strong>
+                        QR Order
+                    </strong>
+
+                    <small>
+                        Restaurant SaaS
+                    </small>
+
+                </div>
+
             </div>
-        </section>
-        <section class="form-panel">
-            <div class="form-card">
-                <div class="mobile-brand">
-                    <div class="brand-mark small">QR</div>
-                    <div><strong>QR Order</strong><small>Restaurant SaaS</small></div>
+
+
+            <!-- =================================================
+                 LOADING STATE
+            ================================================== -->
+
+            <div
+                id="loadingState"
+                class="state-panel"
+            >
+
+                <div class="loader"></div>
+
+                <span>
+                    Verifying your invitation...
+                </span>
+
+            </div>
+
+
+            <!-- =================================================
+                 ACTIVATION FORM
+            ================================================== -->
+
+            <div
+                id="formState"
+                hidden
+            >
+
+                <div class="form-icon">
+                    ✦
                 </div>
-                <div id="loadingState" class="state-panel">
-                    <div class="loader"></div><span>Verifying your invitation...</span>
-                </div>
-                <div id="formState" hidden>
-                    <div class="form-icon">✦</div>
-                    <span class="form-eyebrow">ACCOUNT ACTIVATION</span>
-                    <h2>Activate your manager account</h2>
-                    <p class="form-intro">Complete your account setup by creating a secure password.</p>
-                    <div class="invite-details">
-                        <div><span>INVITED USER</span><strong id="managerName">Manager</strong></div>
-                        <div><span>EMAIL</span><strong id="managerEmail">—</strong></div>
-                        <div><span>ROLE</span><strong>Restaurant Manager</strong></div>
+
+                <span class="form-eyebrow">
+                    ACCOUNT ACTIVATION
+                </span>
+
+                <h2>
+                    Activate your manager account
+                </h2>
+
+                <p class="form-intro">
+                    Complete your account setup by creating
+                    a secure password.
+                </p>
+
+
+                <!-- =============================================
+                     INVITATION DETAILS
+                ============================================== -->
+
+                <div class="invite-details">
+
+                    <div>
+
+                        <span>
+                            INVITED USER
+                        </span>
+
+                        <strong id="managerName">
+                            Manager
+                        </strong>
+
                     </div>
-                    <form id="activationForm" novalidate>
-                        <div class="field"><label for="password">Create Password</label>
-                            <div class="password-wrap"><input type="password" id="password" autocomplete="new-password"
-                                    placeholder="Enter your password" minlength="8" required><button type="button"
-                                    class="toggle-password" data-target="password">SHOW</button></div><small>Use at
-                                least 8 characters.</small>
+
+                    <div>
+
+                        <span>
+                            EMAIL
+                        </span>
+
+                        <strong id="managerEmail">
+                            —
+                        </strong>
+
+                    </div>
+
+                    <div>
+
+                        <span>
+                            ROLE
+                        </span>
+
+                        <strong>
+                            Restaurant Manager
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =============================================
+                     ACTIVATION FORM
+                ============================================== -->
+
+                <form
+                    id="activationForm"
+                    novalidate
+                >
+
+
+                    <!-- =========================================
+                         PASSWORD
+                    ========================================== -->
+
+                    <div class="field">
+
+                        <label for="password">
+                            Create Password
+                        </label>
+
+                        <div class="password-wrap">
+
+                            <input
+                                type="password"
+                                id="password"
+                                autocomplete="new-password"
+                                placeholder="Enter your password"
+                                minlength="8"
+                                required
+                            >
+
+                            <button
+                                type="button"
+                                class="toggle-password"
+                                data-target="password"
+                            >
+                                SHOW
+                            </button>
+
                         </div>
-                        <div class="field"><label for="confirmPassword">Confirm Password</label>
-                            <div class="password-wrap"><input type="password" id="confirmPassword"
-                                    autocomplete="new-password" placeholder="Re-enter your password" minlength="8"
-                                    required><button type="button" class="toggle-password"
-                                    data-target="confirmPassword">SHOW</button></div>
+
+
+                        <!-- =====================================
+                             PASSWORD RULES
+                        ====================================== -->
+
+                        <div class="password-rules">
+
+                            <div
+                                id="lengthCheck"
+                                class="password-rule"
+                            >
+                                <span class="rule-icon">
+                                    ✓
+                                </span>
+
+                                <span>
+                                    At least 8 characters
+                                </span>
+
+                            </div>
+
+
+                            <div
+                                id="uppercaseCheck"
+                                class="password-rule"
+                            >
+                                <span class="rule-icon">
+                                    ✓
+                                </span>
+
+                                <span>
+                                    At least 1 uppercase letter
+                                </span>
+
+                            </div>
+
+
+                            <div
+                                id="numberCheck"
+                                class="password-rule"
+                            >
+                                <span class="rule-icon">
+                                    ✓
+                                </span>
+
+                                <span>
+                                    At least 1 number
+                                </span>
+
+                            </div>
+
                         </div>
-                        <div id="formError" class="form-message error" hidden></div>
-                        <button type="submit" id="activateButton" class="primary-button"><span>Activate
-                                Account</span><span class="button-arrow">→</span></button>
-                    </form>
-                    <p class="login-note">Already activated? <a href="../login/login.html">Go to login</a></p>
-                </div>
-                <div id="successState" class="result-state success" hidden>
-                    <div class="result-icon">✓</div><span class="form-eyebrow">ACCOUNT READY</span>
-                    <h2>You're all set.</h2>
-                    <p>Your manager account has been activated successfully. You can now sign in to the Restaurant SaaS
-                        portal.</p>
-                    <a href="../../login/login.html" class="primary-button link-button">Go to Login <span
-                            class="button-arrow">→</span></a>
-                </div>
-                <div id="errorState" class="result-state" hidden>
-                    <div class="result-icon error-icon">!</div><span class="form-eyebrow">INVITATION UNAVAILABLE</span>
-                    <h2>This invitation cannot be used.</h2>
-                    <p id="errorStateMessage">The activation link is invalid, expired or has already been used.</p>
-                    <a href="../../login/login.html" class="secondary-button">Return to Login</a>
-                </div>
+
+                    </div>
+
+
+                    <!-- =========================================
+                         CONFIRM PASSWORD
+                    ========================================== -->
+
+                    <div class="field">
+
+                        <label for="confirmPassword">
+                            Confirm Password
+                        </label>
+
+                        <div class="password-wrap">
+
+                            <input
+                                type="password"
+                                id="confirmPassword"
+                                autocomplete="new-password"
+                                placeholder="Re-enter your password"
+                                minlength="8"
+                                required
+                            >
+
+                            <button
+                                type="button"
+                                class="toggle-password"
+                                data-target="confirmPassword"
+                            >
+                                SHOW
+                            </button>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- =========================================
+                         ERROR MESSAGE
+                    ========================================== -->
+
+                    <div
+                        id="formError"
+                        class="form-message error"
+                        hidden
+                    ></div>
+
+
+                    <!-- =========================================
+                         ACTIVATE BUTTON
+                    ========================================== -->
+
+                    <button
+                        type="submit"
+                        id="activateButton"
+                        class="primary-button"
+                    >
+
+                        <span>
+                            Activate Account
+                        </span>
+
+                        <span class="button-arrow">
+                            →
+                        </span>
+
+                    </button>
+
+                </form>
+
+
+                <!-- =============================================
+                     LOGIN LINK
+                ============================================== -->
+
+                <p class="login-note">
+
+                    Already activated?
+
+                    <a href="../../login/login.html">
+                        Go to login
+                    </a>
+
+                </p>
+
             </div>
-            <div class="footer-note">© QR Order Restaurant SaaS · Secure Manager Activation</div>
-        </section>
-    </main>
-    <script src="../../config/config.js"></script>
-    <script src="manager-activate.js"></script>
+
+
+            <!-- =================================================
+                 SUCCESS STATE
+            ================================================== -->
+
+            <div
+                id="successState"
+                class="result-state success"
+                hidden
+            >
+
+                <div class="result-icon">
+                    ✓
+                </div>
+
+                <span class="form-eyebrow">
+                    ACCOUNT READY
+                </span>
+
+                <h2>
+                    You're all set.
+                </h2>
+
+                <p id="successMessage">
+                    Your manager account has been activated
+                    successfully. You can now sign in to the
+                    Restaurant SaaS portal.
+                </p>
+
+                <a
+                    href="../../login/login.html"
+                    class="primary-button link-button"
+                >
+
+                    Go to Login
+
+                    <span class="button-arrow">
+                        →
+                    </span>
+
+                </a>
+
+            </div>
+
+
+            <!-- =================================================
+                 ERROR STATE
+            ================================================== -->
+
+            <div
+                id="errorState"
+                class="result-state"
+                hidden
+            >
+
+                <div class="result-icon error-icon">
+                    !
+                </div>
+
+                <span class="form-eyebrow">
+                    INVITATION UNAVAILABLE
+                </span>
+
+                <h2>
+                    This invitation cannot be used.
+                </h2>
+
+                <p id="errorStateMessage">
+                    The activation link is invalid, expired
+                    or has already been used.
+                </p>
+
+                <a
+                    href="../../login/login.html"
+                    class="secondary-button"
+                >
+                    Return to Login
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <!-- =====================================================
+             FOOTER
+        ====================================================== -->
+
+        <div class="footer-note">
+
+            © QR Order Restaurant SaaS ·
+            Secure Manager Activation
+
+        </div>
+
+    </section>
+
+</main>
+
+
+<!-- =========================================================
+     SCRIPTS
+========================================================== -->
+
+<script src="../../config/config.js"></script>
+
+<script src="manager-activate.js"></script>
+
+
 </body>
 
 </html>
