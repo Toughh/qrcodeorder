@@ -1,555 +1,366 @@
-// ==========================================
+// =========================================================
 // QR RESTAURANT SAAS
-// OWNER — MENU PAGE
-// ==========================================
+// PREMIUM MENU COMMAND CENTER
+// =========================================================
 
-// ==========================================
-// N8N OWNER MENU WEBHOOK
-// ==========================================
+const MENU_WEBHOOK =
+    `${N8N_BASE_URL}/owner-menu-manage`;
 
-const N8N_MENU_WEBHOOK =
-`${N8N_BASE_URL}/owner-menu`;
+const SESSION_TOKEN_KEY =
+    "qro_session_token";
 
-// ==========================================
-// N8N OWNER BRANCHES WEBHOOK
-// ==========================================
+const SESSION_DATA_KEY =
+    "qro_session_data";
 
-const N8N_BRANCHES_WEBHOOK =
-`${N8N_BASE_URL}/owner-branches`;
 
-// ==========================================
-// PAGE STATE
-// ==========================================
+// =========================================================
+// STATE
+// =========================================================
 
-let currentSession = null;
-
-let allMenuItems = [];
-
-// ==========================================
-// PAGE LOAD
-// ==========================================
-
-document.addEventListener(
-"DOMContentLoaded",
-async function () {
-
-
-    console.log("==================================");
-    console.log("MENU PAGE: Page loaded");
-    console.log("==================================");
-
-
-    try {
-
-        // ==================================
-        // AUTHENTICATION
-        // ==================================
-
-        console.log(
-            "MENU PAGE: Checking authentication..."
-        );
-
-
-        const session =
-            await requireAuthentication();
-
-
-        if (!session) {
-
-            console.warn(
-                "MENU PAGE: Authentication failed."
-            );
-
-            return;
-
-        }
-
-
-        currentSession =
-            session;
-
-
-        console.log(
-            "MENU PAGE: Authentication successful."
-        );
-
-
-        console.log(
-            "MENU AUTH SESSION:",
-            session
-        );
-
-
-        // ==================================
-        // USER INFORMATION
-        // ==================================
-
-        loadUserInformation(
-            session
-        );
-
-
-        // ==================================
-        // EVENT LISTENERS
-        // ==================================
-
-        setupEventListeners();
-
-
-        // ==================================
-        // LOAD BRANCHES
-        // ==================================
-
-        await loadBranchesForMenu();
-
-
-        console.log("==================================");
-        console.log(
-            "MENU PAGE: Initialization completed."
-        );
-        console.log("==================================");
-
-    }
-
-
-    catch (error) {
-
-        console.error(
-            "MENU PAGE: Initialization error:",
-            error
-        );
-
-
-        showError(
-            "Unable to load the menu. Please try again."
-        );
-
-    }
-
-}
-
-
-);
-
-// ==========================================
-// LOAD USER INFORMATION
-// ==========================================
-
-function loadUserInformation(
-session
-) {
-
-
-console.log(
-    "MENU PAGE: Loading user information..."
-);
-
-
-const ownerName =
-    session?.ownerName ||
-    session?.OwnerName ||
-    session?.name ||
-    session?.userName ||
-    session?.user?.ownerName ||
-    localStorage.getItem("ownerName") ||
-    localStorage.getItem("userName") ||
-    "Owner";
-
-
-const role =
-    session?.role ||
-    session?.Role ||
-    session?.user?.role ||
-    localStorage.getItem("role") ||
-    "Owner";
-
-
-// ==================================
-// USER NAME
-// ==================================
-
-const userNameElement =
-    document.getElementById(
-        "userName"
-    );
-
-
-if (userNameElement) {
-
-    userNameElement.textContent =
-        ownerName;
-
-}
-
-
-// ==================================
-// USER ROLE
-// ==================================
-
-const userRoleElement =
-    document.getElementById(
-        "userRole"
-    );
-
-
-if (userRoleElement) {
-
-    userRoleElement.textContent =
-        role;
-
-}
-
-
-// ==================================
-// AVATAR
-// ==================================
-
-const avatar =
-    document.getElementById(
-        "userAvatar"
-    );
-
-
-if (avatar) {
-
-    avatar.textContent =
-        ownerName
-            .charAt(0)
-            .toUpperCase();
-
-}
-
-
-}
-
-// ==========================================
-// GET SESSION TOKEN
-// ==========================================
-
-function getMenuSessionToken() {
-
-
-/*
- * Prefer the existing auth.js helper.
- */
-
-if (
-    typeof getSessionToken ===
-    "function"
-) {
-
-    const token =
-        getSessionToken();
-
-    if (token) {
-
-        return token;
-
-    }
-
-}
-
-
-/*
- * Fallbacks.
- */
-
-return (
+let sessionToken =
     localStorage.getItem(
-        "qro_session_token"
-    ) ||
-
-    localStorage.getItem(
-        "sessionToken"
-    ) ||
-
-    ""
-);
-
-
-}
-
-// ==========================================
-// LOAD BRANCHES
-// ==========================================
-
-async function loadBranchesForMenu() {
-
-
-console.log("==================================");
-console.log(
-    "MENU PAGE: Loading branches..."
-);
-console.log("==================================");
-
-
-const sessionToken =
-    getMenuSessionToken();
-
-
-if (!sessionToken) {
-
-    console.error(
-        "MENU PAGE: No session token found."
+        SESSION_TOKEN_KEY
     );
 
+let branches = [];
+let menuItems = [];
 
-    showError(
-        "Your session could not be found. Please login again."
-    );
+let selectedBranchId = "";
+
+let editingItemId = null;
 
 
-    return;
-
-}
-
+// =========================================================
+// ELEMENTS
+// =========================================================
 
 const branchSelect =
-    document.getElementById(
-        "branchSelect"
-    );
+    document.getElementById("branchSelect");
+
+const addItemButton =
+    document.getElementById("addItemButton");
+
+const searchInput =
+    document.getElementById("searchInput");
+
+const categoryFilter =
+    document.getElementById("categoryFilter");
+
+const availabilityFilter =
+    document.getElementById("availabilityFilter");
+
+const menuTable =
+    document.getElementById("menuTable");
+
+const emptyState =
+    document.getElementById("emptyState");
+
+const itemModal =
+    document.getElementById("itemModal");
+
+const closeModal =
+    document.getElementById("closeModal");
+
+const cancelModal =
+    document.getElementById("cancelModal");
+
+const itemForm =
+    document.getElementById("itemForm");
 
 
-if (!branchSelect) {
+// =========================================================
+// INIT
+// =========================================================
 
-    console.error(
-        "MENU PAGE: branchSelect not found."
-    );
-
-
-    showError(
-        "Branch selector could not be found."
-    );
+document.addEventListener(
+    "DOMContentLoaded",
+    init
+);
 
 
-    return;
+async function init() {
+
+    sessionToken =
+        localStorage.getItem(
+            SESSION_TOKEN_KEY
+        );
+
+    if (!sessionToken) {
+
+        window.location.href =
+            "../login/login.html";
+
+        return;
+
+    }
+
+    bindEvents();
+
+    await loadMenu();
 
 }
 
 
-showLoading();
+// =========================================================
+// EVENTS
+// =========================================================
 
+function bindEvents() {
 
-try {
+    branchSelect?.addEventListener(
+        "change",
+        async () => {
 
-    console.log(
-        "MENU PAGE: Calling owner-branches..."
-    );
+            selectedBranchId =
+                branchSelect.value;
 
-
-    const response =
-        await fetch(
-            N8N_BRANCHES_WEBHOOK,
-            {
-
-                method: "POST",
-
-                headers: {
-
-                    "Content-Type":
-                        "application/json"
-
-                },
-
-                body:
-                    JSON.stringify({
-
-                        sessionToken:
-                            sessionToken
-
-                    })
-
-            }
-        );
-
-
-    console.log(
-        "MENU BRANCH API HTTP STATUS:",
-        response.status
-    );
-
-
-    const rawResult =
-        await response.json();
-
-
-    console.log(
-        "MENU BRANCH API RAW RESPONSE:",
-        rawResult
-    );
-
-
-    const result =
-        normalizeApiResponse(
-            rawResult
-        );
-
-
-    console.log(
-        "MENU BRANCH API NORMALIZED RESPONSE:",
-        result
-    );
-
-
-    // ==================================
-    // API ERROR
-    // ==================================
-
-    if (
-        !response.ok ||
-        !result ||
-        result.success !== true
-    ) {
-
-        console.error(
-            "MENU BRANCH API ERROR:",
-            result
-        );
-
-
-        if (
-            isInvalidSessionResponse(
-                result
-            )
-        ) {
-
-            handleInvalidSession();
-
-            return;
+            await loadMenu();
 
         }
-
-
-        hideLoading();
-
-
-        showError(
-            result?.message ||
-            "Unable to load branches."
-        );
-
-
-        return;
-
-    }
-
-
-    // ==================================
-    // EXTRACT BRANCHES
-    // ==================================
-
-    const branches =
-        extractBranches(
-            result
-        );
-
-
-    console.log(
-        "MENU PAGE: Branches received:",
-        branches
     );
 
 
-    // ==================================
-    // NO BRANCHES
-    // ==================================
-
-    if (
-        branches.length === 0
-    ) {
-
-        branchSelect.innerHTML =
-            "";
+    searchInput?.addEventListener(
+        "input",
+        renderMenu
+    );
 
 
-        const option =
-            document.createElement(
-                "option"
-            );
+    categoryFilter?.addEventListener(
+        "change",
+        renderMenu
+    );
 
 
-        option.value =
-            "";
+    availabilityFilter?.addEventListener(
+        "change",
+        renderMenu
+    );
 
 
-        option.textContent =
-            "No branches available";
+    addItemButton?.addEventListener(
+        "click",
+        () => {
 
+            if (!selectedBranchId) {
 
-        branchSelect.appendChild(
-            option
-        );
-
-
-        hideLoading();
-
-
-        resetMenuDisplay();
-
-
-        showBranchRequiredMessage(
-            "No branches are available for this restaurant."
-        );
-
-
-        return;
-
-    }
-
-
-    // ==================================
-    // POPULATE BRANCHES
-    // ==================================
-
-    branchSelect.innerHTML =
-        "";
-
-
-    branches.forEach(
-        function (branch) {
-
-            const branchId =
-                branch.branchId ||
-                branch.BranchId ||
-                branch.id ||
-                branch.Id ||
-                "";
-
-
-            const branchName =
-                branch.branchName ||
-                branch.BranchName ||
-                branch.name ||
-                branch.Name ||
-                "Unnamed Branch";
-
-
-            if (!branchId) {
-
-                console.warn(
-                    "MENU PAGE: Branch without ID:",
-                    branch
+                alert(
+                    "Please select a specific branch before adding a menu item."
                 );
-
 
                 return;
 
             }
 
+            openAddModal();
+
+        }
+    );
+
+
+    closeModal?.addEventListener(
+        "click",
+        closeItemModal
+    );
+
+
+    cancelModal?.addEventListener(
+        "click",
+        closeItemModal
+    );
+
+
+    itemForm?.addEventListener(
+        "submit",
+        saveItem
+    );
+
+}
+
+
+// =========================================================
+// LOAD MENU
+// =========================================================
+
+async function loadMenu() {
+
+    setLoading(true);
+
+    try {
+
+        const result =
+            await callMenuAPI({
+                action: "list",
+                branchId:
+                    selectedBranchId
+            });
+
+
+        if (!result.success) {
+
+            throw new Error(
+                result.message ||
+                "Unable to load menu."
+            );
+
+        }
+
+
+        branches =
+            result.branches ||
+            [];
+
+        menuItems =
+            result.items ||
+            [];
+
+
+        populateBranches();
+
+        updateMetrics(
+            result.metrics ||
+            {}
+        );
+
+        populateCategoryFilter();
+
+        renderBranchSummary(
+            result.branches ||
+            []
+        );
+
+        renderMenu();
+
+
+    } catch (error) {
+
+        console.error(
+            error
+        );
+
+        showPageError(
+            error.message
+        );
+
+    } finally {
+
+        setLoading(false);
+
+    }
+
+}
+
+
+// =========================================================
+// API
+// =========================================================
+
+async function callMenuAPI(payload) {
+
+    const response =
+        await fetch(
+            MENU_WEBHOOK,
+            {
+
+                method: "POST",
+
+                headers: {
+                    "Content-Type":
+                        "application/json"
+                },
+
+                body: JSON.stringify({
+
+                    sessionToken,
+
+                    ...payload
+
+                })
+
+            }
+        );
+
+
+    const raw =
+        await response.json();
+
+
+    const result =
+        Array.isArray(raw)
+            ? raw[0]
+            : raw;
+
+
+    if (
+        !response.ok ||
+        !result
+    ) {
+
+        throw new Error(
+            result?.message ||
+            "Menu service unavailable."
+        );
+
+    }
+
+
+    if (
+        result.code ===
+        "INVALID_SESSION"
+    ) {
+
+        localStorage.removeItem(
+            SESSION_TOKEN_KEY
+        );
+
+        localStorage.removeItem(
+            SESSION_DATA_KEY
+        );
+
+        window.location.href =
+            "../login/login.html";
+
+        return;
+
+    }
+
+
+    return result;
+
+}
+
+
+// =========================================================
+// BRANCHES
+// =========================================================
+
+function populateBranches() {
+
+    const current =
+        selectedBranchId;
+
+    branchSelect.innerHTML =
+        `<option value="">
+            All Branches
+        </option>`;
+
+
+    branches.forEach(
+        branch => {
 
             const option =
                 document.createElement(
                     "option"
                 );
 
-
             option.value =
-                branchId;
-
+                branch.branchId ||
+                branch.BranchId;
 
             option.textContent =
-                branchName;
-
+                branch.branchName ||
+                branch.BranchName ||
+                option.value;
 
             branchSelect.appendChild(
                 option
@@ -559,1828 +370,765 @@ try {
     );
 
 
-    // ==================================
-    // VERIFY BRANCHES
-    // ==================================
+    branchSelect.value =
+        current;
 
-    if (
-        branchSelect.options.length === 0
-    ) {
-
-        hideLoading();
+}
 
 
-        showError(
-            "No valid branches were returned."
+// =========================================================
+// CATEGORY FILTER
+// =========================================================
+
+function populateCategoryFilter() {
+
+    const current =
+        categoryFilter.value;
+
+    const categories =
+        [
+            ...new Set(
+                menuItems
+                    .map(
+                        item =>
+                            item.Category
+                    )
+                    .filter(Boolean)
+            )
+        ]
+        .sort(
+            (a, b) =>
+                String(a)
+                    .localeCompare(
+                        String(b)
+                    )
         );
 
 
-        return;
-
-    }
-
-
-    // ==================================
-    // RESTORE PREVIOUS BRANCH
-    // ==================================
-
-    const savedBranchId =
-        localStorage.getItem(
-            "menuBranchId"
-        );
+    categoryFilter.innerHTML =
+        `<option value="">
+            All Categories
+        </option>`;
 
 
-    let selectedBranchId =
-        "";
+    categories.forEach(
+        category => {
 
-
-    if (
-        savedBranchId &&
-        Array.from(
-            branchSelect.options
-        ).some(
-            function (option) {
-
-                return (
-                    option.value ===
-                    savedBranchId
+            const option =
+                document.createElement(
+                    "option"
                 );
 
-            }
-        )
-    ) {
+            option.value =
+                category;
 
-        selectedBranchId =
-            savedBranchId;
+            option.textContent =
+                category;
 
-    }
+            categoryFilter.appendChild(
+                option
+            );
 
-
-    // ==================================
-    // DEFAULT FIRST BRANCH
-    // ==================================
-
-    if (!selectedBranchId) {
-
-        selectedBranchId =
-            branchSelect
-                .options[0]
-                .value;
-
-    }
-
-
-    // ==================================
-    // SET BRANCH
-    // ==================================
-
-    branchSelect.value =
-        selectedBranchId;
-
-
-    localStorage.setItem(
-        "menuBranchId",
-        selectedBranchId
+        }
     );
 
 
-    updateSelectedBranchName(
-        branchSelect
-    );
-
-
-    // ==================================
-    // LOAD MENU
-    // ==================================
-
-    await loadMenu(
-        selectedBranchId
-    );
+    categoryFilter.value =
+        current;
 
 }
 
 
-catch (error) {
+// =========================================================
+// METRICS
+// =========================================================
 
-    console.error(
-        "MENU PAGE: Branch loading error:",
-        error
-    );
+function updateMetrics(metrics) {
 
-
-    hideLoading();
-
-
-    showError(
-        "Unable to connect to the branch service."
-    );
-
-}
-
-
-}
-
-// ==========================================
-// EXTRACT BRANCHES
-// ==========================================
-
-function extractBranches(
-result
-) {
-
-
-/*
- * Supports the existing owner-branches
- * response structure:
- *
- * {
- *   success: true,
- *   data: {
- *      branches: [...]
- *   }
- * }
- *
- * Also supports branches directly on
- * the response if the workflow changes later.
- */
-
-if (
-    Array.isArray(
-        result?.branches
-    )
-) {
-
-    return result.branches;
-
-}
-
-
-if (
-    Array.isArray(
-        result?.data?.branches
-    )
-) {
-
-    return result.data.branches;
-
-}
-
-
-return [];
-
-
-}
-
-// ==========================================
-// LOAD MENU
-// ==========================================
-
-async function loadMenu(
-selectedBranchId
-) {
-
-
-console.log("==================================");
-console.log(
-    "MENU PAGE: Loading menu..."
-);
-console.log("==================================");
-
-
-const sessionToken =
-    getMenuSessionToken();
-
-
-if (!sessionToken) {
-
-    console.error(
-        "MENU PAGE: No session token found."
-    );
-
-
-    showError(
-        "Your session could not be found. Please login again."
-    );
-
-
-    return;
-
-}
-
-
-const branchId =
-    selectedBranchId ||
-    "";
-
-
-if (!branchId) {
-
-    resetMenuDisplay();
-
-
-    showBranchRequiredMessage();
-
-
-    return;
-
-}
-
-
-localStorage.setItem(
-    "menuBranchId",
-    branchId
-);
-
-
-const branchSelect =
     document.getElementById(
-        "branchSelect"
-    );
+        "totalItems"
+    ).textContent =
+        metrics.totalItems ??
+        0;
 
 
-if (branchSelect) {
-
-    branchSelect.value =
-        branchId;
-
-
-    updateSelectedBranchName(
-        branchSelect
-    );
-
-}
-
-
-showLoading();
-
-
-/*
- * IMPORTANT:
- *
- * The completed n8n Owner Menu workflow
- * only requires:
- *
- * sessionToken
- * branchId
- *
- * restaurantId is determined securely
- * by n8n from the authenticated session.
- */
-
-const requestBody = {
-
-    sessionToken:
-        sessionToken,
-
-    branchId:
-        branchId
-
-};
-
-
-console.log(
-    "MENU API REQUEST:",
-    {
-        ...requestBody,
-        sessionToken:
-            "[HIDDEN]"
-    }
-);
-
-
-try {
-
-    console.log(
-        "MENU PAGE: Calling owner-menu..."
-    );
-
-
-    const response =
-        await fetch(
-            N8N_MENU_WEBHOOK,
-            {
-
-                method: "POST",
-
-                headers: {
-
-                    "Content-Type":
-                        "application/json"
-
-                },
-
-                body:
-                    JSON.stringify(
-                        requestBody
-                    )
-
-            }
-        );
-
-
-    console.log(
-        "MENU API HTTP STATUS:",
-        response.status
-    );
-
-
-    const rawResult =
-        await response.json();
-
-
-    console.log(
-        "MENU API RAW RESPONSE:",
-        rawResult
-    );
-
-
-    const result =
-        normalizeApiResponse(
-            rawResult
-        );
-
-
-    console.log(
-        "MENU API NORMALIZED RESPONSE:",
-        result
-    );
-
-
-    // ==================================
-    // SUCCESS
-    // ==================================
-
-    if (
-        response.ok &&
-        result &&
-        result.success === true
-    ) {
-
-        console.log(
-            "MENU PAGE: Menu loaded successfully."
-        );
-
-
-        const menuItems =
-            Array.isArray(
-                result.menuItems
-            )
-                ? result.menuItems
-                : [];
-
-
-        allMenuItems =
-            menuItems;
-
-
-        hideMessage();
-
-
-        populateCategoryFilter(
-            allMenuItems
-        );
-
-
-        updateSummary(
-            allMenuItems
-        );
-
-
-        renderFilteredMenu(
-            allMenuItems
-        );
-
-
-        hideLoading();
-
-
-        return;
-
-    }
-
-
-    // ==================================
-    // INVALID SESSION
-    // ==================================
-
-    if (
-        isInvalidSessionResponse(
-            result
-        )
-    ) {
-
-        console.warn(
-            "MENU PAGE: Session invalid or expired."
-        );
-
-
-        handleInvalidSession();
-
-
-        return;
-
-    }
-
-
-    // ==================================
-    // INVALID BRANCH
-    // ==================================
-
-    if (
-        result &&
-        result.success === false &&
-        result.code ===
-            "INVALID_BRANCH"
-    ) {
-
-        console.warn(
-            "MENU PAGE: Invalid branch."
-        );
-
-
-        allMenuItems =
-            [];
-
-
-        resetMenuDisplay();
-
-
-        hideLoading();
-
-
-        showError(
-            result.message ||
-            "Selected branch does not belong to this restaurant."
-        );
-
-
-        return;
-
-    }
-
-
-    // ==================================
-    // OTHER API ERROR
-    // ==================================
-
-    console.error(
-        "MENU API ERROR:",
-        result
-    );
-
-
-    allMenuItems =
-        [];
-
-
-    resetMenuDisplay();
-
-
-    hideLoading();
-
-
-    showError(
-        result?.message ||
-        "Unable to load menu."
-    );
-
-}
-
-
-catch (error) {
-
-    console.error(
-        "MENU API CONNECTION ERROR:",
-        error
-    );
-
-
-    hideLoading();
-
-
-    showError(
-        "Unable to connect to the menu service."
-    );
-
-}
-
-
-}
-
-// ==========================================
-// NORMALIZE API RESPONSE
-// ==========================================
-
-function normalizeApiResponse(
-rawResult
-) {
-
-
-if (
-    Array.isArray(rawResult)
-) {
-
-    return rawResult[0] || {};
-
-}
-
-
-return rawResult || {};
-
-
-}
-
-// ==========================================
-// INVALID SESSION CHECK
-// ==========================================
-
-function isInvalidSessionResponse(
-result
-) {
-
-
-if (
-    !result ||
-    result.success !== false
-) {
-
-    return false;
-
-}
-
-
-return (
-    result.code ===
-        "INVALID_SESSION"
-
-    ||
-
-    result.code ===
-        "RESTAURANT_SESSION_INVALID"
-
-    ||
-
-    result.code ===
-        "SESSION_TOKEN_MISSING"
-
-    ||
-
-    result.code ===
-        "SESSION_EXPIRED"
-);
-
-
-}
-
-// ==========================================
-// UPDATE SELECTED BRANCH NAME
-// ==========================================
-
-function updateSelectedBranchName(
-branchSelect
-) {
-
-
-if (!branchSelect) {
-
-    return;
-
-}
-
-
-const selectedOption =
-    branchSelect.options[
-        branchSelect.selectedIndex
-    ];
-
-
-const branchNameElement =
     document.getElementById(
-        "branchName"
-    );
+        "availableItems"
+    ).textContent =
+        metrics.availableItems ??
+        0;
 
 
-if (!branchNameElement) {
+    document.getElementById(
+        "unavailableItems"
+    ).textContent =
+        metrics.unavailableItems ??
+        0;
 
-    return;
+
+    document.getElementById(
+        "categoryCount"
+    ).textContent =
+        metrics.categories ??
+        0;
+
+
+    document.getElementById(
+        "availabilityRate"
+    ).textContent =
+        `${metrics.availabilityRate ?? 0}%`;
+
+
+    document.getElementById(
+        "healthAvailability"
+    ).textContent =
+        `${metrics.availabilityRate ?? 0}%`;
+
+
+    document.getElementById(
+        "missingImages"
+    ).textContent =
+        metrics.missingImages ??
+        0;
+
+
+    document.getElementById(
+        "missingDescriptions"
+    ).textContent =
+        metrics.missingDescriptions ??
+        0;
+
+
+    const sessionData =
+        getSessionData();
+
+
+    const currency =
+        sessionData?.currency ||
+        "AED";
+
+
+    document.getElementById(
+        "averagePrice"
+    ).textContent =
+        `${currency} ${Number(
+            metrics.averagePrice || 0
+        ).toFixed(2)}`;
+
+}
+
+
+// =========================================================
+// BRANCH SUMMARY
+// =========================================================
+
+function renderBranchSummary(summary) {
+
+    const container =
+        document.getElementById(
+            "branchSummary"
+        );
+
+
+    if (
+        selectedBranchId ||
+        !summary.length
+    ) {
+
+        container.innerHTML = "";
+
+        document.getElementById(
+            "branchSummaryPanel"
+        ).hidden = true;
+
+        return;
+
+    }
+
+
+    document.getElementById(
+        "branchSummaryPanel"
+    ).hidden = false;
+
+
+    container.innerHTML = `
+
+        <div class="branch-row header">
+
+            <div>BRANCH</div>
+            <div>ITEMS</div>
+            <div>AVAILABLE</div>
+            <div>UNAVAILABLE</div>
+            <div>AVAILABILITY</div>
+
+        </div>
+
+        ${
+            summary.map(
+                branch => `
+
+                    <div class="branch-row">
+
+                        <div class="branch-name">
+                            ${escapeHTML(
+                                branch.branchName
+                            )}
+                        </div>
+
+                        <div>
+                            ${branch.totalItems}
+                        </div>
+
+                        <div>
+                            ${branch.availableItems}
+                        </div>
+
+                        <div>
+                            ${branch.unavailableItems}
+                        </div>
+
+                        <div class="branch-availability">
+                            ${branch.availability}%
+                        </div>
+
+                    </div>
+
+                `
+            ).join("")
+        }
+
+    `;
 
 }
 
 
-if (
-    selectedOption &&
-    selectedOption.value
-) {
-
-    branchNameElement.textContent =
-        selectedOption.textContent;
-
-}
-
-
-}
-
-// ==========================================
-// HANDLE INVALID SESSION
-// ==========================================
-
-function handleInvalidSession() {
-
-
-console.warn(
-    "MENU PAGE: Clearing invalid session."
-);
-
-
-if (
-    typeof clearSession ===
-    "function"
-) {
-
-    clearSession();
-
-}
-
-else {
-
-    localStorage.removeItem(
-        "qro_session_token"
-    );
-
-    localStorage.removeItem(
-        "qro_session_data"
-    );
-
-    localStorage.removeItem(
-        "qro_validated_session"
-    );
-
-    localStorage.removeItem(
-        "sessionToken"
-    );
-
-}
-
-
-window.location.href =
-    "../../login/login.html";
-
-
-}
-
-// ==========================================
+// =========================================================
 // RENDER MENU
-// ==========================================
+// =========================================================
 
-function renderFilteredMenu(
-items
-) {
+function renderMenu() {
 
-
-const menuGrid =
-    document.getElementById(
-        "menuGrid"
-    );
-
-
-const emptyState =
-    document.getElementById(
-        "emptyState"
-    );
-
-
-const menuItemCount =
-    document.getElementById(
-        "menuItemCount"
-    );
-
-
-if (!menuGrid) {
-
-    return;
-
-}
-
-
-menuGrid.innerHTML =
-    "";
-
-
-const itemCount =
-    items.length;
-
-
-if (menuItemCount) {
-
-    menuItemCount.textContent =
-        `${itemCount} ${
-            itemCount === 1
-                ? "item"
-                : "items"
-        }`;
-
-}
-
-
-if (
-    itemCount === 0
-) {
-
-    if (emptyState) {
-
-        emptyState.classList.remove(
-            "hidden"
-        );
-
-    }
-
-
-    return;
-
-}
-
-
-if (emptyState) {
-
-    emptyState.classList.add(
-        "hidden"
-    );
-
-}
-
-
-items.forEach(
-    function (item) {
-
-        menuGrid.appendChild(
-            createMenuCard(
-                item
-            )
-        );
-
-    }
-);
-
-
-}
-
-// ==========================================
-// CREATE MENU CARD
-// ==========================================
-
-function createMenuCard(
-item
-) {
-
-
-const card =
-    document.createElement(
-        "div"
-    );
-
-
-card.className =
-    "menu-card";
-
-
-// ==================================
-// IMAGE
-// ==================================
-
-const imageWrapper =
-    document.createElement(
-        "div"
-    );
-
-
-imageWrapper.className =
-    "menu-image-wrapper";
-
-
-let imageURL =
-    item.imageURL ||
-    item.ImageURL ||
-    "";
-
-
-// ==================================
-// HANDLE AIRTABLE IMAGE FORMAT
-// ==================================
-
-if (Array.isArray(imageURL)) {
-
-    imageURL =
-        imageURL[0]?.url ||
-        "";
-
-}
-
-
-// ==================================
-// HANDLE AIRTABLE STRING FORMAT
-// Example:
-// ZingerBerger.png (https://....)
-// ==================================
-
-if (typeof imageURL === "string") {
-
-    imageURL =
-        imageURL.trim();
-
-
-    const urlMatch =
-        imageURL.match(
-            /\((https?:\/\/[^)]+)\)/
-        );
-
-
-    if (urlMatch) {
-
-        imageURL =
-            urlMatch[1];
-
-    }
-
-}
-
-
-// ==================================
-// CREATE IMAGE
-// ==================================
-
-if (imageURL) {
-
-    const image =
-        document.createElement(
-            "img"
-        );
-
-
-    image.className =
-        "menu-image";
-
-
-    image.src =
-        imageURL;
-
-
-    image.alt =
-        item.itemName ||
-        item.ItemName ||
-        "Menu item";
-
-
-    image.loading =
-        "lazy";
-
-
-    image.onerror =
-        function () {
-
-            image.remove();
-
-
-            createImagePlaceholder(
-                imageWrapper
-            );
-
-        };
-
-
-    imageWrapper.appendChild(
-        image
-    );
-
-}
-
-else {
-
-    createImagePlaceholder(
-        imageWrapper
-    );
-
-}
-
-
-// ==================================
-// CONTENT
-// ==================================
-
-const content =
-    document.createElement(
-        "div"
-    );
-
-
-content.className =
-    "menu-card-content";
-
-
-// ==================================
-// CATEGORY
-// ==================================
-
-const category =
-    document.createElement(
-        "div"
-    );
-
-
-category.className =
-    "menu-category";
-
-
-category.textContent =
-    item.category ||
-    item.Category ||
-    "Menu";
-
-
-// ==================================
-// NAME
-// ==================================
-
-const name =
-    document.createElement(
-        "div"
-    );
-
-
-name.className =
-    "menu-name";
-
-
-name.textContent =
-    item.itemName ||
-    item.ItemName ||
-    "Unnamed Item";
-
-
-// ==================================
-// DESCRIPTION
-// ==================================
-
-const description =
-    document.createElement(
-        "div"
-    );
-
-
-description.className =
-    "menu-description";
-
-
-description.textContent =
-    item.description ||
-    item.Description ||
-    "No description available.";
-
-
-// ==================================
-// FOOTER
-// ==================================
-
-const footer =
-    document.createElement(
-        "div"
-    );
-
-
-footer.className =
-    "menu-card-footer";
-
-
-// ==================================
-// PRICE
-// ==================================
-
-const price =
-    document.createElement(
-        "div"
-    );
-
-
-price.className =
-    "menu-price";
-
-
-const itemPrice =
-    item.price ??
-    item.Price ??
-    0;
-
-
-price.textContent =
-    formatPrice(
-        itemPrice
-    );
-
-
-// ==================================
-// AVAILABILITY
-// ==================================
-
-const badge =
-    document.createElement(
-        "span"
-    );
-
-
-const available =
-    isItemAvailable(
-        item.available ??
-        item.Available
-    );
-
-
-badge.className =
-    `availability-badge ${
-        available
-            ? "available"
-            : "unavailable"
-    }`;
-
-
-badge.textContent =
-    available
-        ? "Available"
-        : "Unavailable";
-
-
-// ==================================
-// BUILD CARD
-// ==================================
-
-footer.appendChild(
-    price
-);
-
-
-footer.appendChild(
-    badge
-);
-
-
-content.appendChild(
-    category
-);
-
-
-content.appendChild(
-    name
-);
-
-
-content.appendChild(
-    description
-);
-
-
-content.appendChild(
-    footer
-);
-
-
-card.appendChild(
-    imageWrapper
-);
-
-
-card.appendChild(
-    content
-);
-
-
-return card;
-
-
-}
-
-// ==========================================
-// IMAGE PLACEHOLDER
-// ==========================================
-
-function createImagePlaceholder(
-imageWrapper
-) {
-
-
-const placeholder =
-    document.createElement(
-        "div"
-    );
-
-
-placeholder.className =
-    "menu-image-placeholder";
-
-
-placeholder.textContent =
-    "🍽️";
-
-
-imageWrapper.appendChild(
-    placeholder
-);
-
-
-}
-
-// ==========================================
-// AVAILABILITY
-// ==========================================
-
-function isItemAvailable(
-value
-) {
-
-
-if (
-    value === false ||
-    value === "false" ||
-    value === "False" ||
-    value === "0" ||
-    value === 0
-) {
-
-    return false;
-
-}
-
-
-return true;
-
-
-}
-
-// ==========================================
-// FORMAT PRICE
-// ==========================================
-
-function formatPrice(
-price
-) {
-
-
-const numericPrice =
-    Number(
-        price || 0
-    );
-
-
-return new Intl.NumberFormat(
-    "en-AE",
-    {
-
-        style:
-            "currency",
-
-        currency:
-            "AED",
-
-        minimumFractionDigits:
-            2
-
-    }
-).format(
-    numericPrice
-);
-
-
-}
-
-// ==========================================
-// UPDATE SUMMARY
-// ==========================================
-
-function updateSummary(
-menuItems
-) {
-
-
-const total =
-    menuItems.length;
-
-
-const available =
-    menuItems.filter(
-        function (item) {
-
-            return isItemAvailable(
-                item.available ??
-                item.Available
-            );
-
-        }
-    ).length;
-
-
-const unavailable =
-    total -
-    available;
-
-
-setText(
-    "totalItems",
-    total
-);
-
-
-setText(
-    "availableItems",
-    available
-);
-
-
-setText(
-    "unavailableItems",
-    unavailable
-);
-
-
-}
-
-// ==========================================
-// CATEGORY FILTER
-// ==========================================
-
-function populateCategoryFilter(
-menuItems
-) {
-
-
-const categoryFilter =
-    document.getElementById(
-        "categoryFilter"
-    );
-
-
-if (!categoryFilter) {
-
-    return;
-
-}
-
-
-const categories =
-    [
-        ...new Set(
-            menuItems
-                .map(
-                    function (item) {
-
-                        return (
-                            item.category ||
-                            item.Category ||
-                            ""
-                        ).trim();
-
-                    }
-                )
-                .filter(Boolean)
+    const search =
+        String(
+            searchInput.value || ""
         )
-    ]
-    .sort(
-        function (a, b) {
-
-            return a.localeCompare(
-                b
-            );
-
-        }
-    );
-
-
-categoryFilter.innerHTML =
-    "";
-
-
-const allOption =
-    document.createElement(
-        "option"
-    );
-
-
-allOption.value =
-    "";
-
-
-allOption.textContent =
-    "All Categories";
-
-
-categoryFilter.appendChild(
-    allOption
-);
-
-
-categories.forEach(
-    function (category) {
-
-        const option =
-            document.createElement(
-                "option"
-            );
-
-
-        option.value =
-            category;
-
-
-        option.textContent =
-            category;
-
-
-        categoryFilter.appendChild(
-            option
-        );
-
-    }
-);
-
-
-}
-
-// ==========================================
-// SEARCH / FILTER
-// ==========================================
-
-function applyMenuFilters() {
-
-
-const searchInput =
-    document.getElementById(
-        "menuSearch"
-    );
-
-
-const categoryFilter =
-    document.getElementById(
-        "categoryFilter"
-    );
-
-
-if (!searchInput) {
-
-    return;
-
-}
-
-
-const searchText =
-    searchInput.value
         .trim()
         .toLowerCase();
 
 
-const selectedCategory =
-    categoryFilter?.value ||
-    "";
+    const category =
+        categoryFilter.value;
 
 
-const filteredItems =
-    allMenuItems.filter(
-        function (item) {
+    const availability =
+        availabilityFilter.value;
 
-            const name =
-                (
-                    item.itemName ||
-                    item.ItemName ||
-                    ""
+
+    const filtered =
+        menuItems.filter(
+            item => {
+
+                const name =
+                    String(
+                        item.ItemName ||
+                        ""
+                    )
+                    .toLowerCase();
+
+
+                const description =
+                    String(
+                        item.Description ||
+                        ""
+                    )
+                    .toLowerCase();
+
+
+                const itemCategory =
+                    String(
+                        item.Category ||
+                        ""
+                    );
+
+
+                const available =
+                    item.Available === true ||
+                    item.Available === "true";
+
+
+                if (
+                    search &&
+                    !name.includes(search) &&
+                    !description.includes(search)
+                ) {
+                    return false;
+                }
+
+
+                if (
+                    category &&
+                    itemCategory !== category
+                ) {
+                    return false;
+                }
+
+
+                if (
+                    availability === "available" &&
+                    !available
+                ) {
+                    return false;
+                }
+
+
+                if (
+                    availability === "unavailable" &&
+                    available
+                ) {
+                    return false;
+                }
+
+
+                return true;
+
+            }
+        );
+
+
+    document.getElementById(
+        "itemCountLabel"
+    ).textContent =
+        `${filtered.length} item${filtered.length === 1 ? "" : "s"}`;
+
+
+    if (!filtered.length) {
+
+        menuTable.innerHTML = "";
+
+        emptyState.hidden = false;
+
+        return;
+
+    }
+
+
+    emptyState.hidden = true;
+
+
+    menuTable.innerHTML = `
+
+        <div class="menu-table-header">
+
+            <div>ITEM</div>
+            <div>CATEGORY</div>
+            <div>PRICE</div>
+            <div>BRANCH</div>
+            <div>STATUS</div>
+            <div>ACTIONS</div>
+
+        </div>
+
+        ${
+            filtered
+                .map(
+                    item =>
+                        renderMenuRow(item)
                 )
-                .toLowerCase();
-
-
-            const description =
-                (
-                    item.description ||
-                    item.Description ||
-                    ""
-                )
-                .toLowerCase();
-
-
-            const category =
-                item.category ||
-                item.Category ||
-                "";
-
-
-            const matchesSearch =
-                !searchText ||
-                name.includes(
-                    searchText
-                ) ||
-                description.includes(
-                    searchText
-                );
-
-
-            const matchesCategory =
-                !selectedCategory ||
-                category ===
-                    selectedCategory;
-
-
-            return (
-                matchesSearch &&
-                matchesCategory
-            );
-
+                .join("")
         }
-    );
+
+    `;
 
 
-renderFilteredMenu(
-    filteredItems
-);
-
+    bindRowActions();
 
 }
 
-// ==========================================
-// RESET MENU DISPLAY
-// ==========================================
 
-function resetMenuDisplay() {
+// =========================================================
+// MENU ROW
+// =========================================================
 
+function renderMenuRow(item) {
 
-allMenuItems =
-    [];
-
-
-setText(
-    "totalItems",
-    0
-);
+    const available =
+        item.Available === true ||
+        item.Available === "true";
 
 
-setText(
-    "availableItems",
-    0
-);
+    const branch =
+        branches.find(
+            b =>
+                (
+                    b.branchId ||
+                    b.BranchId
+                ) ===
+                item.BranchId
+        );
 
 
-setText(
-    "unavailableItems",
-    0
-);
+    const branchName =
+        branch?.branchName ||
+        branch?.BranchName ||
+        item.BranchId ||
+        "—";
 
 
-setText(
-    "menuItemCount",
-    "0 items"
-);
+    const image =
+        item.ImageURL
+            ? `
+                <img
+                    src="${escapeAttribute(
+                        item.ImageURL
+                    )}"
+                    alt=""
+                    onerror="this.style.display='none'"
+                >
+              `
+            : "✦";
 
 
-const menuGrid =
+    return `
+
+        <div class="menu-row">
+
+            <div class="menu-item-info">
+
+                <div class="menu-image">
+                    ${image}
+                </div>
+
+                <div>
+
+                    <div class="menu-item-name">
+                        ${escapeHTML(
+                            item.ItemName ||
+                            "Unnamed item"
+                        )}
+                    </div>
+
+                    <div class="menu-item-description">
+                        ${escapeHTML(
+                            item.Description ||
+                            "No description"
+                        )}
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="menu-cell">
+                ${escapeHTML(
+                    item.Category ||
+                    "—"
+                )}
+            </div>
+
+
+            <div class="menu-cell menu-price">
+                ${formatCurrency(
+                    item.Price
+                )}
+            </div>
+
+
+            <div class="menu-cell">
+                ${escapeHTML(
+                    branchName
+                )}
+            </div>
+
+
+            <div>
+
+                <span
+                    class="status-pill ${
+                        available
+                            ? "available"
+                            : "unavailable"
+                    }"
+                >
+                    ${
+                        available
+                            ? "Available"
+                            : "Unavailable"
+                    }
+                </span>
+
+            </div>
+
+
+            <div class="row-actions">
+
+                ${
+                    selectedBranchId
+                        ? `
+                            <button
+                                class="action-button"
+                                data-action="edit"
+                                data-id="${escapeAttribute(
+                                    item.ItemID
+                                )}"
+                            >
+                                Edit
+                            </button>
+
+                            <button
+                                class="action-button"
+                                data-action="toggle"
+                                data-id="${escapeAttribute(
+                                    item.ItemID
+                                )}"
+                            >
+                                ${
+                                    available
+                                        ? "Disable"
+                                        : "Enable"
+                                }
+                            </button>
+
+                            <button
+                                class="action-button danger"
+                                data-action="delete"
+                                data-id="${escapeAttribute(
+                                    item.ItemID
+                                )}"
+                            >
+                                Delete
+                            </button>
+                        `
+                        : `
+                            <span class="section-note">
+                                Select branch to manage
+                            </span>
+                        `
+                }
+
+            </div>
+
+        </div>
+
+    `;
+
+}
+
+
+// =========================================================
+// ROW ACTIONS
+// =========================================================
+
+function bindRowActions() {
+
+    document
+        .querySelectorAll(
+            ".action-button"
+        )
+        .forEach(
+            button => {
+
+                button.addEventListener(
+                    "click",
+                    async () => {
+
+                        const id =
+                            button.dataset.id;
+
+                        const action =
+                            button.dataset.action;
+
+
+                        if (
+                            action === "edit"
+                        ) {
+
+                            openEditModal(
+                                id
+                            );
+
+                        }
+
+
+                        if (
+                            action === "toggle"
+                        ) {
+
+                            await toggleItem(
+                                id
+                            );
+
+                        }
+
+
+                        if (
+                            action === "delete"
+                        ) {
+
+                            await deleteItem(
+                                id
+                            );
+
+                        }
+
+                    }
+                );
+
+            }
+        );
+
+}
+
+
+// =========================================================
+// ADD MODAL
+// =========================================================
+
+function openAddModal() {
+
+    editingItemId = null;
+
     document.getElementById(
-        "menuGrid"
-    );
+        "modalTitle"
+    ).textContent =
+        "Add Menu Item";
 
 
-if (menuGrid) {
+    itemForm.reset();
 
-    menuGrid.innerHTML =
+
+    document.getElementById(
+        "itemAvailable"
+    ).checked = true;
+
+
+    populateModalBranches();
+
+
+    document.getElementById(
+        "itemBranch"
+    ).value =
+        selectedBranchId;
+
+
+    itemModal.hidden = false;
+
+}
+
+
+// =========================================================
+// EDIT MODAL
+// =========================================================
+
+function openEditModal(itemId) {
+
+    const item =
+        menuItems.find(
+            item =>
+                item.ItemID === itemId
+        );
+
+
+    if (!item) {
+        return;
+    }
+
+
+    editingItemId =
+        itemId;
+
+
+    document.getElementById(
+        "modalTitle"
+    ).textContent =
+        "Edit Menu Item";
+
+
+    populateModalBranches();
+
+
+    document.getElementById(
+        "itemBranch"
+    ).value =
+        item.BranchId || "";
+
+
+    document.getElementById(
+        "itemCategory"
+    ).value =
+        item.Category || "";
+
+
+    document.getElementById(
+        "itemName"
+    ).value =
+        item.ItemName || "";
+
+
+    document.getElementById(
+        "itemPrice"
+    ).value =
+        item.Price ?? "";
+
+
+    document.getElementById(
+        "itemImage"
+    ).value =
+        item.ImageURL || "";
+
+
+    document.getElementById(
+        "itemDescription"
+    ).value =
+        item.Description || "";
+
+
+    document.getElementById(
+        "itemAvailable"
+    ).checked =
+        item.Available === true ||
+        item.Available === "true";
+
+
+    itemModal.hidden = false;
+
+}
+
+
+// =========================================================
+// MODAL BRANCHES
+// =========================================================
+
+function populateModalBranches() {
+
+    const select =
+        document.getElementById(
+            "itemBranch"
+        );
+
+
+    select.innerHTML =
         "";
 
-}
 
+    branches.forEach(
+        branch => {
 
-const emptyState =
-    document.getElementById(
-        "emptyState"
-    );
-
-
-if (emptyState) {
-
-    emptyState.classList.add(
-        "hidden"
-    );
-
-}
-
-
-const categoryFilter =
-    document.getElementById(
-        "categoryFilter"
-    );
-
-
-if (categoryFilter) {
-
-    categoryFilter.innerHTML =
-        `<option value="">All Categories</option>`;
-
-}
-
-
-}
-
-// ==========================================
-// SHOW LOADING
-// ==========================================
-
-function showLoading() {
-
-
-const loadingState =
-    document.getElementById(
-        "loadingState"
-    );
-
-
-const emptyState =
-    document.getElementById(
-        "emptyState"
-    );
-
-
-const menuGrid =
-    document.getElementById(
-        "menuGrid"
-    );
-
-
-if (loadingState) {
-
-    loadingState.classList.remove(
-        "hidden"
-    );
-
-}
-
-
-if (emptyState) {
-
-    emptyState.classList.add(
-        "hidden"
-    );
-
-}
-
-
-if (menuGrid) {
-
-    menuGrid.innerHTML =
-        "";
-
-}
-
-
-hideMessage();
-
-
-}
-
-// ==========================================
-// HIDE LOADING
-// ==========================================
-
-function hideLoading() {
-
-
-const loadingState =
-    document.getElementById(
-        "loadingState"
-    );
-
-
-if (loadingState) {
-
-    loadingState.classList.add(
-        "hidden"
-    );
-
-}
-
-
-}
-
-// ==========================================
-// ERROR MESSAGE
-// ==========================================
-
-function showError(
-message
-) {
-
-
-hideLoading();
-
-
-const messageBox =
-    document.getElementById(
-        "messageBox"
-    );
-
-
-if (!messageBox) {
-
-    console.error(
-        "MENU PAGE ERROR:",
-        message
-    );
-
-
-    return;
-
-}
-
-
-messageBox.textContent =
-    message;
-
-
-messageBox.className =
-    "message-box error";
-
-
-messageBox.classList.remove(
-    "hidden"
-);
-
-
-}
-
-// ==========================================
-// BRANCH REQUIRED MESSAGE
-// ==========================================
-
-function showBranchRequiredMessage(
-message =
-"Please select a branch to view its menu."
-) {
-
-
-hideLoading();
-
-
-const messageBox =
-    document.getElementById(
-        "messageBox"
-    );
-
-
-if (!messageBox) {
-
-    return;
-
-}
-
-
-messageBox.textContent =
-    message;
-
-
-messageBox.className =
-    "message-box";
-
-
-messageBox.classList.remove(
-    "hidden"
-);
-
-
-}
-
-// ==========================================
-// HIDE MESSAGE
-// ==========================================
-
-function hideMessage() {
-
-
-const messageBox =
-    document.getElementById(
-        "messageBox"
-    );
-
-
-if (!messageBox) {
-
-    return;
-
-}
-
-
-messageBox.classList.add(
-    "hidden"
-);
-
-
-messageBox.textContent =
-    "";
-
-
-}
-
-// ==========================================
-// EVENT LISTENERS
-// ==========================================
-
-function setupEventListeners() {
-
-
-// ==================================
-// LOGOUT
-// ==================================
-
-const logoutButton =
-    document.getElementById(
-        "logoutBtn"
-    );
-
-
-if (logoutButton) {
-
-    logoutButton.addEventListener(
-        "click",
-        function () {
-
-            console.log(
-                "MENU PAGE: Logging out."
-            );
-
-
-            if (
-                typeof clearSession ===
-                "function"
-            ) {
-
-                clearSession();
-
-            }
-
-            else {
-
-                localStorage.removeItem(
-                    "qro_session_token"
+            const option =
+                document.createElement(
+                    "option"
                 );
 
-                localStorage.removeItem(
-                    "qro_session_data"
-                );
+            option.value =
+                branch.branchId ||
+                branch.BranchId;
 
-                localStorage.removeItem(
-                    "qro_validated_session"
-                );
+            option.textContent =
+                branch.branchName ||
+                branch.BranchName;
 
-                localStorage.removeItem(
-                    "sessionToken"
-                );
-
-            }
-
-
-            window.location.href =
-                "../../login/login.html";
-
-        }
-    );
-
-}
-
-
-// ==================================
-// MOBILE MENU
-// ==================================
-
-const mobileMenuButton =
-    document.getElementById(
-        "mobileMenuBtn"
-    );
-
-
-if (mobileMenuButton) {
-
-    mobileMenuButton.addEventListener(
-        "click",
-        function () {
-
-            const sidebar =
-                document.querySelector(
-                    ".sidebar"
-                );
-
-
-            if (!sidebar) {
-
-                return;
-
-            }
-
-
-            const isOpen =
-                sidebar.classList.toggle(
-                    "open"
-                );
-
-
-            mobileMenuButton.setAttribute(
-                "aria-expanded",
-                String(isOpen)
+            select.appendChild(
+                option
             );
 
         }
@@ -2389,148 +1137,385 @@ if (mobileMenuButton) {
 }
 
 
-// ==================================
-// BRANCH SELECTOR
-// ==================================
+// =========================================================
+// SAVE
+// =========================================================
 
-const branchSelect =
-    document.getElementById(
-        "branchSelect"
-    );
+async function saveItem(event) {
 
-
-if (branchSelect) {
-
-    branchSelect.addEventListener(
-        "change",
-        async function () {
-
-            const selectedBranchId =
-                this.value;
+    event.preventDefault();
 
 
-            console.log(
-                "=================================="
+    const payload = {
+
+        action:
+            editingItemId
+                ? "update"
+                : "create",
+
+        branchId:
+            document.getElementById(
+                "itemBranch"
+            ).value,
+
+        itemId:
+            editingItemId || "",
+
+        itemName:
+            document.getElementById(
+                "itemName"
+            ).value.trim(),
+
+        category:
+            document.getElementById(
+                "itemCategory"
+            ).value.trim(),
+
+        price:
+            Number(
+                document.getElementById(
+                    "itemPrice"
+                ).value
+            ),
+
+        imageURL:
+            document.getElementById(
+                "itemImage"
+            ).value.trim(),
+
+        description:
+            document.getElementById(
+                "itemDescription"
+            ).value.trim(),
+
+        available:
+            document.getElementById(
+                "itemAvailable"
+            ).checked
+
+    };
+
+
+    try {
+
+        const result =
+            await callMenuAPI(
+                payload
             );
 
 
-            console.log(
-                "MENU PAGE: Branch changed:",
-                selectedBranchId
-            );
+        if (!result.success) {
 
-
-            console.log(
-                "=================================="
-            );
-
-
-            if (!selectedBranchId) {
-
-                resetMenuDisplay();
-
-
-                showBranchRequiredMessage();
-
-
-                return;
-
-            }
-
-
-            localStorage.setItem(
-                "menuBranchId",
-                selectedBranchId
-            );
-
-
-            updateSelectedBranchName(
-                branchSelect
-            );
-
-
-            await loadMenu(
-                selectedBranchId
+            throw new Error(
+                result.message ||
+                "Unable to save menu item."
             );
 
         }
-    );
+
+
+        closeItemModal();
+
+        await loadMenu();
+
+
+    } catch (error) {
+
+        document.getElementById(
+            "modalError"
+        ).textContent =
+            error.message;
+
+        document.getElementById(
+            "modalError"
+        ).hidden = false;
+
+    }
 
 }
 
 
-// ==================================
-// SEARCH
-// ==================================
+// =========================================================
+// TOGGLE
+// =========================================================
 
-const searchInput =
-    document.getElementById(
-        "menuSearch"
-    );
+async function toggleItem(itemId) {
+
+    const item =
+        menuItems.find(
+            item =>
+                item.ItemID === itemId
+        );
 
 
-if (searchInput) {
+    if (!item) {
+        return;
+    }
 
-    searchInput.addEventListener(
-        "input",
-        function () {
 
-            applyMenuFilters();
+    const available =
+        item.Available === true ||
+        item.Available === "true";
+
+
+    try {
+
+        const result =
+            await callMenuAPI({
+
+                action: "toggle",
+
+                itemId,
+
+                branchId:
+                    selectedBranchId,
+
+                available:
+                    !available
+
+            });
+
+
+        if (!result.success) {
+
+            throw new Error(
+                result.message ||
+                "Unable to update availability."
+            );
 
         }
-    );
+
+
+        await loadMenu();
+
+
+    } catch (error) {
+
+        alert(
+            error.message
+        );
+
+    }
 
 }
 
 
-// ==================================
-// CATEGORY FILTER
-// ==================================
+// =========================================================
+// DELETE
+// =========================================================
 
-const categoryFilter =
-    document.getElementById(
-        "categoryFilter"
-    );
+async function deleteItem(itemId) {
+
+    const item =
+        menuItems.find(
+            item =>
+                item.ItemID === itemId
+        );
 
 
-if (categoryFilter) {
+    if (!item) {
+        return;
+    }
 
-    categoryFilter.addEventListener(
-        "change",
-        function () {
 
-            applyMenuFilters();
+    const confirmed =
+        confirm(
+            `Delete "${item.ItemName}"?\n\n` +
+            "This will permanently remove the item " +
+            "from this branch menu."
+        );
+
+
+    if (!confirmed) {
+        return;
+    }
+
+
+    try {
+
+        const result =
+            await callMenuAPI({
+
+                action: "delete",
+
+                itemId,
+
+                branchId:
+                    selectedBranchId
+
+            });
+
+
+        if (!result.success) {
+
+            throw new Error(
+                result.message ||
+                "Unable to delete menu item."
+            );
 
         }
+
+
+        await loadMenu();
+
+
+    } catch (error) {
+
+        alert(
+            error.message
+        );
+
+    }
+
+}
+
+
+// =========================================================
+// CLOSE MODAL
+// =========================================================
+
+function closeItemModal() {
+
+    itemModal.hidden = true;
+
+    editingItemId = null;
+
+}
+
+
+// =========================================================
+// LOADING
+// =========================================================
+
+function setLoading(isLoading) {
+
+    if (!isLoading) {
+        return;
+    }
+
+    menuTable.innerHTML = `
+        <div class="empty-state">
+            <div class="loader"></div>
+            <p>Loading menu...</p>
+        </div>
+    `;
+
+}
+
+
+// =========================================================
+// PAGE ERROR
+// =========================================================
+
+function showPageError(message) {
+
+    menuTable.innerHTML = `
+
+        <div class="empty-state">
+
+            <div class="empty-icon">
+                !
+            </div>
+
+            <h3>
+                Unable to load menu
+            </h3>
+
+            <p>
+                ${escapeHTML(
+                    message ||
+                    "Please try again."
+                )}
+            </p>
+
+        </div>
+
+    `;
+
+}
+
+
+// =========================================================
+// SESSION
+// =========================================================
+
+function getSessionData() {
+
+    try {
+
+        return JSON.parse(
+            localStorage.getItem(
+                SESSION_DATA_KEY
+            ) || "{}"
+        );
+
+    } catch {
+
+        return {};
+
+    }
+
+}
+
+
+// =========================================================
+// CURRENCY
+// =========================================================
+
+function formatCurrency(value) {
+
+    const session =
+        getSessionData();
+
+    const currency =
+        session?.currency ||
+        "AED";
+
+
+    return `${currency} ${Number(
+        value || 0
+    ).toFixed(2)}`;
+
+}
+
+
+// =========================================================
+// HTML SAFETY
+// =========================================================
+
+function escapeHTML(value) {
+
+    return String(
+        value ?? ""
+    )
+    .replace(
+        /&/g,
+        "&amp;"
+    )
+    .replace(
+        /</g,
+        "&lt;"
+    )
+    .replace(
+        />/g,
+        "&gt;"
+    )
+    .replace(
+        /"/g,
+        "&quot;"
+    )
+    .replace(
+        /'/g,
+        "&#039;"
     );
 
 }
 
 
-}
+function escapeAttribute(value) {
 
-// ==========================================
-// HELPER — SET TEXT
-// ==========================================
-
-function setText(
-elementId,
-value
-) {
-
-
-const element =
-    document.getElementById(
-        elementId
+    return escapeHTML(
+        value
     );
-
-
-if (element) {
-
-    element.textContent =
-        value ?? "-";
-
-}
-
 
 }
