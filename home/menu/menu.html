@@ -2,342 +2,627 @@
 <html lang="en">
 
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Menu | Restaurant SaaS</title>
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-    <link rel="stylesheet" href="menu.css">
+    <title>Menu Management | QR Order SaaS</title>
+
+    <link
+        rel="stylesheet"
+        href="./menu.css"
+    >
+
 </head>
+
 
 <body>
 
-<div class="menu-page">
+<div class="app">
 
-    <header class="page-header">
 
-        <div>
-            <span class="eyebrow">MENU MANAGEMENT</span>
+    <!-- ==========================================
+         SIDEBAR
+    =========================================== -->
 
-            <h1>Menu Command Center</h1>
+    <aside class="sidebar">
 
-            <p>
-                Manage your restaurant catalog, availability and
-                branch menus from one place.
-            </p>
+        <div class="brand">
+
+            <div class="brand-logo">
+                QR
+            </div>
+
+            <div>
+
+                <div class="brand-name">
+                    QR Order SaaS
+                </div>
+
+                <div class="brand-subtitle">
+                    Restaurant Platform
+                </div>
+
+            </div>
+
         </div>
 
-        <div class="header-actions">
 
-            <select id="branchSelect">
-                <option value="">All Branches</option>
-            </select>
+        <nav class="navigation">
+
+            <a
+                href="../dashboard/dashboard.html"
+                class="nav-item"
+            >
+                <span>⌂</span>
+                Dashboard
+            </a>
+
+
+            <a
+                href="../restaurant/restaurant.html"
+                class="nav-item"
+            >
+                <span>▣</span>
+                Restaurant
+            </a>
+
+
+            <a
+                href="./menu.html"
+                class="nav-item active"
+            >
+                <span>☷</span>
+                Menu
+            </a>
+
+
+            <a
+                href="../orders/orders.html"
+                class="nav-item"
+            >
+                <span>▤</span>
+                Orders
+            </a>
+
+
+            <a
+                href="../reports/reports.html"
+                class="nav-item"
+            >
+                <span>▥</span>
+                Reports
+            </a>
+
+
+            <a
+                href="../settings/settings.html"
+                class="nav-item"
+            >
+                <span>⚙</span>
+                Settings
+            </a>
+
+        </nav>
+
+
+        <div class="sidebar-footer">
 
             <button
-                id="addItemButton"
-                class="primary-button"
+                type="button"
+                id="logoutBtn"
+                class="logout-btn"
             >
-                <span>+</span>
-                Add Menu Item
+                ⇥ &nbsp; Logout
             </button>
 
         </div>
 
-    </header>
+    </aside>
 
 
-    <!-- =====================================================
-         KPI
-    ====================================================== -->
 
-    <section class="kpi-grid">
+    <!-- ==========================================
+         MAIN
+    =========================================== -->
 
-        <article class="kpi-card">
-
-            <div class="kpi-label">
-                TOTAL ITEMS
-            </div>
-
-            <div id="totalItems" class="kpi-value">
-                0
-            </div>
-
-            <div class="kpi-note">
-                Across selected scope
-            </div>
-
-        </article>
+    <main class="main">
 
 
-        <article class="kpi-card">
+        <!-- ======================================
+             TOPBAR
+        ======================================= -->
 
-            <div class="kpi-label">
-                AVAILABLE
-            </div>
-
-            <div id="availableItems" class="kpi-value">
-                0
-            </div>
-
-            <div class="kpi-note positive">
-                Currently orderable
-            </div>
-
-        </article>
-
-
-        <article class="kpi-card">
-
-            <div class="kpi-label">
-                UNAVAILABLE
-            </div>
-
-            <div id="unavailableItems" class="kpi-value">
-                0
-            </div>
-
-            <div class="kpi-note">
-                Temporarily disabled
-            </div>
-
-        </article>
-
-
-        <article class="kpi-card">
-
-            <div class="kpi-label">
-                CATEGORIES
-            </div>
-
-            <div id="categoryCount" class="kpi-value">
-                0
-            </div>
-
-            <div class="kpi-note">
-                Menu categories
-            </div>
-
-        </article>
-
-    </section>
-
-
-    <!-- =====================================================
-         MENU HEALTH
-    ====================================================== -->
-
-    <section class="panel health-panel">
-
-        <div class="section-heading">
+        <header class="topbar">
 
             <div>
-                <span class="section-eyebrow">
-                    CATALOG INTELLIGENCE
-                </span>
 
-                <h2>Menu Health</h2>
-            </div>
+                <div class="page-label">
+                    RESTAURANT MANAGEMENT
+                </div>
 
-            <div id="availabilityRate" class="health-score">
-                0%
-            </div>
-
-        </div>
-
-        <div class="health-grid">
-
-            <div class="health-item">
-
-                <span>Availability</span>
-
-                <strong id="healthAvailability">
-                    0%
-                </strong>
+                <h1>
+                    Menu Management
+                </h1>
 
             </div>
 
-            <div class="health-item">
 
-                <span>Missing Images</span>
+            <div class="user-area">
 
-                <strong id="missingImages">
-                    0
-                </strong>
+                <div
+                    class="user-avatar"
+                    id="userAvatar"
+                >
+                    A
+                </div>
 
-            </div>
+                <div class="user-info">
 
-            <div class="health-item">
+                    <strong id="userName">
+                        Owner
+                    </strong>
 
-                <span>Missing Details</span>
+                    <span id="userRole">
+                        Owner
+                    </span>
 
-                <strong id="missingDescriptions">
-                    0
-                </strong>
-
-            </div>
-
-            <div class="health-item">
-
-                <span>Average Price</span>
-
-                <strong id="averagePrice">
-                    AED 0.00
-                </strong>
+                </div>
 
             </div>
 
-        </div>
-
-    </section>
+        </header>
 
 
-    <!-- =====================================================
-         BRANCH SUMMARY
-    ====================================================== -->
 
-    <section
-        id="branchSummaryPanel"
-        class="panel"
-    >
+        <!-- ======================================
+             INTRO
+        ======================================= -->
 
-        <div class="section-heading">
+        <section class="menu-intro">
 
             <div>
-                <span class="section-eyebrow">
-                    MULTI-BRANCH VIEW
+
+                <span class="eyebrow">
+                    MENU MANAGEMENT
                 </span>
 
-                <h2>Branch Menu Overview</h2>
+                <h2>
+                    Manage your restaurant menu
+                </h2>
+
+                <p>
+                    Create, update, enable or disable menu items
+                    for each restaurant branch from one place.
+                </p>
+
             </div>
 
-            <span class="section-note">
-                Select a branch above to manage items
-            </span>
 
-        </div>
+            <button
+                type="button"
+                id="addMenuItemBtn"
+                class="primary-btn"
+            >
+                <span>＋</span>
+                Add Menu Item
+            </button>
 
-        <div
-            id="branchSummary"
-            class="branch-summary"
-        ></div>
-
-    </section>
+        </section>
 
 
-    <!-- =====================================================
-         MENU ITEMS
-    ====================================================== -->
 
-    <section class="panel">
+        <!-- ======================================
+             BRANCH TOOLBAR
+        ======================================= -->
 
-        <div class="section-heading">
+        <section class="menu-toolbar">
 
-            <div>
-                <span class="section-eyebrow">
-                    CATALOG
-                </span>
+            <div class="branch-selector">
 
-                <h2>Menu Items</h2>
+                <div class="toolbar-label">
+                    BRANCH
+                </div>
+
+                <select id="branchFilter">
+
+                    <option value="">
+                        All Branches
+                    </option>
+
+                </select>
+
             </div>
 
-            <span id="itemCountLabel" class="section-note">
-                0 items
-            </span>
-
-        </div>
-
-
-        <div class="filters">
 
             <div class="search-box">
 
-                <span>⌕</span>
+                <span>
+                    ⌕
+                </span>
 
                 <input
-                    id="searchInput"
                     type="search"
+                    id="menuSearch"
                     placeholder="Search menu items..."
+                    autocomplete="off"
                 >
 
             </div>
 
 
-            <select id="categoryFilter">
+            <div class="category-filter">
 
-                <option value="">
-                    All Categories
-                </option>
+                <div class="toolbar-label">
+                    CATEGORY
+                </div>
 
-            </select>
+                <select id="categoryFilter">
 
+                    <option value="">
+                        All Categories
+                    </option>
 
-            <select id="availabilityFilter">
+                </select>
 
-                <option value="">
-                    All Availability
-                </option>
-
-                <option value="available">
-                    Available
-                </option>
-
-                <option value="unavailable">
-                    Unavailable
-                </option>
-
-            </select>
-
-        </div>
-
-
-        <div
-            id="menuTable"
-            class="menu-table"
-        ></div>
-
-
-        <div
-            id="emptyState"
-            class="empty-state"
-            hidden
-        >
-
-            <div class="empty-icon">
-                ✦
             </div>
 
-            <h3>
-                No menu items found
-            </h3>
 
-            <p>
-                Add your first menu item or change your filters.
-            </p>
+            <button
+                type="button"
+                id="refreshMenuBtn"
+                class="secondary-btn"
+            >
+                ↻ Refresh
+            </button>
+
+        </section>
+
+
+
+        <!-- ======================================
+             KPI CARDS
+        ======================================= -->
+
+        <section class="menu-metrics">
+
+            <div class="metric-card">
+
+                <div class="metric-icon">
+                    ☷
+                </div>
+
+                <div>
+
+                    <span>
+                        TOTAL ITEMS
+                    </span>
+
+                    <strong id="totalItems">
+                        0
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <div class="metric-card">
+
+                <div class="metric-icon available-icon">
+                    ✓
+                </div>
+
+                <div>
+
+                    <span>
+                        AVAILABLE
+                    </span>
+
+                    <strong id="availableItems">
+                        0
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <div class="metric-card">
+
+                <div class="metric-icon unavailable-icon">
+                    —
+                </div>
+
+                <div>
+
+                    <span>
+                        UNAVAILABLE
+                    </span>
+
+                    <strong id="unavailableItems">
+                        0
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <div class="metric-card">
+
+                <div class="metric-icon">
+                    ◈
+                </div>
+
+                <div>
+
+                    <span>
+                        CATEGORIES
+                    </span>
+
+                    <strong id="categoryCount">
+                        0
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <div class="metric-card">
+
+                <div class="metric-icon">
+                    ◌
+                </div>
+
+                <div>
+
+                    <span>
+                        AVG. PRICE
+                    </span>
+
+                    <strong id="averagePrice">
+                        AED 0.00
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- ======================================
+             MENU CONTENT
+        ======================================= -->
+
+        <section class="menu-panel">
+
+
+            <div class="panel-header">
+
+                <div>
+
+                    <span class="panel-eyebrow">
+                        MENU ITEMS
+                    </span>
+
+                    <h2>
+                        Restaurant Menu
+                    </h2>
+
+                    <p id="menuSummary">
+                        Loading menu items...
+                    </p>
+
+                </div>
+
+
+                <div class="availability-summary">
+
+                    <span>
+                        Availability
+                    </span>
+
+                    <strong id="availabilityRate">
+                        0%
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- ==================================
+                 LOADING
+            =================================== -->
+
+            <div
+                id="menuLoading"
+                class="menu-loading"
+            >
+
+                <div class="loading-spinner">
+                    ⟳
+                </div>
+
+                <span>
+                    Loading menu...
+                </span>
+
+            </div>
+
+
+
+            <!-- ==================================
+                 EMPTY
+            =================================== -->
+
+            <div
+                id="menuEmpty"
+                class="menu-empty hidden"
+            >
+
+                <div class="empty-icon">
+                    ☷
+                </div>
+
+                <h3>
+                    No menu items found
+                </h3>
+
+                <p>
+                    Add your first menu item to start
+                    building your restaurant menu.
+                </p>
+
+                <button
+                    type="button"
+                    id="emptyAddBtn"
+                    class="primary-btn"
+                >
+                    ＋ Add Menu Item
+                </button>
+
+            </div>
+
+
+
+            <!-- ==================================
+                 TABLE
+            =================================== -->
+
+            <div
+                id="menuTableContainer"
+                class="menu-table-container hidden"
+            >
+
+                <table class="menu-table">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                ITEM
+                            </th>
+
+                            <th>
+                                CATEGORY
+                            </th>
+
+                            <th>
+                                BRANCH
+                            </th>
+
+                            <th>
+                                PRICE
+                            </th>
+
+                            <th>
+                                STATUS
+                            </th>
+
+                            <th class="actions-column">
+                                ACTIONS
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody id="menuTableBody">
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+
+            <!-- ==================================
+                 NO FILTER RESULTS
+            =================================== -->
+
+            <div
+                id="noFilterResults"
+                class="no-filter-results hidden"
+            >
+
+                <div>
+                    ⌕
+                </div>
+
+                <strong>
+                    No matching menu items
+                </strong>
+
+                <span>
+                    Try changing your search or filters.
+                </span>
+
+            </div>
+
+
+        </section>
+
+
+
+        <!-- ======================================
+             MESSAGE BAR
+        ======================================= -->
+
+        <div
+            id="menuMessageBar"
+            class="menu-message-bar"
+        >
+
+            <span id="menuMessage">
+                Menu data is loaded from your restaurant configuration.
+            </span>
 
         </div>
 
-    </section>
+
+    </main>
 
 </div>
 
 
-<!-- =========================================================
-     MODAL
-========================================================== -->
+
+<!-- ============================================
+     ADD / EDIT MODAL
+============================================= -->
 
 <div
-    id="itemModal"
+    id="menuModal"
     class="modal-overlay"
-    hidden
+    aria-hidden="true"
 >
 
     <div class="modal-card">
 
+
         <div class="modal-header">
+
+            <div class="modal-icon">
+                ☷
+            </div>
 
             <div>
 
-                <span class="section-eyebrow">
+                <span
+                    class="modal-eyebrow"
+                    id="modalEyebrow"
+                >
                     MENU ITEM
                 </span>
 
@@ -345,167 +630,223 @@
                     Add Menu Item
                 </h2>
 
-            </div>
+                <p id="modalDescription">
+                    Add a new item to your restaurant menu.
+                </p>
 
-            <button
-                id="closeModal"
-                class="close-button"
-            >
-                ×
-            </button>
+            </div>
 
         </div>
 
 
-        <form id="itemForm">
+
+        <form id="menuForm">
+
 
             <input
-                id="itemId"
                 type="hidden"
+                id="itemId"
             >
 
 
             <div class="form-grid">
 
-                <div class="form-field">
 
-                    <label>
-                        Branch
+                <!-- BRANCH -->
+
+                <div class="form-group">
+
+                    <label for="itemBranch">
+                        BRANCH
                     </label>
 
                     <select
                         id="itemBranch"
                         required
-                    ></select>
+                    >
+
+                        <option value="">
+                            Select Branch
+                        </option>
+
+                    </select>
 
                 </div>
 
 
-                <div class="form-field">
 
-                    <label>
-                        Category
+                <!-- CATEGORY -->
+
+                <div class="form-group">
+
+                    <label for="itemCategory">
+                        CATEGORY
                     </label>
 
                     <input
+                        type="text"
                         id="itemCategory"
-                        required
                         placeholder="e.g. Main Course"
+                        required
                     >
 
                 </div>
 
 
-                <div class="form-field full">
 
-                    <label>
-                        Item Name
+                <!-- ITEM NAME -->
+
+                <div class="form-group form-group-wide">
+
+                    <label for="itemName">
+                        ITEM NAME
                     </label>
 
                     <input
+                        type="text"
                         id="itemName"
-                        required
                         placeholder="e.g. Chicken Burger"
-                    >
-
-                </div>
-
-
-                <div class="form-field">
-
-                    <label>
-                        Price
-                    </label>
-
-                    <input
-                        id="itemPrice"
-                        type="number"
-                        min="0"
-                        step="0.01"
+                        maxlength="120"
                         required
-                        placeholder="0.00"
                     >
 
                 </div>
 
 
-                <div class="form-field">
 
-                    <label>
-                        Image URL
+                <!-- PRICE -->
+
+                <div class="form-group">
+
+                    <label for="itemPrice">
+                        PRICE
+                    </label>
+
+                    <div class="price-input">
+
+                        <span>
+                            AED
+                        </span>
+
+                        <input
+                            type="number"
+                            id="itemPrice"
+                            min="0"
+                            step="0.01"
+                            placeholder="0.00"
+                            required
+                        >
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- IMAGE -->
+
+                <div class="form-group">
+
+                    <label for="itemImage">
+                        IMAGE URL
                     </label>
 
                     <input
-                        id="itemImage"
                         type="url"
+                        id="itemImage"
                         placeholder="https://..."
                     >
 
                 </div>
 
 
-                <div class="form-field full">
 
-                    <label>
-                        Description
+                <!-- DESCRIPTION -->
+
+                <div class="form-group form-group-wide">
+
+                    <label for="itemDescription">
+                        DESCRIPTION
                     </label>
 
                     <textarea
                         id="itemDescription"
                         rows="4"
-                        placeholder="Describe the dish..."
+                        maxlength="500"
+                        placeholder="Describe this menu item..."
                     ></textarea>
 
                 </div>
 
 
-                <div class="form-field full">
 
-                    <label class="availability-toggle">
+                <!-- AVAILABILITY -->
 
-                        <input
-                            id="itemAvailable"
-                            type="checkbox"
-                            checked
-                        >
+                <div class="form-group form-group-wide">
 
-                        <span>
-                            Item is available for ordering
-                        </span>
+                    <div class="availability-field">
 
-                    </label>
+                        <div>
+
+                            <label>
+                                ITEM AVAILABILITY
+                            </label>
+
+                            <span>
+                                Customers can order this item
+                                when it is available.
+                            </span>
+
+                        </div>
+
+                        <label class="switch">
+
+                            <input
+                                type="checkbox"
+                                id="itemAvailable"
+                                checked
+                            >
+
+                            <span class="slider"></span>
+
+                        </label>
+
+                    </div>
 
                 </div>
 
             </div>
 
 
+
             <div
-                id="modalError"
-                class="modal-error"
-                hidden
+                id="formError"
+                class="form-error"
             ></div>
+
 
 
             <div class="modal-actions">
 
                 <button
                     type="button"
-                    id="cancelModal"
-                    class="secondary-button"
+                    id="cancelMenuModal"
+                    class="secondary-btn"
                 >
                     Cancel
                 </button>
 
                 <button
                     type="submit"
-                    class="primary-button"
-                    id="saveItemButton"
+                    id="saveMenuItemBtn"
+                    class="primary-btn"
                 >
+                    <span>✓</span>
                     Save Menu Item
                 </button>
 
             </div>
+
 
         </form>
 
@@ -514,7 +855,92 @@
 </div>
 
 
-<script src="../config/config.js"></script>
+
+<!-- ============================================
+     DELETE MODAL
+============================================= -->
+
+<div
+    id="deleteModal"
+    class="modal-overlay"
+    aria-hidden="true"
+>
+
+    <div class="modal-card delete-card">
+
+
+        <div class="modal-icon danger-icon">
+            !
+        </div>
+
+
+        <span class="modal-eyebrow danger-eyebrow">
+            DELETE MENU ITEM
+        </span>
+
+
+        <h2>
+            Delete this menu item?
+        </h2>
+
+
+        <p>
+            This action permanently removes the selected
+            menu item from this branch.
+        </p>
+
+
+        <div class="delete-item-preview">
+
+            <strong id="deleteItemName">
+                Menu Item
+            </strong>
+
+            <span id="deleteItemCategory">
+                Category
+            </span>
+
+        </div>
+
+
+        <div
+            id="deleteError"
+            class="modal-error"
+        ></div>
+
+
+        <div class="modal-actions">
+
+            <button
+                type="button"
+                id="cancelDelete"
+                class="secondary-btn"
+            >
+                Cancel
+            </button>
+
+            <button
+                type="button"
+                id="confirmDelete"
+                class="danger-confirm-btn"
+            >
+                Delete Item
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- IMPORTANT:
+     N8N_BASE_URL should already be defined by your
+     existing shared configuration.
+-->
+
+<script src="../../config.js"></script>
 <script src="menu.js"></script>
 
 </body>

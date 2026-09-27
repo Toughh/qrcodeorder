@@ -1,267 +1,392 @@
-// =========================================================
-// QR RESTAURANT SAAS
-// PREMIUM MENU COMMAND CENTER
-// =========================================================
+// ==========================================
+// QR ORDER SAAS
+// PREMIUM OWNER MENU MANAGEMENT
+// ==========================================
 
-const MENU_WEBHOOK =
+
+// ==========================================
+// CONFIGURATION
+// ==========================================
+
+const MENU_MANAGE_WEBHOOK =
     `${N8N_BASE_URL}/owner-menu-manage`;
 
 const SESSION_TOKEN_KEY =
     "qro_session_token";
 
-const SESSION_DATA_KEY =
-    "qro_session_data";
 
-
-// =========================================================
+// ==========================================
 // STATE
-// =========================================================
+// ==========================================
 
-let sessionToken =
-    localStorage.getItem(
-        SESSION_TOKEN_KEY
-    );
+let menuData = null;
 
-let branches = [];
 let menuItems = [];
 
-let selectedBranchId = "";
+let branches = [];
 
-let editingItemId = null;
+let editingItem = null;
 
-
-// =========================================================
-// ELEMENTS
-// =========================================================
-
-const branchSelect =
-    document.getElementById("branchSelect");
-
-const addItemButton =
-    document.getElementById("addItemButton");
-
-const searchInput =
-    document.getElementById("searchInput");
-
-const categoryFilter =
-    document.getElementById("categoryFilter");
-
-const availabilityFilter =
-    document.getElementById("availabilityFilter");
-
-const menuTable =
-    document.getElementById("menuTable");
-
-const emptyState =
-    document.getElementById("emptyState");
-
-const itemModal =
-    document.getElementById("itemModal");
-
-const closeModal =
-    document.getElementById("closeModal");
-
-const cancelModal =
-    document.getElementById("cancelModal");
-
-const itemForm =
-    document.getElementById("itemForm");
+let deletingItem = null;
 
 
-// =========================================================
-// INIT
-// =========================================================
+// ==========================================
+// DOM HELPER
+// ==========================================
+
+function $(id) {
+
+    return document.getElementById(id);
+
+}
+
+
+// ==========================================
+// SESSION
+// ==========================================
+
+function getSessionToken() {
+
+    return localStorage.getItem(
+        SESSION_TOKEN_KEY
+    ) || "";
+
+}
+
+
+// ==========================================
+// ESCAPE HTML
+// ==========================================
+
+function escapeHtml(value) {
+
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+
+}
+
+
+// ==========================================
+// INITIALIZE
+// ==========================================
 
 document.addEventListener(
     "DOMContentLoaded",
-    init
+    () => {
+
+        initializeEvents();
+
+        loadMenu();
+
+    }
 );
 
 
-async function init() {
+// ==========================================
+// EVENTS
+// ==========================================
 
-    sessionToken =
-        localStorage.getItem(
-            SESSION_TOKEN_KEY
+function initializeEvents() {
+
+
+    $("branchFilter")
+        ?.addEventListener(
+            "change",
+            () => {
+
+                loadMenu(
+                    $("branchFilter").value
+                );
+
+            }
         );
+
+
+    $("categoryFilter")
+        ?.addEventListener(
+            "change",
+            renderMenu
+        );
+
+
+    $("menuSearch")
+        ?.addEventListener(
+            "input",
+            renderMenu
+        );
+
+
+    $("refreshMenuBtn")
+        ?.addEventListener(
+            "click",
+            () => {
+
+                loadMenu(
+                    $("branchFilter")?.value || ""
+                );
+
+            }
+        );
+
+
+    $("addMenuItemBtn")
+        ?.addEventListener(
+            "click",
+            () => openAddModal()
+        );
+
+
+    $("emptyAddBtn")
+        ?.addEventListener(
+            "click",
+            () => openAddModal()
+        );
+
+
+    $("menuForm")
+        ?.addEventListener(
+            "submit",
+            handleFormSubmit
+        );
+
+
+    $("cancelMenuModal")
+        ?.addEventListener(
+            "click",
+            closeMenuModal
+        );
+
+
+    $("cancelDelete")
+        ?.addEventListener(
+            "click",
+            closeDeleteModal
+        );
+
+
+    $("confirmDelete")
+        ?.addEventListener(
+            "click",
+            confirmDelete
+        );
+
+
+    $("logoutBtn")
+        ?.addEventListener(
+            "click",
+            handleLogout
+        );
+
+
+    $("menuModal")
+        ?.addEventListener(
+            "click",
+            event => {
+
+                if (
+                    event.target.id ===
+                    "menuModal"
+                ) {
+
+                    closeMenuModal();
+
+                }
+
+            }
+        );
+
+
+    $("deleteModal")
+        ?.addEventListener(
+            "click",
+            event => {
+
+                if (
+                    event.target.id ===
+                    "deleteModal"
+                ) {
+
+                    closeDeleteModal();
+
+                }
+
+            }
+        );
+
+
+    document.addEventListener(
+        "keydown",
+        event => {
+
+            if (event.key !== "Escape") {
+                return;
+            }
+
+            closeMenuModal();
+            closeDeleteModal();
+
+        }
+    );
+
+}
+
+
+// ==========================================
+// LOAD MENU
+// ==========================================
+
+async function loadMenu(
+    branchId = ""
+) {
+
+    const sessionToken =
+        getSessionToken();
+
 
     if (!sessionToken) {
 
-        window.location.href =
-            "../login/login.html";
+        redirectToLogin();
 
         return;
-
     }
 
-    bindEvents();
 
-    await loadMenu();
+    showLoading();
 
-}
-
-
-// =========================================================
-// EVENTS
-// =========================================================
-
-function bindEvents() {
-
-    branchSelect?.addEventListener(
-        "change",
-        async () => {
-
-            selectedBranchId =
-                branchSelect.value;
-
-            await loadMenu();
-
-        }
-    );
-
-
-    searchInput?.addEventListener(
-        "input",
-        renderMenu
-    );
-
-
-    categoryFilter?.addEventListener(
-        "change",
-        renderMenu
-    );
-
-
-    availabilityFilter?.addEventListener(
-        "change",
-        renderMenu
-    );
-
-
-    addItemButton?.addEventListener(
-        "click",
-        () => {
-
-            if (!selectedBranchId) {
-
-                alert(
-                    "Please select a specific branch before adding a menu item."
-                );
-
-                return;
-
-            }
-
-            openAddModal();
-
-        }
-    );
-
-
-    closeModal?.addEventListener(
-        "click",
-        closeItemModal
-    );
-
-
-    cancelModal?.addEventListener(
-        "click",
-        closeItemModal
-    );
-
-
-    itemForm?.addEventListener(
-        "submit",
-        saveItem
-    );
-
-}
-
-
-// =========================================================
-// LOAD MENU
-// =========================================================
-
-async function loadMenu() {
-
-    setLoading(true);
 
     try {
 
-        const result =
-            await callMenuAPI({
-                action: "list",
-                branchId:
-                    selectedBranchId
-            });
-
-
-        if (!result.success) {
-
-            throw new Error(
-                result.message ||
-                "Unable to load menu."
+        const data =
+            await menuRequest(
+                "list",
+                {
+                    branchId
+                }
             );
 
+
+        if (
+            !data.success
+        ) {
+
+            handleApiError(data);
+
+            return;
         }
 
 
-        branches =
-            result.branches ||
-            [];
+        menuData = data;
 
         menuItems =
-            result.items ||
-            [];
+            Array.isArray(data.items)
+                ? data.items
+                : [];
 
+
+        branches =
+            Array.isArray(data.branches)
+                ? data.branches
+                : [];
+
+
+        populateUser(data);
 
         populateBranches();
 
-        updateMetrics(
-            result.metrics ||
-            {}
-        );
+        populateCategories();
 
-        populateCategoryFilter();
-
-        renderBranchSummary(
-            result.branches ||
-            []
-        );
+        populateMetrics();
 
         renderMenu();
 
+        hideLoading();
 
-    } catch (error) {
+
+        showMessage(
+            "Menu data loaded successfully.",
+            "success"
+        );
+
+    }
+    catch (error) {
 
         console.error(
+            "Menu load error:",
             error
         );
 
-        showPageError(
-            error.message
+        hideLoading();
+
+
+        showMessage(
+            error.message ||
+            "Unable to load menu.",
+            "error"
         );
-
-    } finally {
-
-        setLoading(false);
 
     }
 
 }
 
 
-// =========================================================
-// API
-// =========================================================
+// ==========================================
+// API REQUEST
+// ==========================================
 
-async function callMenuAPI(payload) {
+async function menuRequest(
+    action,
+    values = {}
+) {
+
+    const sessionToken =
+        getSessionToken();
+
+
+    const body = {
+
+        sessionToken,
+
+        action,
+
+        branchId:
+            values.branchId || "",
+
+        itemId:
+            values.itemId || "",
+
+        itemName:
+            values.itemName || "",
+
+        category:
+            values.category || "",
+
+        description:
+            values.description || "",
+
+        imageURL:
+            values.imageURL || "",
+
+        price:
+            values.price !== undefined
+                ? values.price
+                : "",
+
+        available:
+            values.available !== undefined
+                ? values.available
+                : ""
+
+    };
+
 
     const response =
         await fetch(
-            MENU_WEBHOOK,
+            MENU_MANAGE_WEBHOOK,
             {
-
                 method: "POST",
 
                 headers: {
@@ -269,121 +394,266 @@ async function callMenuAPI(payload) {
                         "application/json"
                 },
 
-                body: JSON.stringify({
-
-                    sessionToken,
-
-                    ...payload
-
-                })
-
+                body:
+                    JSON.stringify(body)
             }
         );
 
 
-    const raw =
-        await response.json();
+    let data;
 
+    try {
 
-    const result =
-        Array.isArray(raw)
-            ? raw[0]
-            : raw;
+        data =
+            await response.json();
 
-
-    if (
-        !response.ok ||
-        !result
-    ) {
+    }
+    catch {
 
         throw new Error(
-            result?.message ||
-            "Menu service unavailable."
+            "Invalid response received from menu service."
         );
 
     }
 
 
     if (
-        result.code ===
+        data.code ===
         "INVALID_SESSION"
     ) {
 
-        localStorage.removeItem(
-            SESSION_TOKEN_KEY
+        redirectToLogin();
+
+        return data;
+    }
+
+
+    if (
+        !response.ok
+    ) {
+
+        throw new Error(
+            data.message ||
+            "Menu request failed."
         );
-
-        localStorage.removeItem(
-            SESSION_DATA_KEY
-        );
-
-        window.location.href =
-            "../login/login.html";
-
-        return;
 
     }
 
 
-    return result;
+    return data;
 
 }
 
 
-// =========================================================
+// ==========================================
+// USER
+// ==========================================
+
+function populateUser(data) {
+
+    const profile =
+        data.profile || {};
+
+
+    /*
+     * The current menu workflow primarily
+     * returns restaurant/menu information.
+     *
+     * If session profile data exists locally,
+     * use it for the topbar.
+     */
+
+    let sessionData = null;
+
+
+    try {
+
+        sessionData =
+            JSON.parse(
+                localStorage.getItem(
+                    "qro_session_data"
+                ) || "null"
+            );
+
+    }
+    catch {
+
+        sessionData = null;
+
+    }
+
+
+    const ownerName =
+        profile.ownerName ||
+        sessionData?.ownerName ||
+        sessionData?.Name ||
+        sessionData?.name ||
+        "Owner";
+
+
+    const role =
+        sessionData?.Role ||
+        sessionData?.role ||
+        "Owner";
+
+
+    setText(
+        "userName",
+        ownerName
+    );
+
+
+    setText(
+        "userRole",
+        role
+    );
+
+
+    setText(
+        "userAvatar",
+        getInitial(ownerName)
+    );
+
+}
+
+
+// ==========================================
 // BRANCHES
-// =========================================================
+// ==========================================
 
 function populateBranches() {
 
-    const current =
-        selectedBranchId;
+    const filter =
+        $("branchFilter");
 
-    branchSelect.innerHTML =
-        `<option value="">
+    const modalBranch =
+        $("itemBranch");
+
+
+    if (!filter) {
+        return;
+    }
+
+
+    const currentFilter =
+        filter.value;
+
+
+    filter.innerHTML = `
+        <option value="">
             All Branches
-        </option>`;
+        </option>
+    `;
+
+
+    if (modalBranch) {
+
+        modalBranch.innerHTML = `
+            <option value="">
+                Select Branch
+            </option>
+        `;
+
+    }
 
 
     branches.forEach(
         branch => {
+
+            const branchId =
+                String(
+                    branch.branchId ||
+                    branch.BranchId ||
+                    ""
+                ).trim();
+
+
+            const branchName =
+                String(
+                    branch.branchName ||
+                    branch.BranchName ||
+                    branchId
+                ).trim();
+
+
+            if (!branchId) {
+                return;
+            }
+
 
             const option =
                 document.createElement(
                     "option"
                 );
 
+
             option.value =
-                branch.branchId ||
-                branch.BranchId;
+                branchId;
 
             option.textContent =
-                branch.branchName ||
-                branch.BranchName ||
-                option.value;
+                branchName;
 
-            branchSelect.appendChild(
+
+            filter.appendChild(
                 option
             );
+
+
+            if (modalBranch) {
+
+                const modalOption =
+                    option.cloneNode(true);
+
+                modalBranch.appendChild(
+                    modalOption
+                );
+
+            }
 
         }
     );
 
 
-    branchSelect.value =
-        current;
+    /*
+     * Preserve current branch filter.
+     */
+
+    if (
+        currentFilter &&
+        [...filter.options]
+            .some(
+                option =>
+                    option.value ===
+                    currentFilter
+            )
+    ) {
+
+        filter.value =
+            currentFilter;
+
+    }
 
 }
 
 
-// =========================================================
-// CATEGORY FILTER
-// =========================================================
+// ==========================================
+// CATEGORIES
+// ==========================================
 
-function populateCategoryFilter() {
+function populateCategories() {
 
-    const current =
-        categoryFilter.value;
+    const select =
+        $("categoryFilter");
+
+
+    if (!select) {
+        return;
+    }
+
+
+    const currentValue =
+        select.value;
+
 
     const categories =
         [
@@ -391,24 +661,26 @@ function populateCategoryFilter() {
                 menuItems
                     .map(
                         item =>
-                            item.Category
+                            String(
+                                item.Category ||
+                                item.category ||
+                                ""
+                            ).trim()
                     )
                     .filter(Boolean)
             )
         ]
         .sort(
             (a, b) =>
-                String(a)
-                    .localeCompare(
-                        String(b)
-                    )
+                a.localeCompare(b)
         );
 
 
-    categoryFilter.innerHTML =
-        `<option value="">
+    select.innerHTML = `
+        <option value="">
             All Categories
-        </option>`;
+        </option>
+    `;
 
 
     categories.forEach(
@@ -419,713 +691,13 @@ function populateCategoryFilter() {
                     "option"
                 );
 
+
             option.value =
                 category;
 
             option.textContent =
                 category;
 
-            categoryFilter.appendChild(
-                option
-            );
-
-        }
-    );
-
-
-    categoryFilter.value =
-        current;
-
-}
-
-
-// =========================================================
-// METRICS
-// =========================================================
-
-function updateMetrics(metrics) {
-
-    document.getElementById(
-        "totalItems"
-    ).textContent =
-        metrics.totalItems ??
-        0;
-
-
-    document.getElementById(
-        "availableItems"
-    ).textContent =
-        metrics.availableItems ??
-        0;
-
-
-    document.getElementById(
-        "unavailableItems"
-    ).textContent =
-        metrics.unavailableItems ??
-        0;
-
-
-    document.getElementById(
-        "categoryCount"
-    ).textContent =
-        metrics.categories ??
-        0;
-
-
-    document.getElementById(
-        "availabilityRate"
-    ).textContent =
-        `${metrics.availabilityRate ?? 0}%`;
-
-
-    document.getElementById(
-        "healthAvailability"
-    ).textContent =
-        `${metrics.availabilityRate ?? 0}%`;
-
-
-    document.getElementById(
-        "missingImages"
-    ).textContent =
-        metrics.missingImages ??
-        0;
-
-
-    document.getElementById(
-        "missingDescriptions"
-    ).textContent =
-        metrics.missingDescriptions ??
-        0;
-
-
-    const sessionData =
-        getSessionData();
-
-
-    const currency =
-        sessionData?.currency ||
-        "AED";
-
-
-    document.getElementById(
-        "averagePrice"
-    ).textContent =
-        `${currency} ${Number(
-            metrics.averagePrice || 0
-        ).toFixed(2)}`;
-
-}
-
-
-// =========================================================
-// BRANCH SUMMARY
-// =========================================================
-
-function renderBranchSummary(summary) {
-
-    const container =
-        document.getElementById(
-            "branchSummary"
-        );
-
-
-    if (
-        selectedBranchId ||
-        !summary.length
-    ) {
-
-        container.innerHTML = "";
-
-        document.getElementById(
-            "branchSummaryPanel"
-        ).hidden = true;
-
-        return;
-
-    }
-
-
-    document.getElementById(
-        "branchSummaryPanel"
-    ).hidden = false;
-
-
-    container.innerHTML = `
-
-        <div class="branch-row header">
-
-            <div>BRANCH</div>
-            <div>ITEMS</div>
-            <div>AVAILABLE</div>
-            <div>UNAVAILABLE</div>
-            <div>AVAILABILITY</div>
-
-        </div>
-
-        ${
-            summary.map(
-                branch => `
-
-                    <div class="branch-row">
-
-                        <div class="branch-name">
-                            ${escapeHTML(
-                                branch.branchName
-                            )}
-                        </div>
-
-                        <div>
-                            ${branch.totalItems}
-                        </div>
-
-                        <div>
-                            ${branch.availableItems}
-                        </div>
-
-                        <div>
-                            ${branch.unavailableItems}
-                        </div>
-
-                        <div class="branch-availability">
-                            ${branch.availability}%
-                        </div>
-
-                    </div>
-
-                `
-            ).join("")
-        }
-
-    `;
-
-}
-
-
-// =========================================================
-// RENDER MENU
-// =========================================================
-
-function renderMenu() {
-
-    const search =
-        String(
-            searchInput.value || ""
-        )
-        .trim()
-        .toLowerCase();
-
-
-    const category =
-        categoryFilter.value;
-
-
-    const availability =
-        availabilityFilter.value;
-
-
-    const filtered =
-        menuItems.filter(
-            item => {
-
-                const name =
-                    String(
-                        item.ItemName ||
-                        ""
-                    )
-                    .toLowerCase();
-
-
-                const description =
-                    String(
-                        item.Description ||
-                        ""
-                    )
-                    .toLowerCase();
-
-
-                const itemCategory =
-                    String(
-                        item.Category ||
-                        ""
-                    );
-
-
-                const available =
-                    item.Available === true ||
-                    item.Available === "true";
-
-
-                if (
-                    search &&
-                    !name.includes(search) &&
-                    !description.includes(search)
-                ) {
-                    return false;
-                }
-
-
-                if (
-                    category &&
-                    itemCategory !== category
-                ) {
-                    return false;
-                }
-
-
-                if (
-                    availability === "available" &&
-                    !available
-                ) {
-                    return false;
-                }
-
-
-                if (
-                    availability === "unavailable" &&
-                    available
-                ) {
-                    return false;
-                }
-
-
-                return true;
-
-            }
-        );
-
-
-    document.getElementById(
-        "itemCountLabel"
-    ).textContent =
-        `${filtered.length} item${filtered.length === 1 ? "" : "s"}`;
-
-
-    if (!filtered.length) {
-
-        menuTable.innerHTML = "";
-
-        emptyState.hidden = false;
-
-        return;
-
-    }
-
-
-    emptyState.hidden = true;
-
-
-    menuTable.innerHTML = `
-
-        <div class="menu-table-header">
-
-            <div>ITEM</div>
-            <div>CATEGORY</div>
-            <div>PRICE</div>
-            <div>BRANCH</div>
-            <div>STATUS</div>
-            <div>ACTIONS</div>
-
-        </div>
-
-        ${
-            filtered
-                .map(
-                    item =>
-                        renderMenuRow(item)
-                )
-                .join("")
-        }
-
-    `;
-
-
-    bindRowActions();
-
-}
-
-
-// =========================================================
-// MENU ROW
-// =========================================================
-
-function renderMenuRow(item) {
-
-    const available =
-        item.Available === true ||
-        item.Available === "true";
-
-
-    const branch =
-        branches.find(
-            b =>
-                (
-                    b.branchId ||
-                    b.BranchId
-                ) ===
-                item.BranchId
-        );
-
-
-    const branchName =
-        branch?.branchName ||
-        branch?.BranchName ||
-        item.BranchId ||
-        "—";
-
-
-    const image =
-        item.ImageURL
-            ? `
-                <img
-                    src="${escapeAttribute(
-                        item.ImageURL
-                    )}"
-                    alt=""
-                    onerror="this.style.display='none'"
-                >
-              `
-            : "✦";
-
-
-    return `
-
-        <div class="menu-row">
-
-            <div class="menu-item-info">
-
-                <div class="menu-image">
-                    ${image}
-                </div>
-
-                <div>
-
-                    <div class="menu-item-name">
-                        ${escapeHTML(
-                            item.ItemName ||
-                            "Unnamed item"
-                        )}
-                    </div>
-
-                    <div class="menu-item-description">
-                        ${escapeHTML(
-                            item.Description ||
-                            "No description"
-                        )}
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <div class="menu-cell">
-                ${escapeHTML(
-                    item.Category ||
-                    "—"
-                )}
-            </div>
-
-
-            <div class="menu-cell menu-price">
-                ${formatCurrency(
-                    item.Price
-                )}
-            </div>
-
-
-            <div class="menu-cell">
-                ${escapeHTML(
-                    branchName
-                )}
-            </div>
-
-
-            <div>
-
-                <span
-                    class="status-pill ${
-                        available
-                            ? "available"
-                            : "unavailable"
-                    }"
-                >
-                    ${
-                        available
-                            ? "Available"
-                            : "Unavailable"
-                    }
-                </span>
-
-            </div>
-
-
-            <div class="row-actions">
-
-                ${
-                    selectedBranchId
-                        ? `
-                            <button
-                                class="action-button"
-                                data-action="edit"
-                                data-id="${escapeAttribute(
-                                    item.ItemID
-                                )}"
-                            >
-                                Edit
-                            </button>
-
-                            <button
-                                class="action-button"
-                                data-action="toggle"
-                                data-id="${escapeAttribute(
-                                    item.ItemID
-                                )}"
-                            >
-                                ${
-                                    available
-                                        ? "Disable"
-                                        : "Enable"
-                                }
-                            </button>
-
-                            <button
-                                class="action-button danger"
-                                data-action="delete"
-                                data-id="${escapeAttribute(
-                                    item.ItemID
-                                )}"
-                            >
-                                Delete
-                            </button>
-                        `
-                        : `
-                            <span class="section-note">
-                                Select branch to manage
-                            </span>
-                        `
-                }
-
-            </div>
-
-        </div>
-
-    `;
-
-}
-
-
-// =========================================================
-// ROW ACTIONS
-// =========================================================
-
-function bindRowActions() {
-
-    document
-        .querySelectorAll(
-            ".action-button"
-        )
-        .forEach(
-            button => {
-
-                button.addEventListener(
-                    "click",
-                    async () => {
-
-                        const id =
-                            button.dataset.id;
-
-                        const action =
-                            button.dataset.action;
-
-
-                        if (
-                            action === "edit"
-                        ) {
-
-                            openEditModal(
-                                id
-                            );
-
-                        }
-
-
-                        if (
-                            action === "toggle"
-                        ) {
-
-                            await toggleItem(
-                                id
-                            );
-
-                        }
-
-
-                        if (
-                            action === "delete"
-                        ) {
-
-                            await deleteItem(
-                                id
-                            );
-
-                        }
-
-                    }
-                );
-
-            }
-        );
-
-}
-
-
-// =========================================================
-// ADD MODAL
-// =========================================================
-
-function openAddModal() {
-
-    editingItemId = null;
-
-    document.getElementById(
-        "modalTitle"
-    ).textContent =
-        "Add Menu Item";
-
-
-    itemForm.reset();
-
-
-    document.getElementById(
-        "itemAvailable"
-    ).checked = true;
-
-
-    populateModalBranches();
-
-
-    document.getElementById(
-        "itemBranch"
-    ).value =
-        selectedBranchId;
-
-
-    itemModal.hidden = false;
-
-}
-
-
-// =========================================================
-// EDIT MODAL
-// =========================================================
-
-function openEditModal(itemId) {
-
-    const item =
-        menuItems.find(
-            item =>
-                item.ItemID === itemId
-        );
-
-
-    if (!item) {
-        return;
-    }
-
-
-    editingItemId =
-        itemId;
-
-
-    document.getElementById(
-        "modalTitle"
-    ).textContent =
-        "Edit Menu Item";
-
-
-    populateModalBranches();
-
-
-    document.getElementById(
-        "itemBranch"
-    ).value =
-        item.BranchId || "";
-
-
-    document.getElementById(
-        "itemCategory"
-    ).value =
-        item.Category || "";
-
-
-    document.getElementById(
-        "itemName"
-    ).value =
-        item.ItemName || "";
-
-
-    document.getElementById(
-        "itemPrice"
-    ).value =
-        item.Price ?? "";
-
-
-    document.getElementById(
-        "itemImage"
-    ).value =
-        item.ImageURL || "";
-
-
-    document.getElementById(
-        "itemDescription"
-    ).value =
-        item.Description || "";
-
-
-    document.getElementById(
-        "itemAvailable"
-    ).checked =
-        item.Available === true ||
-        item.Available === "true";
-
-
-    itemModal.hidden = false;
-
-}
-
-
-// =========================================================
-// MODAL BRANCHES
-// =========================================================
-
-function populateModalBranches() {
-
-    const select =
-        document.getElementById(
-            "itemBranch"
-        );
-
-
-    select.innerHTML =
-        "";
-
-
-    branches.forEach(
-        branch => {
-
-            const option =
-                document.createElement(
-                    "option"
-                );
-
-            option.value =
-                branch.branchId ||
-                branch.BranchId;
-
-            option.textContent =
-                branch.branchName ||
-                branch.BranchName;
 
             select.appendChild(
                 option
@@ -1134,165 +706,1008 @@ function populateModalBranches() {
         }
     );
 
+
+    if (
+        categories.includes(
+            currentValue
+        )
+    ) {
+
+        select.value =
+            currentValue;
+
+    }
+
 }
 
 
-// =========================================================
-// SAVE
-// =========================================================
+// ==========================================
+// METRICS
+// ==========================================
 
-async function saveItem(event) {
+function populateMetrics() {
+
+    const metrics =
+        menuData?.metrics || {};
+
+
+    setText(
+        "totalItems",
+        Number(
+            metrics.totalItems || 0
+        )
+    );
+
+
+    setText(
+        "availableItems",
+        Number(
+            metrics.availableItems || 0
+        )
+    );
+
+
+    setText(
+        "unavailableItems",
+        Number(
+            metrics.unavailableItems || 0
+        )
+    );
+
+
+    setText(
+        "categoryCount",
+        Number(
+            metrics.categories || 0
+        )
+    );
+
+
+    setText(
+        "averagePrice",
+        `AED ${Number(
+            metrics.averagePrice || 0
+        ).toFixed(2)}`
+    );
+
+
+    setText(
+        "availabilityRate",
+        `${Number(
+            metrics.availabilityRate || 0
+        ).toFixed(1)}%`
+    );
+
+
+    const total =
+        Number(
+            metrics.totalItems || 0
+        );
+
+
+    setText(
+        "menuSummary",
+        total === 0
+            ? "No menu items have been added yet."
+            : `${total} menu item${total === 1 ? "" : "s"} across your restaurant branches.`
+    );
+
+}
+
+
+// ==========================================
+// RENDER MENU
+// ==========================================
+
+function renderMenu() {
+
+    const tbody =
+        $("menuTableBody");
+
+
+    if (!tbody) {
+        return;
+    }
+
+
+    const search =
+        String(
+            $("menuSearch")?.value ||
+            ""
+        )
+            .trim()
+            .toLowerCase();
+
+
+    const category =
+        String(
+            $("categoryFilter")?.value ||
+            ""
+        )
+            .trim()
+            .toLowerCase();
+
+
+    const branch =
+        String(
+            $("branchFilter")?.value ||
+            ""
+        )
+            .trim();
+
+
+    const filtered =
+        menuItems.filter(
+            item => {
+
+                const itemName =
+                    String(
+                        item.ItemName ||
+                        item.itemName ||
+                        ""
+                    ).toLowerCase();
+
+
+                const itemCategory =
+                    String(
+                        item.Category ||
+                        item.category ||
+                        ""
+                    ).toLowerCase();
+
+
+                const description =
+                    String(
+                        item.Description ||
+                        item.description ||
+                        ""
+                    ).toLowerCase();
+
+
+                const itemBranch =
+                    String(
+                        item.BranchId ||
+                        item.branchId ||
+                        ""
+                    ).trim();
+
+
+                const matchesSearch =
+                    !search ||
+                    itemName.includes(search) ||
+                    itemCategory.includes(search) ||
+                    description.includes(search);
+
+
+                const matchesCategory =
+                    !category ||
+                    itemCategory === category;
+
+
+                const matchesBranch =
+                    !branch ||
+                    itemBranch === branch;
+
+
+                return (
+                    matchesSearch &&
+                    matchesCategory &&
+                    matchesBranch
+                );
+
+            }
+        );
+
+
+    tbody.innerHTML = "";
+
+
+    if (
+        menuItems.length === 0
+    ) {
+
+        showEmptyState();
+
+        return;
+
+    }
+
+
+    hideEmptyState();
+
+
+    if (
+        filtered.length === 0
+    ) {
+
+        $("menuTableContainer")
+            ?.classList.add("hidden");
+
+        $("noFilterResults")
+            ?.classList.remove("hidden");
+
+        return;
+
+    }
+
+
+    $("menuTableContainer")
+        ?.classList.remove("hidden");
+
+    $("noFilterResults")
+        ?.classList.add("hidden");
+
+
+    filtered.forEach(
+        item => {
+
+            tbody.appendChild(
+                createMenuRow(item)
+            );
+
+        }
+    );
+
+}
+
+
+// ==========================================
+// CREATE TABLE ROW
+// ==========================================
+
+function createMenuRow(item) {
+
+    const row =
+        document.createElement(
+            "tr"
+        );
+
+
+    const itemId =
+        getItemId(item);
+
+
+    const itemName =
+        getItemName(item);
+
+
+    const category =
+        getItemCategory(item);
+
+
+    const description =
+        getItemDescription(item);
+
+
+    const branchId =
+        getItemBranch(item);
+
+
+    const price =
+        Number(
+            item.Price ??
+            item.price ??
+            0
+        );
+
+
+    const available =
+        isItemAvailable(item);
+
+
+    const branchName =
+        getBranchName(branchId);
+
+
+    const imageUrl =
+        getImageUrl(item);
+
+
+    const imageHtml =
+        imageUrl
+            ? `
+                <img
+                    class="item-image"
+                    src="${escapeHtml(imageUrl)}"
+                    alt="${escapeHtml(itemName)}"
+                    onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                >
+                <div
+                    class="item-image-placeholder"
+                    style="display:none;"
+                >
+                    ${escapeHtml(
+                        getInitial(itemName)
+                    )}
+                </div>
+              `
+            : `
+                <div class="item-image-placeholder">
+                    ${escapeHtml(
+                        getInitial(itemName)
+                    )}
+                </div>
+              `;
+
+
+    row.innerHTML = `
+
+        <td>
+
+            <div class="menu-item-cell">
+
+                ${imageHtml}
+
+                <div class="menu-item-info">
+
+                    <strong>
+                        ${escapeHtml(itemName)}
+                    </strong>
+
+                    <span>
+                        ${escapeHtml(
+                            description ||
+                            "No description added."
+                        )}
+                    </span>
+
+                </div>
+
+            </div>
+
+        </td>
+
+
+        <td>
+
+            <span class="category-badge">
+                ${escapeHtml(
+                    category ||
+                    "Uncategorized"
+                )}
+            </span>
+
+        </td>
+
+
+        <td>
+
+            <span class="branch-name">
+                ${escapeHtml(
+                    branchName
+                )}
+            </span>
+
+        </td>
+
+
+        <td>
+
+            <strong class="price-value">
+                AED ${price.toFixed(2)}
+            </strong>
+
+        </td>
+
+
+        <td>
+
+            <div class="status-cell">
+
+                <span class="status-badge ${available ? "available" : "unavailable"}">
+
+                    <span class="status-dot"></span>
+
+                    ${available
+                        ? "Available"
+                        : "Unavailable"
+                    }
+
+                </span>
+
+            </div>
+
+        </td>
+
+
+        <td>
+
+            <div class="row-actions">
+
+                <button
+                    type="button"
+                    class="icon-action"
+                    title="Edit"
+                    data-action="edit"
+                    data-item-id="${escapeHtml(itemId)}"
+                    data-branch-id="${escapeHtml(branchId)}"
+                >
+                    ✎
+                </button>
+
+
+                <button
+                    type="button"
+                    class="icon-action"
+                    title="${available ? "Disable" : "Enable"}"
+                    data-action="toggle"
+                    data-item-id="${escapeHtml(itemId)}"
+                    data-branch-id="${escapeHtml(branchId)}"
+                >
+                    ${available ? "◉" : "○"}
+                </button>
+
+
+                <button
+                    type="button"
+                    class="icon-action delete-action"
+                    title="Delete"
+                    data-action="delete"
+                    data-item-id="${escapeHtml(itemId)}"
+                    data-branch-id="${escapeHtml(branchId)}"
+                >
+                    ×
+                </button>
+
+            </div>
+
+        </td>
+
+    `;
+
+
+    row.querySelectorAll(
+        "[data-action]"
+    )
+        .forEach(
+            button => {
+
+                button.addEventListener(
+                    "click",
+                    () => {
+
+                        const action =
+                            button.dataset.action;
+
+
+                        if (
+                            action ===
+                            "edit"
+                        ) {
+
+                            openEditModal(
+                                item
+                            );
+
+                        }
+
+
+                        if (
+                            action ===
+                            "toggle"
+                        ) {
+
+                            toggleItem(
+                                item
+                            );
+
+                        }
+
+
+                        if (
+                            action ===
+                            "delete"
+                        ) {
+
+                            openDeleteModal(
+                                item
+                            );
+
+                        }
+
+                    }
+                );
+
+            }
+        );
+
+
+    return row;
+
+}
+
+
+// ==========================================
+// EMPTY STATE
+// ==========================================
+
+function showEmptyState() {
+
+    $("menuTableContainer")
+        ?.classList.add("hidden");
+
+
+    $("noFilterResults")
+        ?.classList.add("hidden");
+
+
+    $("menuEmpty")
+        ?.classList.remove("hidden");
+
+}
+
+
+function hideEmptyState() {
+
+    $("menuEmpty")
+        ?.classList.add("hidden");
+
+}
+
+
+// ==========================================
+// ADD MODAL
+// ==========================================
+
+function openAddModal() {
+
+    editingItem = null;
+
+
+    $("menuForm")?.reset();
+
+
+    $("itemId").value =
+        "";
+
+
+    $("modalEyebrow").textContent =
+        "NEW MENU ITEM";
+
+
+    $("modalTitle").textContent =
+        "Add Menu Item";
+
+
+    $("modalDescription").textContent =
+        "Add a new item to your restaurant menu.";
+
+
+    $("saveMenuItemBtn").innerHTML =
+        `<span>✓</span> Save Menu Item`;
+
+
+    $("itemAvailable").checked =
+        true;
+
+
+    $("formError").textContent =
+        "";
+
+
+    const selectedBranch =
+        $("branchFilter")?.value ||
+        "";
+
+
+    if (selectedBranch) {
+
+        $("itemBranch").value =
+            selectedBranch;
+
+    }
+
+
+    openModal(
+        "menuModal"
+    );
+
+
+    setTimeout(
+        () => {
+
+            $("itemName")
+                ?.focus();
+
+        },
+        100
+    );
+
+}
+
+
+// ==========================================
+// EDIT MODAL
+// ==========================================
+
+function openEditModal(item) {
+
+    editingItem =
+        item;
+
+
+    const itemId =
+        getItemId(item);
+
+
+    $("itemId").value =
+        itemId;
+
+
+    $("itemBranch").value =
+        getItemBranch(item);
+
+
+    $("itemCategory").value =
+        getItemCategory(item);
+
+
+    $("itemName").value =
+        getItemName(item);
+
+
+    $("itemPrice").value =
+        Number(
+            item.Price ??
+            item.price ??
+            0
+        );
+
+
+    $("itemImage").value =
+        getImageUrl(item);
+
+
+    $("itemDescription").value =
+        getItemDescription(item);
+
+
+    $("itemAvailable").checked =
+        isItemAvailable(item);
+
+
+    $("modalEyebrow").textContent =
+        "EDIT MENU ITEM";
+
+
+    $("modalTitle").textContent =
+        "Update Menu Item";
+
+
+    $("modalDescription").textContent =
+        "Update the details of this menu item.";
+
+
+    $("saveMenuItemBtn").innerHTML =
+        `<span>✓</span> Update Menu Item`;
+
+
+    $("formError").textContent =
+        "";
+
+
+    openModal(
+        "menuModal"
+    );
+
+}
+
+
+// ==========================================
+// FORM SUBMIT
+// ==========================================
+
+async function handleFormSubmit(
+    event
+) {
 
     event.preventDefault();
 
 
-    const payload = {
-
-        action:
-            editingItemId
-                ? "update"
-                : "create",
-
-        branchId:
-            document.getElementById(
-                "itemBranch"
-            ).value,
-
-        itemId:
-            editingItemId || "",
-
-        itemName:
-            document.getElementById(
-                "itemName"
-            ).value.trim(),
-
-        category:
-            document.getElementById(
-                "itemCategory"
-            ).value.trim(),
-
-        price:
-            Number(
-                document.getElementById(
-                    "itemPrice"
-                ).value
-            ),
-
-        imageURL:
-            document.getElementById(
-                "itemImage"
-            ).value.trim(),
-
-        description:
-            document.getElementById(
-                "itemDescription"
-            ).value.trim(),
-
-        available:
-            document.getElementById(
-                "itemAvailable"
-            ).checked
-
-    };
+    const branchId =
+        $("itemBranch")?.value.trim();
 
 
-    try {
-
-        const result =
-            await callMenuAPI(
-                payload
-            );
+    const itemName =
+        $("itemName")?.value.trim();
 
 
-        if (!result.success) {
-
-            throw new Error(
-                result.message ||
-                "Unable to save menu item."
-            );
-
-        }
+    const category =
+        $("itemCategory")?.value.trim();
 
 
-        closeItemModal();
-
-        await loadMenu();
-
-
-    } catch (error) {
-
-        document.getElementById(
-            "modalError"
-        ).textContent =
-            error.message;
-
-        document.getElementById(
-            "modalError"
-        ).hidden = false;
-
-    }
-
-}
-
-
-// =========================================================
-// TOGGLE
-// =========================================================
-
-async function toggleItem(itemId) {
-
-    const item =
-        menuItems.find(
-            item =>
-                item.ItemID === itemId
+    const price =
+        Number(
+            $("itemPrice")?.value
         );
 
 
-    if (!item) {
-        return;
-    }
+    const description =
+        $("itemDescription")?.value.trim();
+
+
+    const imageURL =
+        $("itemImage")?.value.trim();
 
 
     const available =
-        item.Available === true ||
-        item.Available === "true";
+        $("itemAvailable")?.checked === true;
+
+
+    const error =
+        $("formError");
+
+
+    error.textContent =
+        "";
+
+
+    if (!branchId) {
+
+        error.textContent =
+            "Please select a branch.";
+
+        return;
+
+    }
+
+
+    if (!itemName) {
+
+        error.textContent =
+            "Menu item name is required.";
+
+        return;
+
+    }
+
+
+    if (!category) {
+
+        error.textContent =
+            "Category is required.";
+
+        return;
+
+    }
+
+
+    if (
+        Number.isNaN(price) ||
+        price < 0
+    ) {
+
+        error.textContent =
+            "Please enter a valid price.";
+
+        return;
+
+    }
+
+
+    const button =
+        $("saveMenuItemBtn");
+
+
+    button.disabled =
+        true;
+
+
+    button.innerHTML =
+        `<span>⟳</span> ${
+            editingItem
+                ? "Updating..."
+                : "Saving..."
+        }`;
 
 
     try {
 
-        const result =
-            await callMenuAPI({
-
-                action: "toggle",
-
-                itemId,
-
-                branchId:
-                    selectedBranchId,
-
-                available:
-                    !available
-
-            });
+        let data;
 
 
-        if (!result.success) {
+        if (editingItem) {
+
+            data =
+                await menuRequest(
+                    "update",
+                    {
+                        branchId,
+
+                        itemId:
+                            getItemId(
+                                editingItem
+                            ),
+
+                        itemName,
+
+                        category,
+
+                        description,
+
+                        imageURL,
+
+                        price,
+
+                        available
+                    }
+                );
+
+        }
+        else {
+
+            data =
+                await menuRequest(
+                    "create",
+                    {
+                        branchId,
+
+                        itemName,
+
+                        category,
+
+                        description,
+
+                        imageURL,
+
+                        price,
+
+                        available
+                    }
+                );
+
+        }
+
+
+        if (
+            !data ||
+            !data.success
+        ) {
+
+            error.textContent =
+                data?.message ||
+                "Unable to save menu item.";
+
+            return;
+
+        }
+
+
+        closeMenuModal();
+
+
+        showMessage(
+            data.message ||
+            "Menu item saved successfully.",
+            "success"
+        );
+
+
+        await loadMenu(
+            branchId
+        );
+
+    }
+    catch (errorObject) {
+
+        console.error(
+            "Menu save error:",
+            errorObject
+        );
+
+
+        error.textContent =
+            errorObject.message ||
+            "Unable to save menu item.";
+
+    }
+    finally {
+
+        button.disabled =
+            false;
+
+
+        button.innerHTML =
+            editingItem
+                ? `<span>✓</span> Update Menu Item`
+                : `<span>✓</span> Save Menu Item`;
+
+    }
+
+}
+
+
+// ==========================================
+// TOGGLE
+// ==========================================
+
+async function toggleItem(item) {
+
+    const itemId =
+        getItemId(item);
+
+
+    const branchId =
+        getItemBranch(item);
+
+
+    if (
+        !itemId ||
+        !branchId
+    ) {
+
+        showMessage(
+            "Menu item information is incomplete.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    const current =
+        isItemAvailable(item);
+
+
+    try {
+
+        showMessage(
+            current
+                ? "Disabling menu item..."
+                : "Enabling menu item...",
+            "success"
+        );
+
+
+        const data =
+            await menuRequest(
+                "toggle",
+                {
+                    branchId,
+
+                    itemId
+                }
+            );
+
+
+        if (
+            !data ||
+            !data.success
+        ) {
 
             throw new Error(
-                result.message ||
-                "Unable to update availability."
+                data?.message ||
+                "Unable to change item availability."
             );
 
         }
 
 
-        await loadMenu();
+        showMessage(
+            data.message ||
+            "Menu availability updated.",
+            "success"
+        );
 
 
-    } catch (error) {
+        await loadMenu(
+            $("branchFilter")?.value || ""
+        );
 
-        alert(
-            error.message
+    }
+    catch (error) {
+
+        console.error(
+            "Menu toggle error:",
+            error
+        );
+
+
+        showMessage(
+            error.message ||
+            "Unable to change item availability.",
+            "error"
         );
 
     }
@@ -1300,222 +1715,599 @@ async function toggleItem(itemId) {
 }
 
 
-// =========================================================
-// DELETE
-// =========================================================
+// ==========================================
+// DELETE MODAL
+// ==========================================
 
-async function deleteItem(itemId) {
+function openDeleteModal(item) {
+
+    deletingItem =
+        item;
+
+
+    $("deleteItemName").textContent =
+        getItemName(item);
+
+
+    $("deleteItemCategory").textContent =
+        getItemCategory(item) ||
+        "Uncategorized";
+
+
+    $("deleteError").textContent =
+        "";
+
+
+    $("confirmDelete").disabled =
+        false;
+
+
+    $("confirmDelete").textContent =
+        "Delete Item";
+
+
+    openModal(
+        "deleteModal"
+    );
+
+}
+
+
+function closeDeleteModal() {
+
+    closeModal(
+        "deleteModal"
+    );
+
+
+    deletingItem =
+        null;
+
+}
+
+
+// ==========================================
+// CONFIRM DELETE
+// ==========================================
+
+async function confirmDelete() {
+
+    if (!deletingItem) {
+        return;
+    }
+
 
     const item =
-        menuItems.find(
-            item =>
-                item.ItemID === itemId
-        );
+        deletingItem;
 
 
-    if (!item) {
+    const itemId =
+        getItemId(item);
+
+
+    const branchId =
+        getItemBranch(item);
+
+
+    const button =
+        $("confirmDelete");
+
+
+    const error =
+        $("deleteError");
+
+
+    if (
+        !itemId ||
+        !branchId
+    ) {
+
+        error.textContent =
+            "Menu item information is incomplete.";
+
         return;
+
     }
 
 
-    const confirmed =
-        confirm(
-            `Delete "${item.ItemName}"?\n\n` +
-            "This will permanently remove the item " +
-            "from this branch menu."
-        );
+    button.disabled =
+        true;
 
 
-    if (!confirmed) {
-        return;
-    }
+    button.textContent =
+        "Deleting...";
+
+
+    error.textContent =
+        "";
 
 
     try {
 
-        const result =
-            await callMenuAPI({
+        const data =
+            await menuRequest(
+                "delete",
+                {
+                    branchId,
 
-                action: "delete",
-
-                itemId,
-
-                branchId:
-                    selectedBranchId
-
-            });
+                    itemId
+                }
+            );
 
 
-        if (!result.success) {
+        if (
+            !data ||
+            !data.success
+        ) {
 
             throw new Error(
-                result.message ||
+                data?.message ||
                 "Unable to delete menu item."
             );
 
         }
 
 
-        await loadMenu();
+        closeDeleteModal();
 
 
-    } catch (error) {
-
-        alert(
-            error.message
+        showMessage(
+            data.message ||
+            "Menu item deleted successfully.",
+            "success"
         );
+
+
+        await loadMenu(
+            $("branchFilter")?.value || ""
+        );
+
+    }
+    catch (errorObject) {
+
+        console.error(
+            "Menu delete error:",
+            errorObject
+        );
+
+
+        error.textContent =
+            errorObject.message ||
+            "Unable to delete menu item.";
+
+    }
+    finally {
+
+        button.disabled =
+            false;
+
+
+        button.textContent =
+            "Delete Item";
 
     }
 
 }
 
 
-// =========================================================
-// CLOSE MODAL
-// =========================================================
+// ==========================================
+// ITEM HELPERS
+// ==========================================
 
-function closeItemModal() {
+function getItemId(item) {
 
-    itemModal.hidden = true;
-
-    editingItemId = null;
+    return String(
+        item.ItemID ||
+        item["\ufeffItemID"] ||
+        item.itemId ||
+        ""
+    ).trim();
 
 }
 
 
-// =========================================================
-// LOADING
-// =========================================================
+function getItemName(item) {
 
-function setLoading(isLoading) {
+    return String(
+        item.ItemName ||
+        item.itemName ||
+        ""
+    ).trim();
 
-    if (!isLoading) {
+}
+
+
+function getItemCategory(item) {
+
+    return String(
+        item.Category ||
+        item.category ||
+        ""
+    ).trim();
+
+}
+
+
+function getItemDescription(item) {
+
+    return String(
+        item.Description ||
+        item.description ||
+        ""
+    ).trim();
+
+}
+
+
+function getItemBranch(item) {
+
+    return String(
+        item.BranchId ||
+        item.branchId ||
+        ""
+    ).trim();
+
+}
+
+
+function getImageUrl(item) {
+
+    const value =
+        item.ImageURL ||
+        item.imageURL ||
+        "";
+
+
+    if (
+        Array.isArray(value)
+    ) {
+
+        return String(
+            value[0]?.url ||
+            value[0] ||
+            ""
+        ).trim();
+
+    }
+
+
+    return String(
+        value
+    ).trim();
+
+}
+
+
+function isItemAvailable(item) {
+
+    const value =
+        item.Available ??
+        item.available;
+
+
+    return (
+        value === true ||
+        String(value)
+            .toLowerCase()
+            .trim() === "true" ||
+        String(value)
+            .toLowerCase()
+            .trim() === "checked"
+    );
+
+}
+
+
+function getBranchName(
+    branchId
+) {
+
+    const branch =
+        branches.find(
+            branch =>
+                String(
+                    branch.branchId ||
+                    branch.BranchId ||
+                    ""
+                ).trim() ===
+                String(
+                    branchId
+                ).trim()
+        );
+
+
+    return (
+        branch?.branchName ||
+        branch?.BranchName ||
+        branchId ||
+        "Unknown Branch"
+    );
+
+}
+
+
+// ==========================================
+// MODAL HELPERS
+// ==========================================
+
+function openModal(id) {
+
+    const modal =
+        $(id);
+
+
+    if (!modal) {
         return;
     }
 
-    menuTable.innerHTML = `
-        <div class="empty-state">
-            <div class="loader"></div>
-            <p>Loading menu...</p>
-        </div>
-    `;
+
+    modal.classList.add(
+        "active"
+    );
+
+
+    modal.setAttribute(
+        "aria-hidden",
+        "false"
+    );
 
 }
 
 
-// =========================================================
-// PAGE ERROR
-// =========================================================
+function closeModal(id) {
 
-function showPageError(message) {
+    const modal =
+        $(id);
 
-    menuTable.innerHTML = `
 
-        <div class="empty-state">
+    if (!modal) {
+        return;
+    }
 
-            <div class="empty-icon">
-                !
-            </div>
 
-            <h3>
-                Unable to load menu
-            </h3>
+    modal.classList.remove(
+        "active"
+    );
 
-            <p>
-                ${escapeHTML(
-                    message ||
-                    "Please try again."
-                )}
-            </p>
 
-        </div>
-
-    `;
+    modal.setAttribute(
+        "aria-hidden",
+        "true"
+    );
 
 }
 
 
-// =========================================================
-// SESSION
-// =========================================================
+function closeMenuModal() {
 
-function getSessionData() {
+    closeModal(
+        "menuModal"
+    );
 
-    try {
 
-        return JSON.parse(
-            localStorage.getItem(
-                SESSION_DATA_KEY
-            ) || "{}"
+    editingItem =
+        null;
+
+}
+
+
+// ==========================================
+// LOADING
+// ==========================================
+
+function showLoading() {
+
+    $("menuLoading")
+        ?.classList.remove(
+            "hidden"
         );
 
-    } catch {
 
-        return {};
+    $("menuTableContainer")
+        ?.classList.add(
+            "hidden"
+        );
+
+
+    $("menuEmpty")
+        ?.classList.add(
+            "hidden"
+        );
+
+
+    $("noFilterResults")
+        ?.classList.add(
+            "hidden"
+        );
+
+}
+
+
+function hideLoading() {
+
+    $("menuLoading")
+        ?.classList.add(
+            "hidden"
+        );
+
+}
+
+
+// ==========================================
+// MESSAGE
+// ==========================================
+
+function showMessage(
+    message,
+    type = "success"
+) {
+
+    const bar =
+        $("menuMessageBar");
+
+
+    const element =
+        $("menuMessage");
+
+
+    if (!bar || !element) {
+        return;
+    }
+
+
+    element.textContent =
+        message;
+
+
+    bar.classList.remove(
+        "error",
+        "success"
+    );
+
+
+    bar.classList.add(
+        type === "error"
+            ? "error"
+            : "success"
+    );
+
+}
+
+
+// ==========================================
+// API ERROR
+// ==========================================
+
+function handleApiError(
+    data
+) {
+
+    if (
+        data?.code ===
+        "INVALID_SESSION"
+    ) {
+
+        redirectToLogin();
+
+        return;
+
+    }
+
+
+    showMessage(
+        data?.message ||
+        "Unable to process menu request.",
+        "error"
+    );
+
+}
+
+
+// ==========================================
+// TEXT
+// ==========================================
+
+function setText(
+    id,
+    value
+) {
+
+    const element =
+        $(id);
+
+
+    if (element) {
+
+        element.textContent =
+            value ?? "";
 
     }
 
 }
 
 
-// =========================================================
-// CURRENCY
-// =========================================================
+// ==========================================
+// INITIAL
+// ==========================================
 
-function formatCurrency(value) {
+function getInitial(
+    name
+) {
 
-    const session =
-        getSessionData();
-
-    const currency =
-        session?.currency ||
-        "AED";
-
-
-    return `${currency} ${Number(
-        value || 0
-    ).toFixed(2)}`;
-
-}
+    const value =
+        String(
+            name ||
+            "A"
+        )
+            .trim();
 
 
-// =========================================================
-// HTML SAFETY
-// =========================================================
-
-function escapeHTML(value) {
-
-    return String(
-        value ?? ""
-    )
-    .replace(
-        /&/g,
-        "&amp;"
-    )
-    .replace(
-        /</g,
-        "&lt;"
-    )
-    .replace(
-        />/g,
-        "&gt;"
-    )
-    .replace(
-        /"/g,
-        "&quot;"
-    )
-    .replace(
-        /'/g,
-        "&#039;"
+    return (
+        value.charAt(0)
+            .toUpperCase() ||
+        "A"
     );
 
 }
 
 
-function escapeAttribute(value) {
+// ==========================================
+// LOGIN
+// ==========================================
 
-    return escapeHTML(
-        value
+function redirectToLogin() {
+
+    window.location.href =
+        "../login/login.html";
+
+}
+
+
+// ==========================================
+// LOGOUT
+// ==========================================
+
+function handleLogout() {
+
+    try {
+
+        if (
+            typeof logout ===
+            "function"
+        ) {
+
+            logout();
+
+            return;
+
+        }
+
+    }
+    catch (error) {
+
+        console.error(
+            "Logout error:",
+            error
+        );
+
+    }
+
+
+    localStorage.removeItem(
+        SESSION_TOKEN_KEY
     );
+
+
+    localStorage.removeItem(
+        "qro_session_data"
+    );
+
+
+    localStorage.removeItem(
+        "qro_validated_session"
+    );
+
+
+    redirectToLogin();
 
 }
