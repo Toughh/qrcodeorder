@@ -1,2 +1,2 @@
-const N8N_BASE_URL = "https://doitjust.app.n8n.cloud/webhook";
-const WEB_URL = "https://qrcodeorder0113.vercel.app";
+const N8N_BASE_URL = "https://meinhunyahan.app.n8n.cloud/webhook";
+const WEB_URL = "https://qrcodeorder0114.vercel.app";

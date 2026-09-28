@@ -2,863 +2,211 @@
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
-
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Menu Management | QR Order SaaS</title>
-
-    <link rel="stylesheet" href="./menu.css">
-
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>Menu Management | QR Order Restaurant SaaS</title>
+    <link rel="stylesheet" href="menu.css">
 </head>
 
-
 <body>
-
-    <div class="app">
-
-
-        <!-- ==========================================
-         SIDEBAR
-    =========================================== -->
-
-        <aside class="sidebar">
-
+    <div class="app-shell">
+        <aside class="sidebar" id="sidebar">
             <div class="brand">
-
-                <div class="brand-logo">
-                    QR
-                </div>
-
+                <div class="brand-mark">QR</div>
                 <div>
-
-                    <div class="brand-name">
-                        QR Order SaaS
-                    </div>
-
-                    <div class="brand-subtitle">
-                        Restaurant Platform
-                    </div>
-
+                    <div class="brand-name">QR Order</div>
+                    <div class="brand-subtitle">RESTAURANT SAAS</div>
                 </div>
-
             </div>
-
-
-            <!-- NAVIGATION -->
-
-            <nav class="navigation">
-
-
-                <a href="../dashboard/dashboard.html" class="nav-item">
-
-                    <span>📊</span>
-
-                    Dashboard
-
-                </a>
-
-
-                <a href="../restaurant/restaurant.html" class="nav-item">
-
-                    <span>🏪</span>
-
-                    Restaurant
-
-                </a>
-
-
-                <a href="../branches/branches.html" class="nav-item">
-
-                    <span>🏢</span>
-
-                    Branches
-
-                </a>
-
-
-                <a href="#" class="nav-item active">
-
-                    <span>🍽️</span>
-
-                    Menu
-
-                </a>
-
-
-                <a href="../users/users.html" class="nav-item">
-
-                    <span>👥</span>
-
-                    Users
-
-                </a>
-
-
-                <a href="../orders/orders.html" class="nav-item">
-
-                    <span>📦</span>
-
-                    Orders
-
-                </a>
-
-
-                <a href="../reports/reports.html" class="nav-item">
-
-                    <span>📈</span>
-
-                    Reports
-
-                </a>
-
-
-                <a href="../settings/settings.html" class="nav-item">
-
-                    <span>⚙️</span>
-
-                    Settings
-
-                </a>
-
-
-            </nav>
-
-
-            <!-- SIDEBAR FOOTER -->
-
+            <nav class="navigation"> <a href="../dashboard/dashboard.html" class="nav-item"><span>◈</span>Dashboard</a>
+                <a href="../restaurant/restaurant.html" class="nav-item"><span>⌂</span>Restaurant</a> <a
+                    href="../branches/branches.html" class="nav-item"><span>▦</span>Branches</a> <a
+                    href="../menu/menu.html" class="nav-item active"><span>◆</span>Menu</a> <a
+                    href="../users/users.html" class="nav-item"><span>♙</span>Users</a> <a href="../orders/orders.html"
+                    class="nav-item"><span>▣</span>Orders</a> <a href="../reports/reports.html"
+                    class="nav-item"><span>◒</span>Reports</a> <a href="../settings/settings.html"
+                    class="nav-item"><span>⚙</span>Settings</a> </nav>
             <div class="sidebar-footer">
-
-                <button
-                    id="logoutBtn"
-                    class="logout-btn">
-
-                    🚪 Logout
-
-                </button>
-
+                <button type="button" id="logoutBtn" class="logout-btn">↪ <span>Logout</span></button>
             </div>
-
         </aside>
-
-
-
-        <!-- ==========================================
-         MAIN
-    =========================================== -->
-
-        <main class="main">
-
-
-            <!-- ======================================
-             TOPBAR
-        ======================================= -->
-
+        <main class="main-content">
             <header class="topbar">
-
-                <div>
-
-                    <div class="page-label">
-                        RESTAURANT MANAGEMENT
+                <div class="topbar-left">
+                    <button type="button" class="mobile-menu-button" id="mobileMenuButton">☰</button>
+                    <div><span class="page-eyebrow">MENU MANAGEMENT</span>
+                        <h1>Menu</h1>
+                        <p>Manage your restaurant menu across every branch.</p>
                     </div>
-
-                    <h1>
-                        Menu Management
-                    </h1>
-
                 </div>
-
-
-                <div class="user-area">
-
-                    <div class="user-avatar" id="userAvatar">
-                        A
-                    </div>
-
-                    <div class="user-info">
-
-                        <strong id="userName">
-                            Owner
-                        </strong>
-
-                        <span id="userRole">
-                            Owner
-                        </span>
-
-                    </div>
-
+                <div class="user-block">
+                    <div class="user-avatar" id="topbarUserAvatar">O</div>
+                    <div><strong id="topbarUserName">Owner</strong><span id="topbarUserRole">Owner</span></div>
                 </div>
-
             </header>
-
-
-
-            <!-- ======================================
-             INTRO
-        ======================================= -->
-
-            <section class="menu-intro">
-
-                <div>
-
-                    <span class="eyebrow">
-                        MENU MANAGEMENT
-                    </span>
-
-                    <h2>
-                        Manage your restaurant menu
-                    </h2>
-
-                    <p>
-                        Create, update, enable or disable menu items
-                        for each restaurant branch from one place.
-                    </p>
-
-                </div>
-
-
-                <button type="button" id="addMenuItemBtn" class="primary-btn">
-                    <span>＋</span>
-                    Add Menu Item
-                </button>
-
-            </section>
-
-
-
-            <!-- ======================================
-             BRANCH TOOLBAR
-        ======================================= -->
-
-            <section class="menu-toolbar">
-
-                <div class="branch-selector">
-
-                    <div class="toolbar-label">
-                        BRANCH
+            <section class="content">
+                <div id="pageMessage" class="page-message" hidden></div>
+                <section class="hero-card">
+                    <div><span class="section-eyebrow">MENU CONTROL CENTER</span>
+                        <h2>Build a menu customers remember.</h2>
+                        <p>Create, update and control item availability while keeping every branch organized.</p>
                     </div>
-
-                    <select id="branchFilter">
-
-                        <option value="">
-                            All Branches
-                        </option>
-
-                    </select>
-
-                </div>
-
-
-                <div class="search-box">
-
-                    <span>
-                        ⌕
-                    </span>
-
-                    <input type="search" id="menuSearch" placeholder="Search menu items..." autocomplete="off">
-
-                </div>
-
-
-                <div class="category-filter">
-
-                    <div class="toolbar-label">
-                        CATEGORY
-                    </div>
-
-                    <select id="categoryFilter">
-
-                        <option value="">
-                            All Categories
-                        </option>
-
-                    </select>
-
-                </div>
-
-
-                <button type="button" id="refreshMenuBtn" class="secondary-btn">
-                    ↻ Refresh
-                </button>
-
-            </section>
-
-
-
-            <!-- ======================================
-             KPI CARDS
-        ======================================= -->
-
-            <section class="menu-metrics">
-
-                <div class="metric-card">
-
-                    <div class="metric-icon">
-                        ☷
-                    </div>
-
-                    <div>
-
-                        <span>
-                            TOTAL ITEMS
-                        </span>
-
-                        <strong id="totalItems">
-                            0
-                        </strong>
-
-                    </div>
-
-                </div>
-
-
-                <div class="metric-card">
-
-                    <div class="metric-icon available-icon">
-                        ✓
-                    </div>
-
-                    <div>
-
-                        <span>
-                            AVAILABLE
-                        </span>
-
-                        <strong id="availableItems">
-                            0
-                        </strong>
-
-                    </div>
-
-                </div>
-
-
-                <div class="metric-card">
-
-                    <div class="metric-icon unavailable-icon">
-                        —
-                    </div>
-
-                    <div>
-
-                        <span>
-                            UNAVAILABLE
-                        </span>
-
-                        <strong id="unavailableItems">
-                            0
-                        </strong>
-
-                    </div>
-
-                </div>
-
-
-                <div class="metric-card">
-
-                    <div class="metric-icon">
-                        ◈
-                    </div>
-
-                    <div>
-
-                        <span>
-                            CATEGORIES
-                        </span>
-
-                        <strong id="categoryCount">
-                            0
-                        </strong>
-
-                    </div>
-
-                </div>
-
-
-                <div class="metric-card">
-
-                    <div class="metric-icon">
-                        ◌
-                    </div>
-
-                    <div>
-
-                        <span>
-                            AVG. PRICE
-                        </span>
-
-                        <strong id="averagePrice">
-                            AED 0.00
-                        </strong>
-
-                    </div>
-
-                </div>
-
-            </section>
-
-
-
-            <!-- ======================================
-             MENU CONTENT
-        ======================================= -->
-
-            <section class="menu-panel">
-
-
-                <div class="panel-header">
-
-                    <div>
-
-                        <span class="panel-eyebrow">
-                            MENU ITEMS
-                        </span>
-
-                        <h2>
-                            Restaurant Menu
-                        </h2>
-
-                        <p id="menuSummary">
-                            Loading menu items...
-                        </p>
-
-                    </div>
-
-
-                    <div class="availability-summary">
-
-                        <span>
-                            Availability
-                        </span>
-
-                        <strong id="availabilityRate">
-                            0%
-                        </strong>
-
-                    </div>
-
-                </div>
-
-
-
-                <!-- ==================================
-                 LOADING
-            =================================== -->
-
-                <div id="menuLoading" class="menu-loading">
-
-                    <div class="loading-spinner">
-                        ⟳
-                    </div>
-
-                    <span>
-                        Loading menu...
-                    </span>
-
-                </div>
-
-
-
-                <!-- ==================================
-                 EMPTY
-            =================================== -->
-
-                <div id="menuEmpty" class="menu-empty hidden">
-
-                    <div class="empty-icon">
-                        ☷
-                    </div>
-
-                    <h3>
-                        No menu items found
-                    </h3>
-
-                    <p>
-                        Add your first menu item to start
-                        building your restaurant menu.
-                    </p>
-
-                    <button type="button" id="emptyAddBtn" class="primary-btn">
-                        ＋ Add Menu Item
-                    </button>
-
-                </div>
-
-
-
-                <!-- ==================================
-                 TABLE
-            =================================== -->
-
-                <div id="menuTableContainer" class="menu-table-container hidden">
-
-                    <table class="menu-table">
-
-                        <thead>
-
-                            <tr>
-
-                                <th>
-                                    ITEM
-                                </th>
-
-                                <th>
-                                    CATEGORY
-                                </th>
-
-                                <th>
-                                    BRANCH
-                                </th>
-
-                                <th>
-                                    PRICE
-                                </th>
-
-                                <th>
-                                    STATUS
-                                </th>
-
-                                <th class="actions-column">
-                                    ACTIONS
-                                </th>
-
-                            </tr>
-
-                        </thead>
-
-
-                        <tbody id="menuTableBody">
-                        </tbody>
-
-                    </table>
-
-                </div>
-
-
-
-                <!-- ==================================
-                 NO FILTER RESULTS
-            =================================== -->
-
-                <div id="noFilterResults" class="no-filter-results hidden">
-
-                    <div>
-                        ⌕
-                    </div>
-
-                    <strong>
-                        No matching menu items
-                    </strong>
-
-                    <span>
-                        Try changing your search or filters.
-                    </span>
-
-                </div>
-
-
-            </section>
-
-
-
-            <!-- ======================================
-             MESSAGE BAR
-        ======================================= -->
-
-            <div id="menuMessageBar" class="menu-message-bar">
-
-                <span id="menuMessage">
-                    Menu data is loaded from your restaurant configuration.
-                </span>
-
-            </div>
-
-
-        </main>
-
-    </div>
-
-
-
-    <!-- ============================================
-     ADD / EDIT MODAL
-============================================= -->
-
-    <div id="menuModal" class="modal-overlay" aria-hidden="true">
-
-        <div class="modal-card">
-
-
-            <div class="modal-header">
-
-                <div class="modal-icon">
-                    ☷
-                </div>
-
-                <div>
-
-                    <span class="modal-eyebrow" id="modalEyebrow">
-                        MENU ITEM
-                    </span>
-
-                    <h2 id="modalTitle">
-                        Add Menu Item
-                    </h2>
-
-                    <p id="modalDescription">
-                        Add a new item to your restaurant menu.
-                    </p>
-
-                </div>
-
-            </div>
-
-
-
-            <form id="menuForm">
-
-
-                <input type="hidden" id="itemId">
-
-
-                <div class="form-grid">
-
-
-                    <!-- BRANCH -->
-
-                    <div class="form-group">
-
-                        <label for="itemBranch">
-                            BRANCH
-                        </label>
-
-                        <select id="itemBranch" required>
-
-                            <option value="">
-                                Select Branch
-                            </option>
-
+                    <button type="button" id="addMenuItemButton" class="primary-button"><span class="plus">+</span>Add
+                        Menu Item</button>
+                </section>
+                <section class="toolbar-card">
+                    <div class="branch-filter">
+                        <label for="branchFilter">Branch</label>
+                        <select id="branchFilter">
+                            <option value="">All branches</option>
                         </select>
-
                     </div>
-
-
-
-                    <!-- CATEGORY -->
-
-                    <div class="form-group">
-
-                        <label for="itemCategory">
-                            CATEGORY
-                        </label>
-
-                        <input type="text" id="itemCategory" placeholder="e.g. Main Course" required>
-
-                    </div>
-
-
-
-                    <!-- ITEM NAME -->
-
-                    <div class="form-group form-group-wide">
-
-                        <label for="itemName">
-                            ITEM NAME
-                        </label>
-
-                        <input type="text" id="itemName" placeholder="e.g. Chicken Burger" maxlength="120" required>
-
-                    </div>
-
-
-
-                    <!-- PRICE -->
-
-                    <div class="form-group">
-
-                        <label for="itemPrice">
-                            PRICE
-                        </label>
-
-                        <div class="price-input">
-
-                            <span>
-                                AED
-                            </span>
-
-                            <input type="number" id="itemPrice" min="0" step="0.01" placeholder="0.00" required>
-
+                    <button type="button" id="refreshButton" class="secondary-button">↻ Refresh</button>
+                </section>
+                <section class="kpi-grid">
+                    <article class="kpi-card">
+                        <div class="kpi-icon">◆</div>
+                        <div><span>Total Items</span><strong id="totalItems">0</strong></div>
+                    </article>
+                    <article class="kpi-card">
+                        <div class="kpi-icon available">✓</div>
+                        <div><span>Available</span><strong id="availableItems">0</strong></div>
+                    </article>
+                    <article class="kpi-card">
+                        <div class="kpi-icon unavailable">−</div>
+                        <div><span>Unavailable</span><strong id="unavailableItems">0</strong></div>
+                    </article>
+                    <article class="kpi-card">
+                        <div class="kpi-icon">⌁</div>
+                        <div><span>Categories</span><strong id="categories">0</strong></div>
+                    </article>
+                    <article class="kpi-card">
+                        <div class="kpi-icon">%</div>
+                        <div><span>Availability</span><strong id="availabilityRate">0%</strong></div>
+                    </article>
+                    <article class="kpi-card">
+                        <div class="kpi-icon">AED</div>
+                        <div><span>Average Price</span><strong id="averagePrice">AED 0.00</strong></div>
+                    </article>
+                </section>
+                <section class="branch-summary-card">
+                    <div class="section-heading">
+                        <div><span class="section-eyebrow">BRANCH PERFORMANCE</span>
+                            <h3>Menu coverage by branch</h3>
                         </div>
-
                     </div>
-
-
-
-                    <!-- IMAGE -->
-
-                    <div class="form-group">
-
-                        <label for="itemImage">
-                            IMAGE URL
-                        </label>
-
-                        <input type="url" id="itemImage" placeholder="https://...">
-
-                    </div>
-
-
-
-                    <!-- DESCRIPTION -->
-
-                    <div class="form-group form-group-wide">
-
-                        <label for="itemDescription">
-                            DESCRIPTION
-                        </label>
-
-                        <textarea id="itemDescription" rows="4" maxlength="500"
-                            placeholder="Describe this menu item..."></textarea>
-
-                    </div>
-
-
-
-                    <!-- AVAILABILITY -->
-
-                    <div class="form-group form-group-wide">
-
-                        <div class="availability-field">
-
-                            <div>
-
-                                <label>
-                                    ITEM AVAILABILITY
-                                </label>
-
-                                <span>
-                                    Customers can order this item
-                                    when it is available.
-                                </span>
-
-                            </div>
-
-                            <label class="switch">
-
-                                <input type="checkbox" id="itemAvailable" checked>
-
-                                <span class="slider"></span>
-
-                            </label>
-
+                    <div id="branchSummary" class="branch-summary-grid"></div>
+                </section>
+                <section class="menu-card">
+                    <div class="section-heading menu-heading">
+                        <div><span class="section-eyebrow">MENU CATALOG</span>
+                            <h3>Menu items</h3>
+                            <p id="menuResultText">Loading menu items...</p>
                         </div>
-
                     </div>
-
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Item</th>
+                                    <th>Category</th>
+                                    <th>Branch</th>
+                                    <th>Price</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="menuTableBody"></tbody>
+                        </table>
+                        <div id="emptyState" class="empty-state" hidden>
+                            <div class="empty-icon">◆</div>
+                            <h3>No menu items yet</h3>
+                            <p>Create your first menu item to start building the restaurant catalog.</p>
+                            <button type="button" class="primary-button small-button" id="emptyAddButton">Add Menu
+                                Item</button>
+                        </div>
+                        <div id="loadingState" class="loading-state" hidden>
+                            <div class="spinner"></div><span>Loading menu...</span>
+                        </div>
+                    </div>
+                </section>
+                <footer class="page-footer">© QR Order Restaurant SaaS · Menu Management</footer>
+            </section>
+        </main>
+    </div>
+    <!-- Hidden by default. Only menu.js opens this modal. -->
+    <div id="menuItemModal" class="modal-overlay" hidden>
+        <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+            <div class="modal-header">
+                <div><span class="section-eyebrow" id="modalEyebrow">MENU ITEM</span>
+                    <h2 id="modalTitle">Add Menu Item</h2>
+                    <p id="modalSubtitle">Create a new item for one of your restaurant branches.</p>
                 </div>
-
-
-
-                <div id="formError" class="form-error"></div>
-
-
-
-                <div class="modal-actions">
-
-                    <button type="button" id="cancelMenuModal" class="secondary-btn">
-                        Cancel
-                    </button>
-
-                    <button type="submit" id="saveMenuItemBtn" class="primary-btn">
-                        <span>✓</span>
-                        Save Menu Item
-                    </button>
-
+                <button type="button" class="modal-close" id="modalCloseButton" aria-label="Close">×</button>
+            </div>
+            <form id="menuItemForm" novalidate>
+                <input type="hidden" id="itemId">
+                <div class="form-grid">
+                    <div class="form-field full">
+                        <label for="itemName">Item Name <span>*</span></label>
+                        <input id="itemName" maxlength="100" placeholder="e.g. Truffle Chicken Burger" required>
+                    </div>
+                    <div class="form-field">
+                        <label for="category">Category <span>*</span></label>
+                        <input id="category" maxlength="60" placeholder="e.g. Burgers" required>
+                    </div>
+                    <div class="form-field">
+                        <label for="price">Price <span>*</span></label>
+                        <div class="price-input"><span>AED</span>
+                            <input id="price" type="number" min="0" step="0.01" placeholder="0.00" required>
+                        </div>
+                    </div>
+                    <div class="form-field full">
+                        <label for="modalBranch">Branch <span>*</span></label>
+                        <select id="modalBranch" required>
+                            <option value="">Select branch</option>
+                        </select>
+                    </div>
+                    <div class="form-field full">
+                        <label for="description">Description</label>
+                        <textarea id="description" maxlength="500" rows="3"
+                            placeholder="Short description of the menu item"></textarea>
+                    </div>
+                    <div class="form-field full">
+                        <label for="imageURL">Image URL</label>
+                        <input id="imageURL" type="url" placeholder="https://example.com/menu-item.jpg">
+                    </div>
+                    <div class="availability-field full">
+                        <label class="switch-row"><span><strong>Available for ordering</strong><small>Customers can
+                                    order this item when enabled.</small></span><span class="switch"><input
+                                    type="checkbox" id="available" checked><span class="slider"></span></span>
+                        </label>
+                    </div>
                 </div>
-
-
+                <div id="modalError" class="form-error" hidden></div>
+                <div class="modal-footer">
+                    <button type="button" class="secondary-button" id="cancelModalButton">Cancel</button>
+                    <button type="submit" class="primary-button modal-submit" id="saveMenuItemButton"><span
+                            id="saveButtonText">Create Item</span><span>→</span></button>
+                </div>
             </form>
-
         </div>
-
     </div>
-
-
-
-    <!-- ============================================
-     DELETE MODAL
-============================================= -->
-
-    <div id="deleteModal" class="modal-overlay" aria-hidden="true">
-
-        <div class="modal-card delete-card">
-
-
-            <div class="modal-icon danger-icon">
-                !
+    <div id="confirmModal" class="modal-overlay" hidden>
+        <div class="confirm-card" role="dialog" aria-modal="true">
+            <div class="confirm-icon">!</div>
+            <h2 id="confirmTitle">Delete menu item?</h2>
+            <p id="confirmMessage">This action cannot be undone.</p>
+            <div class="confirm-actions">
+                <button type="button" class="secondary-button" id="confirmCancelButton">Cancel</button>
+                <button type="button" class="danger-button" id="confirmOkButton">Delete</button>
             </div>
-
-
-            <span class="modal-eyebrow danger-eyebrow">
-                DELETE MENU ITEM
-            </span>
-
-
-            <h2>
-                Delete this menu item?
-            </h2>
-
-
-            <p>
-                This action permanently removes the selected
-                menu item from this branch.
-            </p>
-
-
-            <div class="delete-item-preview">
-
-                <strong id="deleteItemName">
-                    Menu Item
-                </strong>
-
-                <span id="deleteItemCategory">
-                    Category
-                </span>
-
-            </div>
-
-
-            <div id="deleteError" class="modal-error"></div>
-
-
-            <div class="modal-actions">
-
-                <button type="button" id="cancelDelete" class="secondary-btn">
-                    Cancel
-                </button>
-
-                <button type="button" id="confirmDelete" class="danger-confirm-btn">
-                    Delete Item
-                </button>
-
-            </div>
-
         </div>
-
     </div>
-
-
-
-    <!-- IMPORTANT:
-     N8N_BASE_URL should already be defined by your
-     existing shared configuration.
--->
-
     <script src="../../config/config.js"></script>
     <script src="../../auth.js"></script>
     <script src="../../js/role-guard.js"></script>
     <script src="menu.js"></script>
-
 </body>
 
 </html>
