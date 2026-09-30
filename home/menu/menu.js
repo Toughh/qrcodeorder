@@ -455,15 +455,23 @@ function setLoading(on) {
     const loading =
         $("loadingState");
 
-
     if (!loading) {
         return;
     }
 
+    if (on) {
 
-    loading.hidden =
-        !on;
+        loading.hidden = false;
 
+        loading.style.display = "flex";
+
+    } else {
+
+        loading.hidden = true;
+
+        loading.style.display = "none";
+
+    }
 }
 
 

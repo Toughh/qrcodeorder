@@ -44,121 +44,326 @@ button {
 	display: flex;
 }
 
+/* =========================================================
+   SIDEBAR — MATCH DASHBOARD / REPORTS / SETTINGS
+   ========================================================= */
+
 .sidebar {
-	position: fixed;
-	inset: 0 auto 0 0;
-	width: 245px;
-	display: flex;
-	flex-direction: column;
-	padding: 30px 18px;
-	background: linear-gradient(160deg,#0b1220,#111827 70%,#182235);
-	color: #fff;
-	z-index: 30;
+
+    position: fixed;
+
+    top: 0;
+    left: 0;
+    bottom: 0;
+
+    width: 246px;
+
+    display: flex;
+    flex-direction: column;
+
+    background:
+        linear-gradient(
+            180deg,
+            #101722 0%,
+            #131b29 100%
+        );
+
+    border-right:
+        1px solid rgba(255, 255, 255, 0.04);
+
+    color: #ffffff;
+
+    z-index: 100;
+
+    overflow-y: auto;
+
+    scrollbar-width: none;
 }
+
+.sidebar::-webkit-scrollbar {
+    display: none;
+}
+
+
+/* =========================================================
+   BRAND
+   ========================================================= */
 
 .brand {
-	display: flex;
-	align-items: center;
-	gap: 12px;
-	padding: 0 8px 30px;
-	border-bottom: 1px solid rgba(255,255,255,.07);
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    padding:
+        26px 22px 24px;
+
+    border-bottom:
+        1px solid rgba(255, 255, 255, 0.055);
 }
+
 
 .brand-mark {
-	width: 43px;
-	height: 43px;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	border-radius: 13px;
-	background: linear-gradient(135deg,#6366f1,#8b5cf6);
-	font-size: 13px;
-	font-weight: 900;
+
+    width: 38px;
+    height: 38px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    border-radius: 10px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #b8892d,
+            #8d681e
+        );
+
+    color: #ffffff;
+
+    font-size: 12px;
+
+    font-weight: 900;
+
+    letter-spacing: 0.5px;
+
+    box-shadow:
+        0 5px 16px rgba(184, 137, 45, 0.22);
 }
+
 
 .brand-name {
-	font-size: 16px;
-	font-weight: 850;
+
+    color: #ffffff;
+
+    font-size: 13px;
+
+    font-weight: 750;
+
+    letter-spacing: 0.1px;
 }
+
 
 .brand-subtitle {
-	margin-top: 3px;
-	color: #8793a6;
-	font-size: 7px;
-	letter-spacing: 1.7px;
-	font-weight: 800;
+
+    margin-top: 3px;
+
+    color: #8290a4;
+
+    font-size: 10px;
+
+    font-weight: 500;
+
+    letter-spacing: 0.2px;
+
+    text-transform: uppercase;
 }
+
+
+/* =========================================================
+   NAVIGATION
+   ========================================================= */
 
 .navigation {
-	display: flex;
-	flex-direction: column;
-	gap: 5px;
-	padding-top: 24px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 5px;
+
+    padding:
+        22px 12px;
 }
+
 
 .nav-item {
-	display: flex;
-	align-items: center;
-	gap: 12px;
-	min-height: 43px;
-	padding: 0 13px;
-	border-radius: 10px;
-	color: #aeb8c7;
-	text-decoration: none;
-	font-size: 11px;
-	font-weight: 700;
-	transition: .18s;
+
+    position: relative;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    min-height: 44px;
+
+    padding:
+        0 13px;
+
+    border-radius: 9px;
+
+    color: #8e9bad;
+
+    text-decoration: none;
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+    letter-spacing: 0.05px;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease;
 }
 
-.nav-item span {
-	width: 20px;
-	text-align: center;
-	color: #8894a6;
-	font-size: 13px;
-}
 
 .nav-item:hover {
-	background: rgba(255,255,255,.055);
-	color: #fff;
+
+    color: #f4f6f8;
+
+    background:
+        rgba(255, 255, 255, 0.055);
 }
+
 
 .nav-item.active {
-	color: #fff;
-	background: linear-gradient(90deg,rgba(184,137,45,.18),rgba(184,137,45,.06));
-	box-shadow: inset 3px 0 var(--gold2);
+
+    color: #ffffff;
+
+    background:
+        linear-gradient(
+            90deg,
+            rgba(184, 137, 45, 0.18),
+            rgba(184, 137, 45, 0.07)
+        );
+
+    box-shadow:
+        inset 0 0 0 1px
+        rgba(184, 137, 45, 0.08);
 }
+
+
+.nav-item.active::before {
+
+    content: "";
+
+    position: absolute;
+
+    left: 0;
+
+    top: 9px;
+    bottom: 9px;
+
+    width: 3px;
+
+    border-radius:
+        0 3px 3px 0;
+
+    background:
+        var(--gold2);
+}
+
+
+/* =========================================================
+   NAV ICON
+   Existing Menu HTML uses .nav-item span
+   ========================================================= */
+
+.nav-item span {
+
+    width: 21px;
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    color: #7f8da0;
+
+    font-size: 16px;
+
+    line-height: 1;
+}
+
 
 .nav-item.active span {
-	color: #d6bd73;
+
+    color: var(--gold2);
 }
+
+
+/* =========================================================
+   SIDEBAR FOOTER
+   ========================================================= */
 
 .sidebar-footer {
-	margin-top: auto;
-	padding-top: 18px;
-	border-top: 1px solid rgba(255,255,255,.07);
+
+    margin-top: auto;
+
+    padding:
+        18px 22px 22px;
+
+    border-top:
+        1px solid
+        rgba(255, 255, 255, 0.055);
 }
+
+
+/* =========================================================
+   LOGOUT
+   ========================================================= */
 
 .logout-btn {
-	width: 100%;
-	height: 42px;
-	border: 0;
-	border-radius: 10px;
-	background: rgba(255,255,255,.045);
-	color: #aeb8c7;
-	font-size: 10px;
-	font-weight: 750;
-	text-align: left;
-	padding: 0 14px;
+
+    width: 100%;
+
+    height: 42px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    border: 0;
+
+    border-radius: 9px;
+
+    background:
+        rgba(255, 255, 255, 0.035);
+
+    color: #7f8da0;
+
+    font-size: 10px;
+
+    font-weight: 600;
+
+    text-align: left;
+
+    padding:
+        0 13px;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease;
 }
 
+
 .logout-btn:hover {
-	background: rgba(255,255,255,.08);
-	color: #fff;
+
+    background:
+        rgba(255, 255, 255, 0.07);
+
+    color: #ffffff;
 }
 
 .main-content {
-	width: calc(100% - 245px);
-	margin-left: 245px;
+	width: calc(100% - 246px);
+    margin-left: 246px;
 	min-height: 100vh;
 }
 
@@ -683,6 +888,10 @@ td {
 	font-size: 10px;
 }
 
+.loading-state[hidden] {
+    display: none !important;
+}
+
 .spinner {
 	width: 24px;
 	height: 24px;
@@ -983,7 +1192,7 @@ td {
 	.sidebar {
 		transform: translateX(-100%);
 		transition: .22s;
-		width: 245px;
+		width: 246px;
 	}
 
 	.sidebar.open {
