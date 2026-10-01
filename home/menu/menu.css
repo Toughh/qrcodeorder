@@ -44,326 +44,121 @@ button {
 	display: flex;
 }
 
-/* =========================================================
-   SIDEBAR — MATCH DASHBOARD / REPORTS / SETTINGS
-   ========================================================= */
-
 .sidebar {
-
-    position: fixed;
-
-    top: 0;
-    left: 0;
-    bottom: 0;
-
-    width: 246px;
-
-    display: flex;
-    flex-direction: column;
-
-    background:
-        linear-gradient(
-            180deg,
-            #101722 0%,
-            #131b29 100%
-        );
-
-    border-right:
-        1px solid rgba(255, 255, 255, 0.04);
-
-    color: #ffffff;
-
-    z-index: 100;
-
-    overflow-y: auto;
-
-    scrollbar-width: none;
+	position: fixed;
+	inset: 0 auto 0 0;
+	width: 245px;
+	display: flex;
+	flex-direction: column;
+	padding: 30px 18px;
+	background: linear-gradient(160deg,#0b1220,#111827 70%,#182235);
+	color: #fff;
+	z-index: 30;
 }
-
-.sidebar::-webkit-scrollbar {
-    display: none;
-}
-
-
-/* =========================================================
-   BRAND
-   ========================================================= */
 
 .brand {
-
-    display: flex;
-
-    align-items: center;
-
-    gap: 12px;
-
-    padding:
-        26px 22px 24px;
-
-    border-bottom:
-        1px solid rgba(255, 255, 255, 0.055);
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	padding: 0 8px 30px;
+	border-bottom: 1px solid rgba(255,255,255,.07);
 }
-
 
 .brand-mark {
-
-    width: 38px;
-    height: 38px;
-
-    display: flex;
-
-    align-items: center;
-    justify-content: center;
-
-    flex-shrink: 0;
-
-    border-radius: 10px;
-
-    background:
-        linear-gradient(
-            135deg,
-            #b8892d,
-            #8d681e
-        );
-
-    color: #ffffff;
-
-    font-size: 12px;
-
-    font-weight: 900;
-
-    letter-spacing: 0.5px;
-
-    box-shadow:
-        0 5px 16px rgba(184, 137, 45, 0.22);
+	width: 43px;
+	height: 43px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: 13px;
+	background: linear-gradient(135deg,#6366f1,#8b5cf6);
+	font-size: 13px;
+	font-weight: 900;
 }
-
 
 .brand-name {
-
-    color: #ffffff;
-
-    font-size: 13px;
-
-    font-weight: 750;
-
-    letter-spacing: 0.1px;
+	font-size: 16px;
+	font-weight: 850;
 }
-
 
 .brand-subtitle {
-
-    margin-top: 3px;
-
-    color: #8290a4;
-
-    font-size: 10px;
-
-    font-weight: 500;
-
-    letter-spacing: 0.2px;
-
-    text-transform: uppercase;
+	margin-top: 3px;
+	color: #8793a6;
+	font-size: 7px;
+	letter-spacing: 1.7px;
+	font-weight: 800;
 }
-
-
-/* =========================================================
-   NAVIGATION
-   ========================================================= */
 
 .navigation {
-
-    display: flex;
-
-    flex-direction: column;
-
-    gap: 5px;
-
-    padding:
-        22px 12px;
+	display: flex;
+	flex-direction: column;
+	gap: 5px;
+	padding-top: 24px;
 }
-
 
 .nav-item {
-
-    position: relative;
-
-    display: flex;
-
-    align-items: center;
-
-    gap: 12px;
-
-    min-height: 44px;
-
-    padding:
-        0 13px;
-
-    border-radius: 9px;
-
-    color: #8e9bad;
-
-    text-decoration: none;
-
-    font-size: 12px;
-
-    font-weight: 600;
-
-    letter-spacing: 0.05px;
-
-    transition:
-        background 0.2s ease,
-        color 0.2s ease,
-        transform 0.2s ease;
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	min-height: 43px;
+	padding: 0 13px;
+	border-radius: 10px;
+	color: #aeb8c7;
+	text-decoration: none;
+	font-size: 11px;
+	font-weight: 700;
+	transition: .18s;
 }
-
-
-.nav-item:hover {
-
-    color: #f4f6f8;
-
-    background:
-        rgba(255, 255, 255, 0.055);
-}
-
-
-.nav-item.active {
-
-    color: #ffffff;
-
-    background:
-        linear-gradient(
-            90deg,
-            rgba(184, 137, 45, 0.18),
-            rgba(184, 137, 45, 0.07)
-        );
-
-    box-shadow:
-        inset 0 0 0 1px
-        rgba(184, 137, 45, 0.08);
-}
-
-
-.nav-item.active::before {
-
-    content: "";
-
-    position: absolute;
-
-    left: 0;
-
-    top: 9px;
-    bottom: 9px;
-
-    width: 3px;
-
-    border-radius:
-        0 3px 3px 0;
-
-    background:
-        var(--gold2);
-}
-
-
-/* =========================================================
-   NAV ICON
-   Existing Menu HTML uses .nav-item span
-   ========================================================= */
 
 .nav-item span {
-
-    width: 21px;
-
-    display: inline-flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    flex-shrink: 0;
-
-    color: #7f8da0;
-
-    font-size: 16px;
-
-    line-height: 1;
+	width: 20px;
+	text-align: center;
+	color: #8894a6;
+	font-size: 13px;
 }
 
+.nav-item:hover {
+	background: rgba(255,255,255,.055);
+	color: #fff;
+}
+
+.nav-item.active {
+	color: #fff;
+	background: linear-gradient(90deg,rgba(184,137,45,.18),rgba(184,137,45,.06));
+	box-shadow: inset 3px 0 var(--gold2);
+}
 
 .nav-item.active span {
-
-    color: var(--gold2);
+	color: #d6bd73;
 }
-
-
-/* =========================================================
-   SIDEBAR FOOTER
-   ========================================================= */
 
 .sidebar-footer {
-
-    margin-top: auto;
-
-    padding:
-        18px 22px 22px;
-
-    border-top:
-        1px solid
-        rgba(255, 255, 255, 0.055);
+	margin-top: auto;
+	padding-top: 18px;
+	border-top: 1px solid rgba(255,255,255,.07);
 }
-
-
-/* =========================================================
-   LOGOUT
-   ========================================================= */
 
 .logout-btn {
-
-    width: 100%;
-
-    height: 42px;
-
-    display: flex;
-
-    align-items: center;
-
-    gap: 10px;
-
-    border: 0;
-
-    border-radius: 9px;
-
-    background:
-        rgba(255, 255, 255, 0.035);
-
-    color: #7f8da0;
-
-    font-size: 10px;
-
-    font-weight: 600;
-
-    text-align: left;
-
-    padding:
-        0 13px;
-
-    transition:
-        background 0.2s ease,
-        color 0.2s ease;
+	width: 100%;
+	height: 42px;
+	border: 0;
+	border-radius: 10px;
+	background: rgba(255,255,255,.045);
+	color: #aeb8c7;
+	font-size: 10px;
+	font-weight: 750;
+	text-align: left;
+	padding: 0 14px;
 }
 
-
 .logout-btn:hover {
-
-    background:
-        rgba(255, 255, 255, 0.07);
-
-    color: #ffffff;
+	background: rgba(255,255,255,.08);
+	color: #fff;
 }
 
 .main-content {
-	width: calc(100% - 246px);
-    margin-left: 246px;
+	width: calc(100% - 245px);
+	margin-left: 245px;
 	min-height: 100vh;
 }
 
@@ -718,8 +513,17 @@ button {
 table {
 	width: 100%;
 	border-collapse: collapse;
-	min-width: 900px;
+	table-layout: fixed;
+	min-width: 1000px;
 }
+
+/* Keep header and body columns perfectly aligned. */
+th:nth-child(1), td:nth-child(1) { width: 39%; }
+th:nth-child(2), td:nth-child(2) { width: 14%; }
+th:nth-child(3), td:nth-child(3) { width: 15%; }
+th:nth-child(4), td:nth-child(4) { width: 10%; }
+th:nth-child(5), td:nth-child(5) { width: 11%; }
+th:nth-child(6), td:nth-child(6) { width: 11%; }
 
 th {
 	height: 42px;
@@ -746,6 +550,12 @@ td {
 	display: flex;
 	align-items: center;
 	gap: 10px;
+	min-width: 0;
+}
+
+.item-cell > div:last-child {
+	min-width: 0;
+	flex: 1 1 auto;
 }
 
 .item-image {
@@ -765,6 +575,11 @@ td {
 	font-size: 12px;
 }
 
+/* The hidden fallback must remain hidden even though the placeholder uses flex. */
+.item-image-placeholder[hidden] {
+	display: none !important;
+}
+
 .item-cell strong {
 	display: block;
 	color: #253247;
@@ -772,10 +587,15 @@ td {
 }
 
 .item-cell small {
-	display: block;
+	display: -webkit-box;
 	margin-top: 3px;
 	color: #9aa3af;
 	font-size: 8px;
+	line-height: 1.45;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	-webkit-box-orient: vertical;
+	-webkit-line-clamp: 2;
 }
 
 .category-badge {
@@ -789,7 +609,14 @@ td {
 }
 
 .branch-name {
+	display: inline-block;
+	max-width: 100%;
 	font-size: 9px;
+	font-weight: 700;
+	color: #526176;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 }
 
 .price {
@@ -818,28 +645,45 @@ td {
 }
 
 .actions {
-	display: flex;
-	gap: 6px;
+	display: inline-flex;
+	align-items: center;
+	gap: 10px;
+	white-space: nowrap;
 }
 
-.icon-button {
-	width: 30px;
-	height: 30px;
-	border: 1px solid #e1e5ea;
-	border-radius: 8px;
-	background: #fff;
-	color: #718096;
-	font-size: 10px;
+.table-action-link {
+	padding: 0;
+	border: 0;
+	background: transparent;
+	font-family: inherit;
+	font-size: 9px;
+	font-weight: 800;
+	line-height: 1;
+	cursor: pointer;
+	transition: color .18s ease, opacity .18s ease;
 }
 
-.icon-button:hover {
-	border-color: #c8b16b;
+.table-action-link.edit {
+	color: #59677a;
+}
+
+.table-action-link.toggle {
 	color: var(--gold);
 }
 
-.icon-button.delete:hover {
-	border-color: #e6b9b9;
-	color: var(--red);
+.table-action-link.delete {
+	color: #b15b5b;
+}
+
+.table-action-link:hover {
+	text-decoration: underline;
+	text-underline-offset: 3px;
+}
+
+.table-action-link:focus-visible {
+	outline: 2px solid #d6bd73;
+	outline-offset: 4px;
+	border-radius: 3px;
 }
 
 .empty-state {
@@ -1192,7 +1036,7 @@ td {
 	.sidebar {
 		transform: translateX(-100%);
 		transition: .22s;
-		width: 246px;
+		width: 245px;
 	}
 
 	.sidebar.open {
@@ -1316,4 +1160,60 @@ td {
 	.hero-card .primary-button {
 		width: 100%;
 	}
+}
+
+/* =========================================================
+   SELECTED BRANCH OVERVIEW
+   ========================================================= */
+
+.branch-summary.selected {
+	padding: 17px 18px;
+	background: linear-gradient(180deg, #fffdf8 0%, #fcfcfd 100%);
+	border-color: #eadfbe;
+}
+
+.branch-summary-label {
+	display: block;
+	margin-bottom: 5px;
+	color: #a48a46;
+	font-size: 7px;
+	font-weight: 850;
+	letter-spacing: .9px;
+	text-transform: uppercase;
+}
+
+.branch-summary-stats {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 18px;
+	margin-top: 13px;
+	color: #8a95a3;
+	font-size: 8px;
+}
+
+.branch-summary-stats strong {
+	margin-right: 3px;
+	color: #263449;
+	font-size: 11px;
+}
+
+.branch-summary-empty {
+	padding: 18px;
+	border: 1px dashed #dfe4ea;
+	border-radius: 11px;
+	background: #fcfcfd;
+}
+
+.branch-summary-empty-label {
+	display: block;
+	margin-bottom: 5px;
+	color: #a48a46;
+	font-size: 7px;
+	font-weight: 850;
+	letter-spacing: .8px;
+}
+
+.branch-summary-empty strong {
+	color: #657286;
+	font-size: 9px;
 }
