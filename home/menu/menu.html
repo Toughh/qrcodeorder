@@ -124,7 +124,7 @@
                     <div class="branch-filter">
                         <label for="branchFilter">Branch</label>
                         <select id="branchFilter">
-                            <option value="">All branches</option>
+                            <option value="">Select branch</option>
                         </select>
                     </div>
                     <button type="button" id="refreshButton" class="secondary-button">↻ Refresh</button>
@@ -151,7 +151,7 @@
                         <div><span>Availability</span><strong id="availabilityRate">0%</strong></div>
                     </article>
                     <article class="kpi-card">
-                        <div class="kpi-icon">AED</div>
+                        <div class="kpi-icon" id="averagePriceCurrency">AED</div>
                         <div><span>Average Price</span><strong id="averagePrice">AED 0.00</strong></div>
                     </article>
                 </section>
@@ -223,7 +223,7 @@
                     </div>
                     <div class="form-field">
                         <label for="price">Price <span>*</span></label>
-                        <div class="price-input"><span>AED</span>
+                        <div class="price-input"><span id="priceCurrency">AED</span>
                             <input id="price" type="number" min="0" step="0.01" placeholder="0.00" required>
                         </div>
                     </div>

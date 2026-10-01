@@ -492,6 +492,32 @@ function setLoading(on) {
 
 
 /* =========================================================
+   CURRENCY LABELS
+   ========================================================= */
+
+function setCurrencyLabels() {
+
+    const currency =
+        String(state.currency || "AED")
+            .trim().toUpperCase();
+
+    const averagePriceCurrency =
+        $("averagePriceCurrency");
+
+    const priceCurrency =
+        $("priceCurrency");
+
+    if (averagePriceCurrency) {
+        averagePriceCurrency.textContent = currency;
+    }
+
+    if (priceCurrency) {
+        priceCurrency.textContent = currency;
+    }
+}
+
+
+/* =========================================================
    TOPBAR
    ========================================================= */
 
@@ -599,7 +625,7 @@ function populateBranches() {
 
     filter.innerHTML =
         `<option value="">
-            All branches
+            Select branch
         </option>` +
 
         state.branches
@@ -1008,32 +1034,29 @@ function renderItems() {
 
                         <td>
 
+                            ${imageHtml}
+
+                        </td>
+
+
+                        <td>
+
                             <div
-                                class="item-cell"
+                                class="item-name"
                             >
+                                ${esc(
+                        item.ItemName ||
+                        "Untitled item"
+                    )}
+                            </div>
 
-                                ${imageHtml}
-
-
-                                <div>
-
-                                    <strong>
-                                        ${esc(
-                    item.ItemName ||
-                    "Unnamed item"
-                )}
-                                    </strong>
-
-
-                                    <small>
-                                        ${esc(
-                    item.Description ||
-                    "No description added"
-                )}
-                                    </small>
-
-                                </div>
-
+                            <div
+                                class="item-description"
+                            >
+                                ${esc(
+                        item.Description ||
+                        "No description added."
+                    )}
                             </div>
 
                         </td>
@@ -1045,9 +1068,9 @@ function renderItems() {
                                 class="category-badge"
                             >
                                 ${esc(
-                    item.Category ||
-                    "Uncategorized"
-                )}
+                        item.Category ||
+                        "Uncategorized"
+                    )}
                             </span>
 
                         </td>
@@ -1055,28 +1078,13 @@ function renderItems() {
 
                         <td>
 
-                            <span
-                                class="branch-name"
-                            >
-                                ${esc(
-                    branchName(
-                        branchIdOf(item)
-                    )
-                )}
-                            </span>
-
-                        </td>
-
-
-                        <td>
-
-                            <span
-                                class="price"
+                            <strong
+                                class="item-price"
                             >
                                 ${money(
-                    item.Price
-                )}
-                            </span>
+                        item.Price
+                    )}
+                            </strong>
 
                         </td>
 
@@ -1093,10 +1101,6 @@ function renderItems() {
                                 "
                             >
 
-                                <b>
-                                    ●
-                                </b>
-
                                 ${available
                         ? "Available"
                         : "Unavailable"
@@ -1109,60 +1113,56 @@ function renderItems() {
 
                         <td>
 
+                            <span
+                                class="branch-badge"
+                            >
+                                ${esc(
+                        branchName(
+                            branchIdOf(item)
+                        )
+                    )}
+                            </span>
+
+                        </td>
+
+
+                        <td>
+
                             <div
-                                class="actions"
+                                class="row-actions"
                             >
 
                                 <button
-
-                                    class="icon-button"
-
-                                    title="Edit item"
-
+                                    type="button"
+                                    class="table-action edit"
                                     data-action="edit"
-
                                     data-id="${esc(id)}"
-
+                                    title="Edit item"
                                 >
-                                    ✎
+                                    Edit
                                 </button>
 
-
                                 <button
-
-                                    class="icon-button"
-
-                                    title="Toggle availability"
-
+                                    type="button"
+                                    class="table-action toggle"
                                     data-action="toggle"
-
                                     data-id="${esc(id)}"
-
+                                    title="Toggle availability"
                                 >
-
                                     ${available
-                        ? "◉"
-                        : "○"
+                        ? "Disable"
+                        : "Enable"
                     }
-
                                 </button>
 
-
                                 <button
-
-                                    class="
-                                        icon-button
-                                        delete
-                                    "
-
-                                    title="Delete item"
-
+                                    type="button"
+                                    class="table-action delete"
                                     data-action="delete"
-
                                     data-id="${esc(id)}"
-
+                                    title="Delete item"
                                 >
-                                    ×
+                                    Delete
                                 </button>
 
                             </div>
@@ -1181,6 +1181,85 @@ function renderItems() {
 
 
 /* =========================================================
+   POPULATE CATEGORY
+   ========================================================= */
+
+function populateCategorySelect(
+    selected = ""
+) {
+
+    const select =
+        $("itemCategory");
+
+    if (!select) {
+        return;
+    }
+
+
+    const categories =
+
+        [...new Set(
+
+            state.items
+
+                .map(
+                    item =>
+                        String(
+                            item.Category ||
+                            ""
+                        ).trim()
+                )
+
+                .filter(Boolean)
+
+        )]
+
+            .sort(
+                (a, b) =>
+                    a.localeCompare(b)
+            );
+
+
+    select.innerHTML =
+
+        `<option value="">
+            Select category
+        </option>` +
+
+        categories
+
+            .map(
+
+                category => `
+
+                    <option
+                        value="${esc(category)}"
+                    >
+                        ${esc(category)}
+                    </option>
+
+                `
+
+            )
+
+            .join("") +
+
+        `<option value="__new__">
+            + Add new category
+        </option>`;
+
+
+    if (selected) {
+
+        select.value =
+            selected;
+
+    }
+
+}
+
+
+/* =========================================================
    LOAD MENU
    ========================================================= */
 
@@ -1188,48 +1267,150 @@ async function loadMenu() {
 
     setLoading(true);
 
+
     try {
 
-        const data =
+        /* -----------------------------------------------------
+           STEP 1
+           Get branch metadata first.
+           Do NOT render menu items from this response.
+           ----------------------------------------------------- */
+
+        const branchData =
+
             await api(
                 "list",
-                state.currentBranchId
-                    ? {
-                        branchId:
-                            state.currentBranchId
-                    }
-                    : {}
+                {}
             );
 
 
-        // ==========================================
-        // USER NAME FROM BACKEND
-        // ==========================================
-
         state.userName =
+
             String(
-                data.userName || ""
+                branchData.userName ||
+                ""
             ).trim();
 
 
-        // ==========================================
-        // CURRENCY FROM BACKEND
-        // ==========================================
-
         state.currency =
+
             String(
-                data.currency ||
+                branchData.currency ||
                 "AED"
             )
                 .trim()
                 .toUpperCase();
 
 
-        // ==========================================
-        // MENU ITEMS
-        // ==========================================
+        state.branches =
+
+            Array.isArray(
+                branchData.branches
+            )
+                ? branchData.branches
+                : [];
+
+
+        /* -----------------------------------------------------
+           STEP 2
+           Automatically select first branch if none selected.
+           ----------------------------------------------------- */
+
+        if (
+            !state.currentBranchId ||
+            !state.branches.some(
+                branch =>
+                    branchIdOf(branch) ===
+                    state.currentBranchId
+            )
+        ) {
+
+            state.currentBranchId =
+
+                state.branches.length
+                    ? branchIdOf(
+                        state.branches[0]
+                    )
+                    : "";
+
+        }
+
+
+        populateBranches();
+
+        setTopbar();
+
+        setCurrencyLabels();
+
+
+        /* -----------------------------------------------------
+           No branches
+           ----------------------------------------------------- */
+
+        if (!state.currentBranchId) {
+
+            state.items = [];
+
+            state.metrics = {};
+
+            renderMetrics({});
+
+            renderBranches([]);
+
+            renderItems();
+
+            showPageMessage(
+                "No branch is available for this restaurant."
+            );
+
+            return;
+
+        }
+
+
+        /* -----------------------------------------------------
+           STEP 3
+           Load ONLY selected branch menu.
+           ----------------------------------------------------- */
+
+        const data =
+
+            await api(
+
+                "list",
+
+                {
+
+                    branchId:
+                        state.currentBranchId
+
+                }
+
+            );
+
+
+        state.userName =
+
+            String(
+                data.userName ||
+                state.userName ||
+                ""
+            ).trim();
+
+
+        state.currency =
+
+            String(
+                data.currency ||
+                state.currency ||
+                "AED"
+            )
+                .trim()
+                .toUpperCase();
+
 
         state.items =
+
             Array.isArray(
                 data.items
             )
@@ -1237,36 +1418,27 @@ async function loadMenu() {
                 : [];
 
 
-        // ==========================================
-        // BRANCHES
-        // ==========================================
+        state.metrics =
+
+            data.metrics || {};
+
+
+        /* -----------------------------------------------------
+           Backend already returns selected branch only.
+           ----------------------------------------------------- */
 
         state.branches =
+
             Array.isArray(
                 data.branches
             )
                 ? data.branches
-                : [];
+                : state.branches;
 
-
-        // ==========================================
-        // METRICS
-        // ==========================================
-
-        state.metrics =
-            data.metrics || {};
-
-
-        // ==========================================
-        // TOP BAR
-        // ==========================================
 
         setTopbar();
 
-
-        // ==========================================
-        // RENDER
-        // ==========================================
+        setCurrencyLabels();
 
         populateBranches();
 
@@ -1284,9 +1456,11 @@ async function loadMenu() {
     } catch (error) {
 
         showPageMessage(
+
             error.message ||
-            "Unable to load menu.",
-            "error"
+
+            "Unable to load menu."
+
         );
 
         state.items = [];
@@ -1304,7 +1478,7 @@ async function loadMenu() {
 
 
 /* =========================================================
-   OPEN ADD / EDIT MODAL
+   OPEN MODAL
    ========================================================= */
 
 function openModal(
@@ -1319,10 +1493,114 @@ function openModal(
         $("menuItemModal");
 
 
-    if (!modal) {
+    const title =
+        $("modalTitle");
+
+
+    const form =
+        $("menuItemForm");
+
+
+    if (!modal || !title || !form) {
         return;
     }
 
+
+    form.reset();
+
+
+    populateCategorySelect(
+        item?.Category || ""
+    );
+
+
+    const selectedBranch =
+
+        branchIdOf(
+            item
+        ) ||
+
+        state.currentBranchId;
+
+
+    $("modalBranch").value =
+        selectedBranch;
+
+
+    if (item) {
+
+        title.textContent =
+            "Edit Menu Item";
+
+
+        $("itemName").value =
+            item.ItemName || "";
+
+
+        $("itemDescription").value =
+            item.Description || "";
+
+
+        $("itemPrice").value =
+            item.Price ?? "";
+
+
+        $("itemImageUrl").value =
+            imageUrlOf(
+                item.ImageURL
+            );
+
+
+        $("itemAvailable").checked =
+            isAvailable(
+                item.Available
+            );
+
+
+        $("itemCategory").value =
+            item.Category || "";
+
+
+        $("itemCategoryCustom").value =
+            "";
+
+    } else {
+
+        title.textContent =
+            "Add Menu Item";
+
+
+        $("itemName").value =
+            "";
+
+
+        $("itemDescription").value =
+            "";
+
+
+        $("itemPrice").value =
+            "";
+
+
+        $("itemImageUrl").value =
+            "";
+
+
+        $("itemAvailable").checked =
+            true;
+
+
+        $("itemCategory").value =
+            "";
+
+
+        $("itemCategoryCustom").value =
+            "";
+
+    }
+
+
+    setCurrencyLabels();
 
     modal.hidden =
         false;
@@ -1331,109 +1609,6 @@ function openModal(
     document.body.classList.add(
         "modal-open"
     );
-
-
-    $("modalError").hidden =
-        true;
-
-
-    $("modalTitle").textContent =
-
-        item
-
-            ? "Edit Menu Item"
-
-            : "Add Menu Item";
-
-
-    $("modalEyebrow").textContent =
-
-        item
-
-            ? "UPDATE MENU ITEM"
-
-            : "CREATE MENU ITEM";
-
-
-    $("modalSubtitle").textContent =
-
-        item
-
-            ? "Keep pricing, descriptions and availability accurate for customers."
-
-            : "Create a new item and publish it to the selected branch.";
-
-
-    $("saveButtonText").textContent =
-
-        item
-
-            ? "Save Changes"
-
-            : "Create Item";
-
-
-    $("itemId").value =
-
-        item
-
-            ? itemIdOf(item)
-
-            : "";
-
-
-    $("itemName").value =
-
-        item?.ItemName || "";
-
-
-    $("category").value =
-
-        item?.Category || "";
-
-
-    $("price").value =
-
-        item?.Price ?? "";
-
-
-    $("description").value =
-
-        item?.Description || "";
-
-
-    /*
-       For editing, ImageURL is an Airtable
-       attachment. We cannot put an attachment
-       object directly into the text field.
-       Extract its URL.
-    */
-
-    $("imageURL").value =
-
-        imageUrlOf(
-            item?.ImageURL
-        );
-
-
-    $("available").checked =
-
-        item
-
-            ? isAvailable(
-                item.Available
-            )
-
-            : true;
-
-
-    $("modalBranch").value =
-
-        item
-
-            ? branchIdOf(item)
-
-            : state.currentBranchId || "";
 
 
     setTimeout(
@@ -1461,54 +1636,34 @@ function closeModal() {
         $("menuItemModal");
 
 
-    if (modal) {
-
-        modal.hidden =
-            true;
-
+    if (!modal) {
+        return;
     }
 
 
-    document.body.classList.remove(
-        "modal-open"
-    );
+    modal.hidden =
+        true;
 
 
     state.editing =
         null;
 
-}
 
+    if (
+        $("confirmModal").hidden
+    ) {
 
-/* =========================================================
-   MODAL ERROR
-   ========================================================= */
+        document.body.classList.remove(
+            "modal-open"
+        );
 
-function modalError(
-    message
-) {
-
-    const el =
-        $("modalError");
-
-
-    if (!el) {
-        return;
     }
 
-
-    el.textContent =
-        message;
-
-
-    el.hidden =
-        false;
-
 }
 
 
 /* =========================================================
-   SAVE MENU ITEM
+   SAVE ITEM
    ========================================================= */
 
 async function saveItem(
@@ -1518,141 +1673,195 @@ async function saveItem(
     event.preventDefault();
 
 
-    $("modalError").hidden =
-        true;
+    const name =
+
+        String(
+            $("itemName").value ||
+            ""
+        ).trim();
 
 
-    const payload = {
+    const description =
 
-        branchId:
-
-            $("modalBranch")
-                .value
-                .trim(),
-
-
-        itemId:
-
-            $("itemId")
-                .value
-                .trim(),
+        String(
+            $("itemDescription").value ||
+            ""
+        ).trim();
 
 
-        itemName:
+    const price =
 
-            $("itemName")
-                .value
-                .trim(),
-
-
-        category:
-
-            $("category")
-                .value
-                .trim(),
+        Number(
+            $("itemPrice").value
+        );
 
 
-        price:
+    const categoryValue =
 
-            $("price")
-                .value,
-
-
-        description:
-
-            $("description")
-                .value
-                .trim(),
+        String(
+            $("itemCategory").value ||
+            ""
+        ).trim();
 
 
-        imageURL:
+    const customCategory =
 
-            $("imageURL")
-                .value
-                .trim(),
-
-
-        available:
-
-            $("available")
-                .checked
-
-    };
+        String(
+            $("itemCategoryCustom").value ||
+            ""
+        ).trim();
 
 
-    if (!payload.branchId) {
+    const category =
 
-        return modalError(
+        categoryValue === "__new__"
+
+            ? customCategory
+
+            : categoryValue;
+
+
+    const imageUrl =
+
+        String(
+            $("itemImageUrl").value ||
+            ""
+        ).trim();
+
+
+    const available =
+
+        $("itemAvailable").checked;
+
+
+    const branchId =
+
+        String(
+            $("modalBranch").value ||
+            state.currentBranchId ||
+            ""
+        ).trim();
+
+
+    if (!branchId) {
+
+        showPageMessage(
             "Please select a branch."
         );
 
-    }
-
-
-    if (!payload.itemName) {
-
-        return modalError(
-            "Menu item name is required."
-        );
+        return;
 
     }
 
 
-    if (!payload.category) {
+    if (!name) {
 
-        return modalError(
-            "Category is required."
+        showPageMessage(
+            "Please enter the menu item name."
         );
+
+        return;
+
+    }
+
+
+    if (!category) {
+
+        showPageMessage(
+            "Please select or enter a category."
+        );
+
+        return;
 
     }
 
 
     if (
-
-        payload.price === "" ||
-
-        Number(payload.price) < 0 ||
-
-        Number.isNaN(
-            Number(payload.price)
-        )
-
+        !Number.isFinite(price) ||
+        price < 0
     ) {
 
-        return modalError(
+        showPageMessage(
             "Please enter a valid price."
         );
 
-    }
-
-
-    const button =
-        $("saveMenuItemButton");
-
-
-    if (button) {
-
-        button.disabled =
-            true;
+        return;
 
     }
 
 
     try {
 
-        const data =
+        setLoading(true);
 
-            await api(
 
-                state.editing
+        let data;
 
-                    ? "update"
 
-                    : "create",
+        if (state.editing) {
 
-                payload
+            data =
 
-            );
+                await api(
+
+                    "update",
+
+                    {
+
+                        branchId,
+
+                        itemId:
+                            itemIdOf(
+                                state.editing
+                            ),
+
+                        itemName:
+                            name,
+
+                        description,
+
+                        category,
+
+                        price,
+
+                        imageUrl,
+
+                        available
+
+                    }
+
+                );
+
+        } else {
+
+            data =
+
+                await api(
+
+                    "create",
+
+                    {
+
+                        branchId,
+
+                        itemName:
+                            name,
+
+                        description,
+
+                        category,
+
+                        price,
+
+                        imageUrl,
+
+                        available
+
+                    }
+
+                );
+
+        }
 
 
         closeModal();
@@ -1662,15 +1871,15 @@ async function saveItem(
 
             data.message ||
 
-            "Menu item saved successfully.",
+            (
+                state.editing
+                    ? "Menu item updated successfully."
+                    : "Menu item created successfully."
+            ),
 
             "success"
 
         );
-
-
-        state.currentBranchId =
-            payload.branchId;
 
 
         await loadMenu();
@@ -1678,7 +1887,7 @@ async function saveItem(
 
     } catch (error) {
 
-        modalError(
+        showPageMessage(
 
             error.message ||
 
@@ -1686,15 +1895,9 @@ async function saveItem(
 
         );
 
-
     } finally {
 
-        if (button) {
-
-            button.disabled =
-                false;
-
-        }
+        setLoading(false);
 
     }
 
