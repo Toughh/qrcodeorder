@@ -93,14 +93,21 @@ const itemIdOf = item =>
    Handles normal BranchId + BOM BranchId
    ========================================================= */
 
-const branchIdOf = item =>
+const branchIdOf = item => {
 
-    String(
-        item.branchId ||
-        item.BranchId ||
-        item["\ufeffBranchId"] ||
+    const source =
+        item?.fields ||
+        item ||
+        {};
+
+    return String(
+        source.branchId ||
+        source.BranchId ||
+        source["\ufeffBranchId"] ||
         ""
     ).trim();
+
+};
 
 
 /* =========================================================
@@ -755,130 +762,66 @@ function renderMetrics(
     }
 
 }
-
-
 /* =========================================================
    RENDER BRANCH SUMMARY
    ========================================================= */
 
 function renderBranches(
-    branches = []
+    summaries = []
 ) {
 
     const el =
         $("branchSummary");
 
-
     if (!el) {
         return;
     }
 
+    const summary =
+        summaries.find(
+            b =>
+                String(b.branchId || "").trim() ===
+                String(state.currentBranchId || "").trim()
+        ) || summaries[0];
 
-    if (!branches.length) {
+    if (!summary) {
 
-        el.innerHTML =
-
-            `<div class="empty-state">
-
-                <p>
-                    No active branches found
-                    for this restaurant.
-                </p>
-
-            </div>`;
+        el.innerHTML = `
+            <div class="branch-summary-empty">
+                <span class="branch-summary-empty-label">BRANCH OVERVIEW</span>
+                <strong>Select a branch to view menu coverage.</strong>
+            </div>
+        `;
 
         return;
-
     }
 
+    const rate =
+        Number(summary.availability) || 0;
 
-    el.innerHTML =
+    el.innerHTML = `
+        <div class="branch-summary selected">
+            <div class="branch-summary-top">
+                <div>
+                    <span class="branch-summary-label">SELECTED BRANCH</span>
+                    <span class="branch-summary-name">
+                        ${esc(summary.branchName || branchName(summary.branchId))}
+                    </span>
+                </div>
+                <span class="branch-summary-rate">${esc(summary.availability || "0.0")}%</span>
+            </div>
 
-        branches
+            <div class="branch-summary-stats">
+                <span><strong>${summary.totalItems || 0}</strong> Items</span>
+                <span><strong>${summary.availableItems || 0}</strong> Available</span>
+                <span><strong>${summary.unavailableItems || 0}</strong> Unavailable</span>
+            </div>
 
-            .map(
-
-                b => {
-
-                    const rate =
-                        Number(
-                            b.availability
-                        ) || 0;
-
-
-                    return `
-
-                        <div
-                            class="branch-summary"
-                        >
-
-                            <div
-                                class="branch-summary-top"
-                            >
-
-                                <span
-                                    class="branch-summary-name"
-                                >
-                                    ${esc(
-                        b.branchName ||
-                        b.branchId
-                    )}
-                                </span>
-
-                                <span
-                                    class="branch-summary-rate"
-                                >
-                                    ${esc(
-                        b.availability
-                    )}%
-                                </span>
-
-                            </div>
-
-
-                            <div
-                                class="branch-summary-meta"
-                            >
-
-                                ${b.totalItems || 0}
-                                items ·
-
-                                ${b.availableItems || 0}
-                                available ·
-
-                                ${b.unavailableItems || 0}
-                                unavailable
-
-                            </div>
-
-
-                            <div
-                                class="progress"
-                            >
-
-                                <span
-                                    style="
-                                        width:${Math.min(
-                        100,
-                        Math.max(
-                            0,
-                            rate
-                        )
-                    )}%
-                                    "
-                                ></span>
-
-                            </div>
-
-                        </div>
-
-                    `;
-
-                }
-
-            )
-
-            .join("");
+            <div class="progress">
+                <span style="width:${Math.min(100, Math.max(0, rate))}%"></span>
+            </div>
+        </div>
+    `;
 
 }
 
@@ -1034,29 +977,32 @@ function renderItems() {
 
                         <td>
 
-                            ${imageHtml}
-
-                        </td>
-
-
-                        <td>
-
                             <div
-                                class="item-name"
+                                class="item-cell"
                             >
-                                ${esc(
-                        item.ItemName ||
-                        "Untitled item"
-                    )}
-                            </div>
 
-                            <div
-                                class="item-description"
-                            >
-                                ${esc(
-                        item.Description ||
-                        "No description added."
-                    )}
+                                ${imageHtml}
+
+
+                                <div>
+
+                                    <strong>
+                                        ${esc(
+                    item.ItemName ||
+                    "Unnamed item"
+                )}
+                                    </strong>
+
+
+                                    <small>
+                                        ${esc(
+                    item.Description ||
+                    "No description added"
+                )}
+                                    </small>
+
+                                </div>
+
                             </div>
 
                         </td>
@@ -1068,9 +1014,24 @@ function renderItems() {
                                 class="category-badge"
                             >
                                 ${esc(
-                        item.Category ||
-                        "Uncategorized"
-                    )}
+                    item.Category ||
+                    "Uncategorized"
+                )}
+                            </span>
+
+                        </td>
+
+
+                        <td>
+
+                            <span
+                                class="branch-badge"
+                            >
+                                ${esc(
+                    branchName(
+                        branchIdOf(item)
+                    )
+                )}
                             </span>
 
                         </td>
@@ -1082,8 +1043,8 @@ function renderItems() {
                                 class="item-price"
                             >
                                 ${money(
-                        item.Price
-                    )}
+                    item.Price
+                )}
                             </strong>
 
                         </td>
@@ -1106,21 +1067,6 @@ function renderItems() {
                         : "Unavailable"
                     }
 
-                            </span>
-
-                        </td>
-
-
-                        <td>
-
-                            <span
-                                class="branch-badge"
-                            >
-                                ${esc(
-                        branchName(
-                            branchIdOf(item)
-                        )
-                    )}
                             </span>
 
                         </td>
@@ -1160,7 +1106,7 @@ function renderItems() {
                                     class="table-action delete"
                                     data-action="delete"
                                     data-id="${esc(id)}"
-                                    title="Delete item"
+                                    title="Delete menu item"
                                 >
                                     Delete
                                 </button>
@@ -1257,8 +1203,6 @@ function populateCategorySelect(
     }
 
 }
-
-
 /* =========================================================
    LOAD MENU
    ========================================================= */
@@ -1267,53 +1211,42 @@ async function loadMenu() {
 
     setLoading(true);
 
-
     try {
 
         /* -----------------------------------------------------
-           STEP 1
-           Get branch metadata first.
-           Do NOT render menu items from this response.
+           Always obtain branch metadata first. The backend will
+           return no catalog items when no branch is selected.
            ----------------------------------------------------- */
 
-        const branchData =
-
+        const data =
             await api(
                 "list",
-                {}
+                state.currentBranchId
+                    ? { branchId: state.currentBranchId }
+                    : {}
             );
 
-
         state.userName =
-
             String(
-                branchData.userName ||
+                data.userName ||
+                state.userName ||
                 ""
             ).trim();
 
-
         state.currency =
-
             String(
-                branchData.currency ||
+                data.currency ||
+                state.currency ||
                 "AED"
-            )
-                .trim()
-                .toUpperCase();
-
+            ).trim().toUpperCase();
 
         state.branches =
-
-            Array.isArray(
-                branchData.branches
-            )
-                ? branchData.branches
+            Array.isArray(data.branches)
+                ? data.branches
                 : [];
 
-
         /* -----------------------------------------------------
-           STEP 2
-           Automatically select first branch if none selected.
+           Select the first branch automatically on first load.
            ----------------------------------------------------- */
 
         if (
@@ -1324,149 +1257,89 @@ async function loadMenu() {
                     state.currentBranchId
             )
         ) {
-
             state.currentBranchId =
-
                 state.branches.length
-                    ? branchIdOf(
-                        state.branches[0]
-                    )
+                    ? branchIdOf(state.branches[0])
                     : "";
-
         }
 
-
         populateBranches();
-
         setTopbar();
-
         setCurrencyLabels();
 
-
         /* -----------------------------------------------------
-           No branches
+           If a branch was just selected, fetch its catalog.
            ----------------------------------------------------- */
 
-        if (!state.currentBranchId) {
+        if (state.currentBranchId) {
 
-            state.items = [];
+            const branchData =
+                await api(
+                    "list",
+                    { branchId: state.currentBranchId }
+                );
 
-            state.metrics = {};
+            state.userName =
+                String(
+                    branchData.userName ||
+                    state.userName ||
+                    ""
+                ).trim();
 
-            renderMetrics({});
+            state.currency =
+                String(
+                    branchData.currency ||
+                    state.currency ||
+                    "AED"
+                ).trim().toUpperCase();
 
-            renderBranches([]);
+            state.items =
+                Array.isArray(branchData.items)
+                    ? branchData.items
+                    : [];
+
+            state.metrics =
+                branchData.metrics || {};
+
+            state.branches =
+                Array.isArray(branchData.branches)
+                    ? branchData.branches
+                    : state.branches;
+
+            setTopbar();
+            setCurrencyLabels();
+            populateBranches();
+            renderMetrics(state.metrics);
+
+            renderBranches(
+                Array.isArray(branchData.branchSummary)
+                    ? branchData.branchSummary
+                    : []
+            );
 
             renderItems();
 
-            showPageMessage(
-                "No branch is available for this restaurant."
-            );
+        } else {
 
-            return;
+            state.items = [];
+            state.metrics = {};
+
+            renderMetrics({});
+            renderBranches([]);
+            renderItems();
 
         }
-
-
-        /* -----------------------------------------------------
-           STEP 3
-           Load ONLY selected branch menu.
-           ----------------------------------------------------- */
-
-        const data =
-
-            await api(
-
-                "list",
-
-                {
-
-                    branchId:
-                        state.currentBranchId
-
-                }
-
-            );
-
-
-        state.userName =
-
-            String(
-                data.userName ||
-                state.userName ||
-                ""
-            ).trim();
-
-
-        state.currency =
-
-            String(
-                data.currency ||
-                state.currency ||
-                "AED"
-            )
-                .trim()
-                .toUpperCase();
-
-
-        state.items =
-
-            Array.isArray(
-                data.items
-            )
-                ? data.items
-                : [];
-
-
-        state.metrics =
-
-            data.metrics || {};
-
-
-        /* -----------------------------------------------------
-           Backend already returns selected branch only.
-           ----------------------------------------------------- */
-
-        state.branches =
-
-            Array.isArray(
-                data.branches
-            )
-                ? data.branches
-                : state.branches;
-
-
-        setTopbar();
-
-        setCurrencyLabels();
-
-        populateBranches();
-
-        renderMetrics(
-            state.metrics
-        );
-
-        renderBranches(
-            state.branches
-        );
-
-        renderItems();
-
 
     } catch (error) {
 
         showPageMessage(
-
             error.message ||
-
-            "Unable to load menu."
-
+            "Unable to load menu.",
+            "error"
         );
 
         state.items = [];
-
         renderItems();
-
 
     } finally {
 
@@ -1478,7 +1351,7 @@ async function loadMenu() {
 
 
 /* =========================================================
-   OPEN MODAL
+   OPEN ADD / EDIT MODAL
    ========================================================= */
 
 function openModal(
@@ -1488,139 +1361,87 @@ function openModal(
     state.editing =
         item;
 
-
     const modal =
         $("menuItemModal");
 
-
-    const title =
-        $("modalTitle");
-
-
-    const form =
-        $("menuItemForm");
-
-
-    if (!modal || !title || !form) {
+    if (!modal) {
         return;
     }
 
-
-    form.reset();
-
-
-    populateCategorySelect(
-        item?.Category || ""
-    );
-
-
-    const selectedBranch =
-
-        branchIdOf(
-            item
-        ) ||
-
-        state.currentBranchId;
-
-
-    $("modalBranch").value =
-        selectedBranch;
-
-
-    if (item) {
-
-        title.textContent =
-            "Edit Menu Item";
-
-
-        $("itemName").value =
-            item.ItemName || "";
-
-
-        $("itemDescription").value =
-            item.Description || "";
-
-
-        $("itemPrice").value =
-            item.Price ?? "";
-
-
-        $("itemImageUrl").value =
-            imageUrlOf(
-                item.ImageURL
-            );
-
-
-        $("itemAvailable").checked =
-            isAvailable(
-                item.Available
-            );
-
-
-        $("itemCategory").value =
-            item.Category || "";
-
-
-        $("itemCategoryCustom").value =
-            "";
-
-    } else {
-
-        title.textContent =
-            "Add Menu Item";
-
-
-        $("itemName").value =
-            "";
-
-
-        $("itemDescription").value =
-            "";
-
-
-        $("itemPrice").value =
-            "";
-
-
-        $("itemImageUrl").value =
-            "";
-
-
-        $("itemAvailable").checked =
-            true;
-
-
-        $("itemCategory").value =
-            "";
-
-
-        $("itemCategoryCustom").value =
-            "";
-
-    }
-
-
-    setCurrencyLabels();
-
     modal.hidden =
         false;
-
 
     document.body.classList.add(
         "modal-open"
     );
 
+    $("modalError").hidden =
+        true;
+
+    $("modalTitle").textContent =
+        item
+            ? "Edit Menu Item"
+            : "Add Menu Item";
+
+    $("modalEyebrow").textContent =
+        item
+            ? "UPDATE MENU ITEM"
+            : "CREATE MENU ITEM";
+
+    $("modalSubtitle").textContent =
+        item
+            ? "Keep pricing, descriptions and availability accurate for customers."
+            : "Create a new item and publish it to the selected branch.";
+
+    $("saveButtonText").textContent =
+        item
+            ? "Save Changes"
+            : "Create Item";
+
+    $("itemId").value =
+        item
+            ? itemIdOf(item)
+            : "";
+
+    $("itemName").value =
+        item?.ItemName || "";
+
+    $("category").value =
+        item?.Category || "";
+
+    $("price").value =
+        item?.Price ?? "";
+
+    $("description").value =
+        item?.Description || "";
+
+    /*
+       For editing, ImageURL is an Airtable
+       attachment. We cannot put an attachment
+       object directly into the text field.
+       Extract its URL.
+    */
+
+    $("imageURL").value =
+        imageUrlOf(
+            item?.ImageURL
+        );
+
+    $("available").checked =
+        item
+            ? isAvailable(item.Available)
+            : true;
+
+    $("modalBranch").value =
+        item
+            ? branchIdOf(item)
+            : state.currentBranchId || "";
 
     setTimeout(
-
         () => {
-
             $("itemName")?.focus();
-
         },
-
         50
-
     );
 
 }
@@ -1635,35 +1456,46 @@ function closeModal() {
     const modal =
         $("menuItemModal");
 
-
-    if (!modal) {
-        return;
+    if (modal) {
+        modal.hidden = true;
     }
 
-
-    modal.hidden =
-        true;
-
+    document.body.classList.remove(
+        "modal-open"
+    );
 
     state.editing =
         null;
-
-
-    if (
-        $("confirmModal").hidden
-    ) {
-
-        document.body.classList.remove(
-            "modal-open"
-        );
-
-    }
 
 }
 
 
 /* =========================================================
-   SAVE ITEM
+   MODAL ERROR
+   ========================================================= */
+
+function modalError(
+    message
+) {
+
+    const el =
+        $("modalError");
+
+    if (!el) {
+        return;
+    }
+
+    el.textContent =
+        message;
+
+    el.hidden =
+        false;
+
+}
+
+
+/* =========================================================
+   SAVE MENU ITEM
    ========================================================= */
 
 async function saveItem(
@@ -1672,238 +1504,133 @@ async function saveItem(
 
     event.preventDefault();
 
+    $("modalError").hidden =
+        true;
 
-    const name =
+    const payload = {
 
-        String(
-            $("itemName").value ||
-            ""
-        ).trim();
+        branchId:
+            $("modalBranch")
+                .value
+                .trim(),
 
+        itemId:
+            $("itemId")
+                .value
+                .trim(),
 
-    const description =
+        itemName:
+            $("itemName")
+                .value
+                .trim(),
 
-        String(
-            $("itemDescription").value ||
-            ""
-        ).trim();
+        category:
+            $("category")
+                .value
+                .trim(),
 
+        price:
+            $("price")
+                .value,
 
-    const price =
+        description:
+            $("description")
+                .value
+                .trim(),
 
-        Number(
-            $("itemPrice").value
-        );
+        imageURL:
+            $("imageURL")
+                .value
+                .trim(),
 
+        available:
+            $("available")
+                .checked
 
-    const categoryValue =
+    };
 
-        String(
-            $("itemCategory").value ||
-            ""
-        ).trim();
+    if (!payload.branchId) {
 
-
-    const customCategory =
-
-        String(
-            $("itemCategoryCustom").value ||
-            ""
-        ).trim();
-
-
-    const category =
-
-        categoryValue === "__new__"
-
-            ? customCategory
-
-            : categoryValue;
-
-
-    const imageUrl =
-
-        String(
-            $("itemImageUrl").value ||
-            ""
-        ).trim();
-
-
-    const available =
-
-        $("itemAvailable").checked;
-
-
-    const branchId =
-
-        String(
-            $("modalBranch").value ||
-            state.currentBranchId ||
-            ""
-        ).trim();
-
-
-    if (!branchId) {
-
-        showPageMessage(
+        return modalError(
             "Please select a branch."
         );
 
-        return;
-
     }
 
+    if (!payload.itemName) {
 
-    if (!name) {
-
-        showPageMessage(
-            "Please enter the menu item name."
+        return modalError(
+            "Menu item name is required."
         );
 
-        return;
-
     }
 
+    if (!payload.category) {
 
-    if (!category) {
-
-        showPageMessage(
-            "Please select or enter a category."
+        return modalError(
+            "Category is required."
         );
 
-        return;
-
     }
-
 
     if (
-        !Number.isFinite(price) ||
-        price < 0
+        payload.price === "" ||
+        Number(payload.price) < 0 ||
+        Number.isNaN(Number(payload.price))
     ) {
 
-        showPageMessage(
+        return modalError(
             "Please enter a valid price."
         );
 
-        return;
-
     }
 
+    const button =
+        $("saveMenuItemButton");
+
+    if (button) {
+        button.disabled = true;
+    }
 
     try {
 
-        setLoading(true);
-
-
-        let data;
-
-
-        if (state.editing) {
-
-            data =
-
-                await api(
-
-                    "update",
-
-                    {
-
-                        branchId,
-
-                        itemId:
-                            itemIdOf(
-                                state.editing
-                            ),
-
-                        itemName:
-                            name,
-
-                        description,
-
-                        category,
-
-                        price,
-
-                        imageUrl,
-
-                        available
-
-                    }
-
-                );
-
-        } else {
-
-            data =
-
-                await api(
-
-                    "create",
-
-                    {
-
-                        branchId,
-
-                        itemName:
-                            name,
-
-                        description,
-
-                        category,
-
-                        price,
-
-                        imageUrl,
-
-                        available
-
-                    }
-
-                );
-
-        }
-
+        const data =
+            await api(
+                state.editing
+                    ? "update"
+                    : "create",
+                payload
+            );
 
         closeModal();
 
-
         showPageMessage(
-
             data.message ||
-
-            (
-                state.editing
-                    ? "Menu item updated successfully."
-                    : "Menu item created successfully."
-            ),
-
+            "Menu item saved successfully.",
             "success"
-
         );
 
+        state.currentBranchId =
+            payload.branchId;
 
         await loadMenu();
 
-
     } catch (error) {
 
-        showPageMessage(
-
+        modalError(
             error.message ||
-
             "Unable to save menu item."
-
         );
 
     } finally {
 
-        setLoading(false);
+        if (button) {
+            button.disabled = false;
+        }
 
     }
 
 }
-
-
 /* =========================================================
    FIND ITEM
    ========================================================= */
@@ -2104,8 +1831,6 @@ function closeConfirm() {
         null;
 
 }
-
-
 /* =========================================================
    SETUP
    ========================================================= */
