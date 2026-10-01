@@ -30,8 +30,10 @@ const state = {
     confirmAction: null,
 
     currentBranchId: "",
-    
-    userName: ""
+
+    userName: "",
+
+    currency: "AED"
 
 };
 
@@ -202,9 +204,20 @@ function imageUrlOf(value) {
    MONEY
    ========================================================= */
 
-const money = value =>
+function money(value) {
 
-    `AED ${Number(value || 0).toFixed(2)}`;
+    const amount =
+        Number(value || 0);
+
+    const currency =
+        String(
+            state.currency || "AED"
+        )
+            .trim()
+            .toUpperCase();
+
+    return `${currency} ${amount.toFixed(2)}`;
+}
 
 
 /* =========================================================
@@ -483,22 +496,47 @@ function setLoading(on) {
    ========================================================= */
 
 function setTopbar() {
+
     const name =
         state.userName ||
         "Owner";
 
-    if ($("topbarUserName")) {
-        $("topbarUserName").textContent = name;
+    const role =
+        roleName();
+
+    const nameElement =
+        $("topbarUserName");
+
+    const roleElement =
+        $("topbarUserRole");
+
+    const avatarElement =
+        $("topbarUserAvatar");
+
+
+    if (nameElement) {
+
+        nameElement.textContent =
+            name;
+
     }
 
-    if ($("topbarUserRole")) {
-        $("topbarUserRole").textContent = roleName();
+
+    if (roleElement) {
+
+        roleElement.textContent =
+            role;
+
     }
 
-    if ($("topbarUserAvatar")) {
-        $("topbarUserAvatar").textContent =
+
+    if (avatarElement) {
+
+        avatarElement.textContent =
             name.charAt(0).toUpperCase();
+
     }
+
 }
 
 
@@ -756,17 +794,17 @@ function renderBranches(
                                     class="branch-summary-name"
                                 >
                                     ${esc(
-                                        b.branchName ||
-                                        b.branchId
-                                    )}
+                        b.branchName ||
+                        b.branchId
+                    )}
                                 </span>
 
                                 <span
                                     class="branch-summary-rate"
                                 >
                                     ${esc(
-                                        b.availability
-                                    )}%
+                        b.availability
+                    )}%
                                 </span>
 
                             </div>
@@ -795,12 +833,12 @@ function renderBranches(
                                 <span
                                     style="
                                         width:${Math.min(
-                                            100,
-                                            Math.max(
-                                                0,
-                                                rate
-                                            )
-                                        )}%
+                        100,
+                        Math.max(
+                            0,
+                            rate
+                        )
+                    )}%
                                     "
                                 ></span>
 
@@ -850,10 +888,9 @@ function renderItems() {
 
         resultText.textContent =
 
-            `${visible.length} menu item${
-                visible.length === 1
-                    ? ""
-                    : "s"
+            `${visible.length} menu item${visible.length === 1
+                ? ""
+                : "s"
             } · Live branch catalog`;
 
     }
@@ -921,9 +958,9 @@ function renderItems() {
                                 src="${esc(image)}"
 
                                 alt="${esc(
-                                    item.ItemName ||
-                                    "Menu item"
-                                )}"
+                        item.ItemName ||
+                        "Menu item"
+                    )}"
 
                                 loading="lazy"
 
@@ -982,17 +1019,17 @@ function renderItems() {
 
                                     <strong>
                                         ${esc(
-                                            item.ItemName ||
-                                            "Unnamed item"
-                                        )}
+                    item.ItemName ||
+                    "Unnamed item"
+                )}
                                     </strong>
 
 
                                     <small>
                                         ${esc(
-                                            item.Description ||
-                                            "No description added"
-                                        )}
+                    item.Description ||
+                    "No description added"
+                )}
                                     </small>
 
                                 </div>
@@ -1008,9 +1045,9 @@ function renderItems() {
                                 class="category-badge"
                             >
                                 ${esc(
-                                    item.Category ||
-                                    "Uncategorized"
-                                )}
+                    item.Category ||
+                    "Uncategorized"
+                )}
                             </span>
 
                         </td>
@@ -1022,10 +1059,10 @@ function renderItems() {
                                 class="branch-name"
                             >
                                 ${esc(
-                                    branchName(
-                                        branchIdOf(item)
-                                    )
-                                )}
+                    branchName(
+                        branchIdOf(item)
+                    )
+                )}
                             </span>
 
                         </td>
@@ -1037,8 +1074,8 @@ function renderItems() {
                                 class="price"
                             >
                                 ${money(
-                                    item.Price
-                                )}
+                    item.Price
+                )}
                             </span>
 
                         </td>
@@ -1049,11 +1086,10 @@ function renderItems() {
                             <span
                                 class="
                                     status-badge
-                                    ${
-                                        available
-                                            ? "available"
-                                            : "unavailable"
-                                    }
+                                    ${available
+                        ? "available"
+                        : "unavailable"
+                    }
                                 "
                             >
 
@@ -1061,11 +1097,10 @@ function renderItems() {
                                     ●
                                 </b>
 
-                                ${
-                                    available
-                                        ? "Available"
-                                        : "Unavailable"
-                                }
+                                ${available
+                        ? "Available"
+                        : "Unavailable"
+                    }
 
                             </span>
 
@@ -1105,11 +1140,10 @@ function renderItems() {
 
                                 >
 
-                                    ${
-                                        available
-                                            ? "◉"
-                                            : "○"
-                                    }
+                                    ${available
+                        ? "◉"
+                        : "○"
+                    }
 
                                 </button>
 
@@ -1154,33 +1188,23 @@ async function loadMenu() {
 
     setLoading(true);
 
-
     try {
 
         const data =
-
             await api(
-
                 "list",
-
                 state.currentBranchId
-
                     ? {
-
                         branchId:
                             state.currentBranchId
-
                     }
-
                     : {}
-
             );
 
 
-        // =====================================================
-        // USER NAME
-        // Backend now returns userName from Users table
-        // =====================================================
+        // ==========================================
+        // USER NAME FROM BACKEND
+        // ==========================================
 
         state.userName =
             String(
@@ -1188,63 +1212,71 @@ async function loadMenu() {
             ).trim();
 
 
-        setTopbar();
+        // ==========================================
+        // CURRENCY FROM BACKEND
+        // ==========================================
+
+        state.currency =
+            String(
+                data.currency ||
+                "AED"
+            )
+                .trim()
+                .toUpperCase();
 
 
-        // =====================================================
+        // ==========================================
         // MENU ITEMS
-        // =====================================================
+        // ==========================================
 
         state.items =
-
             Array.isArray(
                 data.items
             )
-
                 ? data.items
-
                 : [];
 
 
-        // =====================================================
+        // ==========================================
         // BRANCHES
-        // =====================================================
+        // ==========================================
 
         state.branches =
-
             Array.isArray(
                 data.branches
             )
-
                 ? data.branches
-
                 : [];
 
 
-        // =====================================================
+        // ==========================================
         // METRICS
-        // =====================================================
+        // ==========================================
 
         state.metrics =
             data.metrics || {};
 
 
-        // =====================================================
+        // ==========================================
+        // TOP BAR
+        // ==========================================
+
+        setTopbar();
+
+
+        // ==========================================
         // RENDER
-        // =====================================================
+        // ==========================================
 
         populateBranches();
-
 
         renderMetrics(
             state.metrics
         );
 
-
         renderBranches(
             state.branches
         );
-
 
         renderItems();
 
@@ -1252,17 +1284,12 @@ async function loadMenu() {
     } catch (error) {
 
         showPageMessage(
-
             error.message ||
-
-            "Unable to load menu."
-
+            "Unable to load menu.",
+            "error"
         );
 
-
-        state.items =
-            [];
-
+        state.items = [];
 
         renderItems();
 
@@ -1833,9 +1860,8 @@ function askDelete(
 
     $("confirmMessage").textContent =
 
-        `“${
-            item.ItemName ||
-            "This item"
+        `“${item.ItemName ||
+        "This item"
         }” will be permanently removed from the menu catalog.`;
 
 
