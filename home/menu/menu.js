@@ -29,7 +29,9 @@ const state = {
 
     confirmAction: null,
 
-    currentBranchId: ""
+    currentBranchId: "",
+    
+    userName: ""
 
 };
 
@@ -92,6 +94,7 @@ const itemIdOf = item =>
 const branchIdOf = item =>
 
     String(
+        item.branchId ||
         item.BranchId ||
         item["\ufeffBranchId"] ||
         ""
@@ -480,48 +483,22 @@ function setLoading(on) {
    ========================================================= */
 
 function setTopbar() {
-
     const name =
-        ownerName();
+        state.userName ||
+        "Owner";
 
-
-    const nameEl =
-        $("topbarUserName");
-
-
-    const roleEl =
-        $("topbarUserRole");
-
-
-    const avatarEl =
-        $("topbarUserAvatar");
-
-
-    if (nameEl) {
-
-        nameEl.textContent =
-            name;
-
+    if ($("topbarUserName")) {
+        $("topbarUserName").textContent = name;
     }
 
-
-    if (roleEl) {
-
-        roleEl.textContent =
-            roleName();
-
+    if ($("topbarUserRole")) {
+        $("topbarUserRole").textContent = roleName();
     }
 
-
-    if (avatarEl) {
-
-        avatarEl.textContent =
-            name
-                .charAt(0)
-                .toUpperCase();
-
+    if ($("topbarUserAvatar")) {
+        $("topbarUserAvatar").textContent =
+            name.charAt(0).toUpperCase();
     }
-
 }
 
 
@@ -567,91 +544,86 @@ function populateBranches() {
     const filter =
         $("branchFilter");
 
-
     const modal =
         $("modalBranch");
-
 
     if (!filter || !modal) {
         return;
     }
 
-
     const selected =
         state.currentBranchId;
 
 
-    filter.innerHTML =
+    /* =====================================================
+       BRANCH FILTER DROPDOWN
+       ===================================================== */
 
+    filter.innerHTML =
         `<option value="">
             All branches
         </option>` +
 
         state.branches
+            .map(branch => {
 
-            .map(
+                const id =
+                    branchIdOf(branch);
 
-                b => {
+                const name =
+                    branch.branchName ||
+                    branch.BranchName ||
+                    branch.Name ||
+                    id;
 
-                    const id =
-                        branchIdOf(b);
+                return `
+                    <option
+                        value="${esc(id)}"
+                    >
+                        ${esc(name)}
+                    </option>
+                `;
 
-
-                    return `
-
-                        <option
-                            value="${esc(id)}"
-                        >
-                            ${esc(
-                                b.BranchName ||
-                                id
-                            )}
-                        </option>
-
-                    `;
-
-                }
-
-            )
-
+            })
             .join("");
 
 
-    modal.innerHTML =
+    /* =====================================================
+       ADD / EDIT MODAL BRANCH DROPDOWN
+       ===================================================== */
 
+    modal.innerHTML =
         `<option value="">
             Select branch
         </option>` +
 
         state.branches
+            .map(branch => {
 
-            .map(
+                const id =
+                    branchIdOf(branch);
 
-                b => {
+                const name =
+                    branch.branchName ||
+                    branch.BranchName ||
+                    branch.Name ||
+                    id;
 
-                    const id =
-                        branchIdOf(b);
+                return `
+                    <option
+                        value="${esc(id)}"
+                    >
+                        ${esc(name)}
+                    </option>
+                `;
 
-
-                    return `
-
-                        <option
-                            value="${esc(id)}"
-                        >
-                            ${esc(
-                                b.BranchName ||
-                                id
-                            )}
-                        </option>
-
-                    `;
-
-                }
-
-            )
-
+            })
             .join("");
 
+
+    /* =====================================================
+       RESTORE CURRENT FILTER
+       ===================================================== */
 
     filter.value =
         selected;
@@ -1205,6 +1177,24 @@ async function loadMenu() {
             );
 
 
+        // =====================================================
+        // USER NAME
+        // Backend now returns userName from Users table
+        // =====================================================
+
+        state.userName =
+            String(
+                data.userName || ""
+            ).trim();
+
+
+        setTopbar();
+
+
+        // =====================================================
+        // MENU ITEMS
+        // =====================================================
+
         state.items =
 
             Array.isArray(
@@ -1215,6 +1205,10 @@ async function loadMenu() {
 
                 : [];
 
+
+        // =====================================================
+        // BRANCHES
+        // =====================================================
 
         state.branches =
 
@@ -1227,9 +1221,17 @@ async function loadMenu() {
                 : [];
 
 
+        // =====================================================
+        // METRICS
+        // =====================================================
+
         state.metrics =
             data.metrics || {};
 
+
+        // =====================================================
+        // RENDER
+        // =====================================================
 
         populateBranches();
 
