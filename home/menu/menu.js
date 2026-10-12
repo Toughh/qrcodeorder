@@ -2102,7 +2102,7 @@ function setup() {
 
 
                 location.href =
-                    "../login/login.html";
+                    "../../login/login.html";
 
             }
 
