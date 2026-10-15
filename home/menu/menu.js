@@ -93,21 +93,17 @@ const itemIdOf = item =>
    Handles normal BranchId + BOM BranchId
    ========================================================= */
 
-const branchIdOf = item => {
 
-    const source =
-        item?.fields ||
-        item ||
-        {};
+function branchIdOf(item) {
+    const source = item?.fields || item || {};
 
     return String(
-        source.branchId ||
-        source.BranchId ||
-        source["\ufeffBranchId"] ||
+        source.branchId ??
+        source.BranchId ??
+        source["\ufeffBranchId"] ??
         ""
     ).trim();
-
-};
+}
 
 
 /* =========================================================
@@ -610,95 +606,38 @@ function branchName(id) {
    POPULATE BRANCHES
    ========================================================= */
 
+
 function populateBranches() {
+    const selected = state.currentBranchId;
 
-    const filter =
-        $("branchFilter");
+    const buildOptions = () =>
+        `<option value="">Select branch</option>` +
+        state.branches.map(branch => {
+            const id = branchIdOf(branch);
+            const name =
+                branch.branchName ||
+                branch.BranchName ||
+                branch.Name ||
+                id;
 
-    const modal =
-        $("modalBranch");
+            return `
+                <option value="${esc(id)}">
+                    ${esc(name)}
+                </option>
+            `;
+        }).join("");
 
-    if (!filter || !modal) {
-        return;
+    const filter = $("branchFilter");
+    const modal = $("modalBranch");
+
+    if (filter) {
+        filter.innerHTML = buildOptions();
+        filter.value = selected;
     }
 
-    const selected =
-        state.currentBranchId;
-
-
-    /* =====================================================
-       BRANCH FILTER DROPDOWN
-       ===================================================== */
-
-    filter.innerHTML =
-        `<option value="">
-            Select branch
-        </option>` +
-
-        state.branches
-            .map(branch => {
-
-                const id =
-                    branchIdOf(branch);
-
-                const name =
-                    branch.branchName ||
-                    branch.BranchName ||
-                    branch.Name ||
-                    id;
-
-                return `
-                    <option
-                        value="${esc(id)}"
-                    >
-                        ${esc(name)}
-                    </option>
-                `;
-
-            })
-            .join("");
-
-
-    /* =====================================================
-       ADD / EDIT MODAL BRANCH DROPDOWN
-       ===================================================== */
-
-    modal.innerHTML =
-        `<option value="">
-            Select branch
-        </option>` +
-
-        state.branches
-            .map(branch => {
-
-                const id =
-                    branchIdOf(branch);
-
-                const name =
-                    branch.branchName ||
-                    branch.BranchName ||
-                    branch.Name ||
-                    id;
-
-                return `
-                    <option
-                        value="${esc(id)}"
-                    >
-                        ${esc(name)}
-                    </option>
-                `;
-
-            })
-            .join("");
-
-
-    /* =====================================================
-       RESTORE CURRENT FILTER
-       ===================================================== */
-
-    filter.value =
-        selected;
-
+    if (modal) {
+        modal.innerHTML = buildOptions();
+    }
 }
 
 
@@ -1130,79 +1069,36 @@ function renderItems() {
    POPULATE CATEGORY
    ========================================================= */
 
-function populateCategorySelect(
-    selected = ""
-) {
 
-    const select =
-        $("itemCategory");
+function populateCategorySelect(selected = "") {
+    const select = $("category");
 
-    if (!select) {
-        return;
-    }
+    if (!select) return;
 
-
-    const categories =
-
-        [...new Set(
-
+    const categories = [
+        ...new Set(
             state.items
-
-                .map(
-                    item =>
-                        String(
-                            item.Category ||
-                            ""
-                        ).trim()
-                )
-
+                .map(item => String(item.Category || "").trim())
                 .filter(Boolean)
-
-        )]
-
-            .sort(
-                (a, b) =>
-                    a.localeCompare(b)
-            );
-
+        )
+    ].sort((a, b) => a.localeCompare(b));
 
     select.innerHTML =
+        `<option value="">Select category</option>` +
+        categories.map(category => `
+            <option value="${esc(category)}">
+                ${esc(category)}
+            </option>
+        `).join("") +
+        `<option value="__new__">+ Add new category</option>`;
 
-        `<option value="">
-            Select category
-        </option>` +
-
-        categories
-
-            .map(
-
-                category => `
-
-                    <option
-                        value="${esc(category)}"
-                    >
-                        ${esc(category)}
-                    </option>
-
-                `
-
-            )
-
-            .join("") +
-
-        `<option value="__new__">
-            + Add new category
-        </option>`;
-
-
-    if (selected) {
-
-        select.value =
-            selected;
-
+    if (selected && categories.includes(selected)) {
+        select.value = selected;
+    } else {
+        select.value = "";
     }
-
 }
+
 /* =========================================================
    LOAD MENU
    ========================================================= */
@@ -1301,6 +1197,8 @@ async function loadMenu() {
             state.metrics =
                 branchData.metrics || {};
 
+            populateCategorySelect();
+
             state.branches =
                 Array.isArray(branchData.branches)
                     ? branchData.branches
@@ -1322,6 +1220,7 @@ async function loadMenu() {
         } else {
 
             state.items = [];
+            populateCategorySelect();
             state.metrics = {};
 
             renderMetrics({});
@@ -1406,8 +1305,9 @@ function openModal(
     $("itemName").value =
         item?.ItemName || "";
 
-    $("category").value =
-        item?.Category || "";
+    populateCategorySelect(
+        item?.Category || ""
+    );
 
     $("price").value =
         item?.Price ?? "";
@@ -1838,6 +1738,27 @@ function closeConfirm() {
 function setup() {
 
     setTopbar();
+
+
+    $("category")?.addEventListener("change", event => {
+        if (event.target.value !== "__new__") return;
+
+        const category = prompt("Enter the new category name:");
+
+        if (category && category.trim()) {
+            const newCategory = category.trim();
+
+            const option = document.createElement("option");
+            option.value = newCategory;
+            option.textContent = newCategory;
+
+            event.target.insertBefore(option, event.target.lastElementChild);
+            event.target.value = newCategory;
+        } else {
+            event.target.value = "";
+        }
+    });
+
 
 
     /* -----------------------------------------------------

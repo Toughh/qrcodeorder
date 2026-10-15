@@ -219,11 +219,15 @@
                     </div>
                     <div class="form-field">
                         <label for="category">Category <span>*</span></label>
-                        <input id="category" maxlength="60" placeholder="e.g. Burgers" required>
+                        <select id="category" required>
+                            <option value="">Select category</option>
+                            <option value="__new__">+ Add new category</option>
+                        </select>
                     </div>
                     <div class="form-field">
                         <label for="price">Price <span>*</span></label>
-                        <div class="price-input"><span>AED</span>
+                        <div class="price-input">
+                            <span id="priceCurrency">AED</span>
                             <input id="price" type="number" min="0" step="0.01" placeholder="0.00" required>
                         </div>
                     </div>
