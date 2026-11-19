@@ -701,67 +701,103 @@ function renderMetrics(
     }
 
 }
+
 /* =========================================================
-   RENDER BRANCH SUMMARY
+   RENDER SELECTED BRANCH MENU COVERAGE
    ========================================================= */
 
-function renderBranches(
-    summaries = []
-) {
+function renderBranches(branchSummary = []) {
 
-    const el =
-        $("branchSummary");
+    const el = $("branchSummary");
 
     if (!el) {
         return;
     }
 
-    const summary =
-        summaries.find(
-            b =>
-                String(b.branchId || "").trim() ===
-                String(state.currentBranchId || "").trim()
-        ) || summaries[0];
-
-    if (!summary) {
-
+    // No branch selected
+    if (!state.currentBranchId) {
         el.innerHTML = `
-            <div class="branch-summary-empty">
-                <span class="branch-summary-empty-label">BRANCH OVERVIEW</span>
-                <strong>Select a branch to view menu coverage.</strong>
+            <div class="empty-state">
+                <p>Please select a branch to view menu coverage.</p>
             </div>
         `;
-
         return;
     }
 
-    const rate =
-        Number(summary.availability) || 0;
+    // Find the currently selected branch
+    const selectedBranch = Array.isArray(branchSummary)
+        ? branchSummary.find(branch =>
+            String(branch.branchId || "").trim() ===
+            String(state.currentBranchId).trim()
+        )
+        : null;
+
+    // No matching branch summary returned by backend
+    if (!selectedBranch) {
+        el.innerHTML = `
+            <div class="empty-state">
+                <p>No menu coverage data is available for this branch.</p>
+            </div>
+        `;
+        return;
+    }
+
+    const total = Number(selectedBranch.totalItems || 0);
+
+    const available = Number(
+        selectedBranch.availableItems || 0
+    );
+
+    const unavailable = Number(
+        selectedBranch.unavailableItems ??
+        (total - available)
+    );
+
+    const rate = Number(
+        selectedBranch.availability ??
+        (total ? (available / total) * 100 : 0)
+    );
+
+    const safeRate = Math.min(
+        100,
+        Math.max(0, rate)
+    );
+
+    const selectedName =
+        selectedBranch.branchName ||
+        branchName(state.currentBranchId);
 
     el.innerHTML = `
         <div class="branch-summary selected">
+
             <div class="branch-summary-top">
-                <div>
-                    <span class="branch-summary-label">SELECTED BRANCH</span>
-                    <span class="branch-summary-name">
-                        ${esc(summary.branchName || branchName(summary.branchId))}
-                    </span>
-                </div>
-                <span class="branch-summary-rate">${esc(summary.availability || "0.0")}%</span>
+
+                <span class="branch-summary-name">
+                    ${esc(selectedName)}
+                </span>
+
+                <span class="branch-summary-rate">
+                    ${safeRate.toFixed(1)}% Available
+                </span>
+
             </div>
 
-            <div class="branch-summary-stats">
-                <span><strong>${summary.totalItems || 0}</strong> Items</span>
-                <span><strong>${summary.availableItems || 0}</strong> Available</span>
-                <span><strong>${summary.unavailableItems || 0}</strong> Unavailable</span>
+            <div class="branch-summary-meta">
+
+                ${total} Total Items
+                <span>·</span>
+                ${available} Available
+                <span>·</span>
+                ${unavailable} Unavailable
+
             </div>
 
             <div class="progress">
-                <span style="width:${Math.min(100, Math.max(0, rate))}%"></span>
+                <span style="width:${safeRate}%"></span>
             </div>
+
         </div>
     `;
-
 }
 
 
